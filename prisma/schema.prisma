@@ -1,0 +1,1289 @@
+// ═══════════════════════════════════════════════════════════════
+// 🦅 EAGLE GYM — Prisma Database Schema
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════════════════
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  RECEPTIONIST
+  TRAINER
+  MEMBER
+  WORKER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+  FROZEN
+  PENDING
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  FROZEN
+  PENDING
+  GRACE
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIAL
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  UPI
+  ONLINE
+  CHEQUE
+  BANK_TRANSFER
+  EMI
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  PT_SESSION
+  PRODUCT
+  OTHER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EARLY_LEAVE
+}
+
+enum AttendanceMode {
+  MANUAL
+  QR
+  BIOMETRIC
+  KIOSK
+}
+
+enum EquipmentStatus {
+  WORKING
+  UNDER_MAINTENANCE
+  OUT_OF_ORDER
+  RETIRED
+}
+
+enum EquipmentCategory {
+  CARDIO
+  STRENGTH
+  FREE_WEIGHTS
+  FUNCTIONAL
+  RECOVERY
+  ACCESSORIES
+}
+
+enum ClassCategory {
+  YOGA
+  ZUMBA
+  CROSSFIT
+  PILATES
+  SPINNING
+  HIIT
+  BOXING
+  DANCE
+  MEDITATION
+  AEROBICS
+}
+
+enum ClassStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  WAITLIST
+  CANCELLED
+  NO_SHOW
+}
+
+enum WorkoutDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ELITE
+}
+
+enum DietType {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  MAINTENANCE
+  KETO
+  VEGAN
+  CUSTOM
+}
+
+enum GoalType {
+  WEIGHT_LOSS
+  WEIGHT_GAIN
+  MUSCLE_GAIN
+  ENDURANCE
+  FLEXIBILITY
+  STRENGTH
+  CUSTOM
+}
+
+enum Feeling {
+  EASY
+  MODERATE
+  HARD
+  EXTREME
+}
+
+enum ProductCategory {
+  SUPPLEMENT
+  MERCHANDISE
+  BEVERAGE
+  EQUIPMENT
+  OTHER
+}
+
+enum SaleStatus {
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum NotificationType {
+  PAYMENT_DUE
+  PAYMENT_RECEIVED
+  SUBSCRIPTION_EXPIRING
+  SUBSCRIPTION_EXPIRED
+  CLASS_REMINDER
+  CLASS_CANCELLED
+  WORKOUT_ASSIGNED
+  DIET_ASSIGNED
+  ACHIEVEMENT_UNLOCKED
+  ANNOUNCEMENT
+  MESSAGE
+  SYSTEM
+  BIRTHDAY
+  MAINTENANCE_ALERT
+}
+
+enum DocumentType {
+  ID_PROOF
+  MEDICAL_CERTIFICATE
+  JOINING_FORM
+  CONTRACT
+  RECEIPT
+  INVOICE
+  PROGRESS_PHOTO
+  OTHER
+}
+
+enum MaintenanceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum LogAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+  CHECKIN
+  CHECKOUT
+  ASSIGN
+  FREEZE
+  UPGRADE
+  CANCEL
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// BRANCH
+// ═══════════════════════════════════════════════════════════════
+
+model Branch {
+  id        String  @id @default(cuid())
+  name      String
+  location  String
+  address   String?
+  phone     String?
+  status    String  @default("ACTIVE") // ACTIVE, MAINTENANCE, CLOSED
+  managerId String? // Reference to Admin user id
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  users   User[]
+  classes GymClass[]
+
+  @@map("branches")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CORE USER
+// ═══════════════════════════════════════════════════════════════
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  phone         String?    @unique
+  password      String
+  firstName     String
+  lastName      String
+  avatar        String?
+  role          Role       @default(MEMBER)
+  status        UserStatus @default(ACTIVE)
+  emailVerified DateTime?
+  phoneVerified DateTime?
+  lastLoginAt   DateTime?
+  lastLoginIp   String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  branchId         String?
+  branch           Branch?           @relation(fields: [branchId], references: [id])
+  member           Member?
+  trainer          Trainer?
+  receptionist     Receptionist?
+  admin            Admin?
+  superAdmin       SuperAdmin?
+  worker           Worker?
+  sessions         Session[]
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+  sentMessages     Message[]         @relation("SentMessages")
+  receivedMessages Message[]         @relation("ReceivedMessages")
+  achievements     UserAchievement[]
+  xpTransactions   XPTransaction[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SESSION (NextAuth)
+// ═══════════════════════════════════════════════════════════════
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MEMBER
+// ═══════════════════════════════════════════════════════════════
+
+model Member {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Physical
+  dateOfBirth      DateTime?
+  gender           Gender?
+  bloodGroup       String?
+  emergencyContact String?
+  address          String?
+  city             String?
+  state            String?
+  pincode          String?
+  country          String    @default("India")
+
+  // Gym Specific
+  joinDate DateTime     @default(now())
+  source   String? // How they heard about gym
+  notes    String?      @db.Text
+  status   MemberStatus @default(ACTIVE)
+
+  // Relations
+  subscription   Subscription?
+  attendance     Attendance[]
+  progress       Progress[]
+  progressPhotos ProgressPhoto[]
+  workouts       WorkoutLog[]
+  dietPlans      DietPlan[]      @relation("MemberDietPlans")
+  payments       Payment[]
+  classBookings  ClassBooking[]
+  goals          Goal[]
+  trainerId      String?
+  trainer        Trainer?        @relation(fields: [trainerId], references: [id])
+  messages       Message[]
+  documents      Document[]
+  notifications  Notification[]
+  DietLog        DietLog[]
+
+  @@index([status])
+  @@index([trainerId])
+  @@index([joinDate])
+  @@map("members")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TRAINER
+// ═══════════════════════════════════════════════════════════════
+
+model Trainer {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  specialization String[]
+  experience     Int      @default(0)
+  salary         Decimal? @db.Decimal(10, 2)
+  bio            String?  @db.Text
+  certifications String[]
+  rating         Float    @default(0)
+  totalRatings   Int      @default(0)
+  isActive       Boolean  @default(true)
+
+  // Availability
+  availableDays String[] // ["MON","TUE","WED"]
+  availableFrom String   @default("06:00") // HH:MM
+  availableTo   String   @default("22:00") // HH:MM
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  members   Member[]
+  classes   GymClass[]
+  sessions  PTSession[]
+  workouts  WorkoutPlan[]
+  dietPlans DietPlan[]    @relation("TrainerDietPlans")
+  messages  Message[]
+
+  @@index([isActive])
+  @@map("trainers")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RECEPTIONIST
+// ═══════════════════════════════════════════════════════════════
+
+model Receptionist {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  shiftStart  String   @default("06:00")
+  shiftEnd    String   @default("22:00")
+  salary      Decimal? @db.Decimal(10, 2)
+  joiningDate DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("receptionists")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════════════════
+
+model Admin {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  permissions Json? // Custom permission overrides
+  salary      Decimal? @db.Decimal(10, 2)
+  joiningDate DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUPER ADMIN
+// ═══════════════════════════════════════════════════════════════
+
+model SuperAdmin {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("super_admins")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WORKER / STAFF
+// ═══════════════════════════════════════════════════════════════
+
+model Worker {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  department  String   @default("GENERAL") // CLEANING, MAINTENANCE, SECURITY
+  shiftStart  String   @default("06:00")
+  shiftEnd    String   @default("22:00")
+  salary      Decimal? @db.Decimal(10, 2)
+  joiningDate DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  // Relations
+  tasks           Task[]
+  maintenanceLogs MaintenanceLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("workers")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUBSCRIPTION PLANS
+// ═══════════════════════════════════════════════════════════════
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  duration    Int // days
+  price       Decimal  @db.Decimal(10, 2)
+  gstIncluded Boolean  @default(true)
+  features    String[]
+  description String?  @db.Text
+  color       String?
+  isActive    Boolean  @default(true)
+  maxCheckIns Int      @default(0) // 0 = unlimited
+  ptSessions  Int      @default(0)
+  guestPasses Int      @default(0)
+  sortOrder   Int      @default(0)
+
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  subscriptions Subscription[]
+
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("plans")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUBSCRIPTION
+// ═══════════════════════════════════════════════════════════════
+
+model Subscription {
+  id       String @id @default(cuid())
+  memberId String @unique
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id])
+
+  startDate   DateTime
+  endDate     DateTime
+  amount      Decimal            @db.Decimal(10, 2)
+  discount    Decimal            @default(0) @db.Decimal(10, 2)
+  status      SubscriptionStatus @default(ACTIVE)
+  autoRenew   Boolean            @default(false)
+  freezeUntil DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([endDate])
+  @@index([memberId])
+  @@map("subscriptions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAYMENTS
+// ═══════════════════════════════════════════════════════════════
+
+model Payment {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  amount        Decimal       @db.Decimal(10, 2)
+  tax           Decimal       @default(0) @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  total         Decimal       @db.Decimal(10, 2)
+  method        PaymentMethod
+  type          PaymentType   @default(SUBSCRIPTION)
+  status        PaymentStatus @default(PENDING)
+  receiptNo     String        @unique
+  transactionId String?
+  description   String?
+
+  subscriptionId String?
+  saleId         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([receiptNo])
+  @@map("payments")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTENDANCE
+// ═══════════════════════════════════════════════════════════════
+
+model Attendance {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  date       DateTime         @default(now()) @db.Date
+  checkIn    DateTime
+  checkOut   DateTime?
+  status     AttendanceStatus @default(PRESENT)
+  mode       AttendanceMode   @default(MANUAL)
+  deviceInfo String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([memberId, date])
+  @@index([memberId])
+  @@index([date])
+  @@index([status])
+  @@map("attendance")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GROUP CLASSES
+// ═══════════════════════════════════════════════════════════════
+
+model GymClass {
+  id          String        @id @default(cuid())
+  name        String
+  description String?       @db.Text
+  category    ClassCategory
+  trainerId   String
+  trainer     Trainer       @relation(fields: [trainerId], references: [id])
+  branchId    String?
+  branch      Branch?       @relation(fields: [branchId], references: [id])
+
+  maxCapacity Int
+  duration    Int // minutes
+  color       String?
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  schedules ClassSchedule[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("gym_classes")
+}
+
+model ClassSchedule {
+  id      String   @id @default(cuid())
+  classId String
+  class   GymClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  dayOfWeek Int // 0-6
+  startTime String // HH:MM
+  room      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bookings ClassBooking[]
+
+  @@index([classId])
+  @@index([dayOfWeek])
+  @@map("class_schedules")
+}
+
+model ClassBooking {
+  id         String        @id @default(cuid())
+  scheduleId String
+  schedule   ClassSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  status       BookingStatus @default(CONFIRMED)
+  bookedAt     DateTime      @default(now())
+  cancelledAt  DateTime?
+  cancelReason String?
+
+  @@unique([scheduleId, memberId])
+  @@index([memberId])
+  @@index([status])
+  @@map("class_bookings")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PT SESSIONS
+// ═══════════════════════════════════════════════════════════════
+
+model PTSession {
+  id        String  @id @default(cuid())
+  trainerId String
+  trainer   Trainer @relation(fields: [trainerId], references: [id])
+
+  memberId    String
+  date        DateTime
+  startTime   String // HH:MM
+  endTime     String // HH:MM
+  status      String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  notes       String?  @db.Text
+  memberNotes String?  @db.Text
+  rating      Int?
+  feedback    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trainerId])
+  @@index([memberId])
+  @@index([date])
+  @@map("pt_sessions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WORKOUTS
+// ═══════════════════════════════════════════════════════════════
+
+model WorkoutPlan {
+  id                 String            @id @default(cuid())
+  name               String
+  description        String?           @db.Text
+  difficulty         WorkoutDifficulty @default(BEGINNER)
+  estimatedDuration  Int? // minutes
+  targetMuscleGroups String[]
+  isTemplate         Boolean           @default(true)
+  trainerId          String?
+  trainer            Trainer?          @relation(fields: [trainerId], references: [id])
+  memberId           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  exercises Exercise[]
+  logs      WorkoutLog[]
+
+  @@index([isTemplate])
+  @@index([trainerId])
+  @@map("workout_plans")
+}
+
+model Exercise {
+  id        String      @id @default(cuid())
+  workoutId String
+  workout   WorkoutPlan @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  name        String
+  muscleGroup String?
+  sets        Int      @default(3)
+  reps        Int      @default(10)
+  weight      Decimal? @db.Decimal(8, 2)
+  duration    Int? // seconds
+  rest        Int      @default(60) // seconds
+  notes       String?
+  videoUrl    String?
+  sortOrder   Int      @default(0)
+
+  @@index([workoutId])
+  @@map("exercises")
+}
+
+model WorkoutLog {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  workoutPlanId String
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id])
+
+  completedExercises Json // Array of completed exercise data
+  duration           Int // minutes
+  caloriesBurned     Int?
+  feeling            Feeling?
+  notes              String?
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([createdAt])
+  @@map("workout_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DIET PLANS
+// ═══════════════════════════════════════════════════════════════
+
+model DietPlan {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?  @db.Text
+  type          DietType @default(CUSTOM)
+  totalCalories Int?
+  isTemplate    Boolean  @default(true)
+  trainerId     String?
+  trainer       Trainer? @relation(fields: [trainerId], references: [id], onDelete: SetNull, name: "TrainerDietPlans")
+  memberId      String?
+  member        Member?  @relation(fields: [memberId], references: [id], onDelete: SetNull, name: "MemberDietPlans")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  meals Meal[]
+  logs  DietLog[]
+
+  @@index([isTemplate])
+  @@index([trainerId])
+  @@map("diet_plans")
+}
+
+model Meal {
+  id         String   @id @default(cuid())
+  dietPlanId String
+  dietPlan   DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  name      String
+  time      String // HH:MM
+  items     String[]
+  calories  Int?
+  protein   Decimal? @db.Decimal(6, 2)
+  carbs     Decimal? @db.Decimal(6, 2)
+  fats      Decimal? @db.Decimal(6, 2)
+  fiber     Decimal? @db.Decimal(6, 2)
+  notes     String?
+  sortOrder Int      @default(0)
+
+  @@index([dietPlanId])
+  @@map("meals")
+}
+
+model DietLog {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  dietPlanId String
+  dietPlan   DietPlan @relation(fields: [dietPlanId], references: [id])
+
+  mealId         String
+  consumed       Boolean
+  actualCalories Int?
+  notes          String?
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([createdAt])
+  @@map("diet_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROGRESS & GOALS
+// ═══════════════════════════════════════════════════════════════
+
+model Progress {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  weight    Decimal? @db.Decimal(5, 2)
+  height    Decimal? @db.Decimal(5, 2)
+  bodyFat   Decimal? @db.Decimal(5, 2)
+  chest     Decimal? @db.Decimal(5, 2)
+  waist     Decimal? @db.Decimal(5, 2)
+  hips      Decimal? @db.Decimal(5, 2)
+  biceps    Decimal? @db.Decimal(5, 2)
+  thighs    Decimal? @db.Decimal(5, 2)
+  shoulders Decimal? @db.Decimal(5, 2)
+  forearms  Decimal? @db.Decimal(5, 2)
+  calves    Decimal? @db.Decimal(5, 2)
+  neck      Decimal? @db.Decimal(5, 2)
+  notes     String?  @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([createdAt])
+  @@map("progress")
+}
+
+model ProgressPhoto {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  photoUrl  String
+  photoType String // FRONT, SIDE, BACK
+  weight    Decimal? @db.Decimal(5, 2)
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([createdAt])
+  @@map("progress_photos")
+}
+
+model Goal {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  title        String
+  description  String?   @db.Text
+  type         GoalType
+  targetValue  Decimal   @db.Decimal(10, 2)
+  currentValue Decimal   @default(0) @db.Decimal(10, 2)
+  unit         String
+  deadline     DateTime?
+  isAchieved   Boolean   @default(false)
+  achievedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId])
+  @@index([isAchieved])
+  @@map("goals")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EQUIPMENT & MAINTENANCE
+// ═══════════════════════════════════════════════════════════════
+
+model Equipment {
+  id             String            @id @default(cuid())
+  name           String
+  category       EquipmentCategory
+  model          String?
+  serialNumber   String?           @unique
+  purchaseDate   DateTime?
+  purchasePrice  Decimal?          @db.Decimal(10, 2)
+  warrantyExpiry DateTime?
+  vendor         String?
+  location       String?
+  status         EquipmentStatus   @default(WORKING)
+  lastService    DateTime?
+  nextService    DateTime?
+  notes          String?           @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  logs MaintenanceLog[]
+
+  @@index([category])
+  @@index([status])
+  @@index([location])
+  @@map("equipment")
+}
+
+model MaintenanceLog {
+  id          String    @id @default(cuid())
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  issue       String            @db.Text
+  resolvedBy  String?
+  workerId    String?
+  worker      Worker?           @relation(fields: [workerId], references: [id])
+  cost        Decimal?          @db.Decimal(10, 2)
+  status      MaintenanceStatus @default(PENDING)
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([equipmentId])
+  @@index([status])
+  @@map("maintenance_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INVENTORY / POS
+// ═══════════════════════════════════════════════════════════════
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  category    ProductCategory
+  description String?         @db.Text
+  price       Decimal         @db.Decimal(10, 2)
+  costPrice   Decimal?        @db.Decimal(10, 2)
+  stock       Int             @default(0)
+  minStock    Int             @default(5)
+  barcode     String?         @unique
+  image       String?
+  gstRate     Decimal         @default(18) @db.Decimal(5, 2)
+  isActive    Boolean         @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  saleItems SaleItem[]
+
+  @@index([category])
+  @@index([isActive])
+  @@index([barcode])
+  @@map("products")
+}
+
+model Sale {
+  id            String        @id @default(cuid())
+  items         SaleItem[]
+  subtotal      Decimal       @db.Decimal(10, 2)
+  tax           Decimal       @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  total         Decimal       @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  status        SaleStatus    @default(COMPLETED)
+
+  customerId    String?
+  customerName  String?
+  customerPhone String?
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("sales")
+}
+
+model SaleItem {
+  id     String @id @default(cuid())
+  saleId String
+  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Decimal @db.Decimal(10, 2)
+  discount Decimal @default(0) @db.Decimal(10, 2)
+  total    Decimal @db.Decimal(10, 2)
+
+  @@index([saleId])
+  @@index([productId])
+  @@map("sale_items")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TASKS (For Workers)
+// ═══════════════════════════════════════════════════════════════
+
+model Task {
+  id       String @id @default(cuid())
+  workerId String
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?   @db.Text
+  type        String // CLEANING, MAINTENANCE, GENERAL
+  priority    String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  status      String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  dueDate     DateTime?
+  completedAt DateTime?
+  photoProof  String?
+
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workerId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHAT / MESSAGES
+// ═══════════════════════════════════════════════════════════════
+
+model Conversation {
+  id             String   @id @default(cuid())
+  participantIds String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  messages Message[]
+
+  @@index([participantIds])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade, name: "SentMessages")
+
+  receiverId String
+  receiver   User   @relation(fields: [receiverId], references: [id], onDelete: Cascade, name: "ReceivedMessages")
+
+  content     String    @db.Text
+  attachments String[]
+  readBy      String[]
+  readAt      DateTime?
+
+  createdAt DateTime @default(now())
+  Member    Member?  @relation(fields: [memberId], references: [id])
+  memberId  String?
+  Trainer   Trainer? @relation(fields: [trainerId], references: [id])
+  trainerId String?
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title        String
+  body         String           @db.Text
+  type         NotificationType
+  data         Json?
+  isRead       Boolean          @default(false)
+  readAt       DateTime?
+  sentEmail    Boolean          @default(false)
+  sentWhatsApp Boolean          @default(false)
+  sentPush     Boolean          @default(true)
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  member   Member? @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  memberId String?
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOCUMENTS
+// ═══════════════════════════════════════════════════════════════
+
+model Document {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  name     String
+  type     DocumentType
+  url      String
+  size     Int?
+  mimeType String?
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([type])
+  @@map("documents")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GAMIFICATION
+// ═══════════════════════════════════════════════════════════════
+
+model Achievement {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  xpValue     Int
+  condition   Json
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  achievedAt DateTime @default(now())
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model XPTransaction {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount      Int
+  reason      String
+  referenceId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("xp_transactions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIT LOGS (Super Admin Only)
+// ═══════════════════════════════════════════════════════════════
+
+model AuditLog {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  action     LogAction
+  entityType String
+  entityId   String?
+  oldValue   Json?
+  newValue   Json?
+  ipAddress  String?
+  userAgent  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GYM SETTINGS
+// ═══════════════════════════════════════════════════════════════
+
+model GymSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  category    String   @default("GENERAL")
+  description String?
+  updatedBy   String
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@map("gym_settings")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VISITOR / GUEST PASS
+// ═══════════════════════════════════════════════════════════════
+
+model VisitorPass {
+  id         String    @id @default(cuid())
+  name       String
+  phone      String
+  email      String?
+  purpose    String?
+  referredBy String?
+  passCode   String    @unique
+  validFrom  DateTime  @default(now())
+  validUntil DateTime
+  isUsed     Boolean   @default(false)
+  usedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  createdBy String
+
+  @@index([passCode])
+  @@index([validUntil])
+  @@map("visitor_passes")
+}
