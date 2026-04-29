@@ -11,14 +11,15 @@ import {
   ArrowRight, 
   Dumbbell, 
   CheckCircle2,
-  ShieldCheck
+  ShieldCheck,
+  ChevronLeft
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 // ═══════════════════════════════════════════════════════════════
-// 🦅 EAGLE GYM — Registration Page
+// 🦅 EAGLE GYM — Dashboard Consistent Registration Page
 // ═══════════════════════════════════════════════════════════════
 
 export default function RegisterPage() {
@@ -74,49 +75,55 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-obsidian-950 py-12">
-      {/* Background Decor */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold-500/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gold-500/5 rounded-full blur-[120px]" />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background py-8">
+      {/* Premium Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-xl px-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
-            <div className="w-10 h-10 rounded-xl bg-gold-500 flex items-center justify-center transition-transform group-hover:rotate-12">
-              <Dumbbell className="w-6 h-6 text-obsidian-950" />
-            </div>
-            <span className="font-display text-2xl font-bold text-white tracking-tighter">
-              EAGLE<span className="text-gold-500">GYM</span>
-            </span>
+        <div className="text-center mb-6">
+          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20 mb-4">
+            <Dumbbell className="w-6 h-6" />
           </Link>
-          <h1 className="text-3xl font-bold text-white mb-2">Join the Elite</h1>
-          <p className="text-white/40">Start your transformation journey today</p>
+          <h1 className="text-2xl font-bold text-foreground">
+            JOIN <span className="text-brand-orange">THE ELITE</span>
+          </h1>
+          <p className="text-xs text-txt-secondary mt-1 font-medium">Start your transformation journey today</p>
         </div>
 
         {/* Form Card */}
         <motion.div
-          className="glass-card p-8 md:p-10"
+          className="surface-card p-6 md:p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
         >
           {/* Progress Bar */}
-          <div className="flex gap-2 mb-8">
-            <div className={cn("h-1 flex-1 rounded-full transition-colors", step >= 1 ? "bg-gold-500" : "bg-white/10")} />
-            <div className={cn("h-1 flex-1 rounded-full transition-colors", step >= 2 ? "bg-gold-500" : "bg-white/10")} />
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex-1 h-1 rounded-full bg-surface-sunken overflow-hidden">
+              <motion.div 
+                className="h-full bg-brand-orange"
+                initial={{ width: "50%" }}
+                animate={{ width: step === 1 ? "50%" : "100%" }}
+                transition={{ duration: 0.5, ease: "circOut" }}
+              />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-txt-tertiary">
+              Step {step} of 2
+            </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {step === 1 ? (
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="firstName" className="text-xs font-medium text-white/60 uppercase tracking-wider">First Name</label>
-                    <div className={cn("relative flex items-center rounded-xl border bg-white/[0.03] transition-all", focusedField === "firstName" ? "border-gold-500/50 ring-1 ring-gold-500/20" : "border-white/10")}>
-                      <User className="absolute left-4 w-4 h-4 text-white/30" />
+                  <div className="space-y-1.5">
+                    <label htmlFor="firstName" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">First Name</label>
+                    <div className="relative">
+                      <User className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "firstName" ? "text-brand-orange" : "text-txt-tertiary")} />
                       <input
                         id="firstName"
                         name="firstName"
@@ -124,15 +131,15 @@ export default function RegisterPage() {
                         onChange={handleChange}
                         onFocus={() => setFocusedField("firstName")}
                         onBlur={() => setFocusedField(null)}
-                        className="w-full bg-transparent py-3 pl-11 pr-4 text-sm text-white outline-none"
-                        placeholder="John"
+                        className="surface-input h-11 pl-11 text-sm"
+                        placeholder="First Name"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="lastName" className="text-xs font-medium text-white/60 uppercase tracking-wider">Last Name</label>
-                    <div className={cn("relative flex items-center rounded-xl border bg-white/[0.03] transition-all", focusedField === "lastName" ? "border-gold-500/50 ring-1 ring-gold-500/20" : "border-white/10")}>
-                      <User className="absolute left-4 w-4 h-4 text-white/30" />
+                  <div className="space-y-1.5">
+                    <label htmlFor="lastName" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Last Name</label>
+                    <div className="relative">
+                      <User className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "lastName" ? "text-brand-orange" : "text-txt-tertiary")} />
                       <input
                         id="lastName"
                         name="lastName"
@@ -140,17 +147,17 @@ export default function RegisterPage() {
                         onChange={handleChange}
                         onFocus={() => setFocusedField("lastName")}
                         onBlur={() => setFocusedField(null)}
-                        className="w-full bg-transparent py-3 pl-11 pr-4 text-sm text-white outline-none"
-                        placeholder="Doe"
+                        className="surface-input h-11 pl-11 text-sm"
+                        placeholder="Last Name"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-xs font-medium text-white/60 uppercase tracking-wider">Email Address</label>
-                  <div className={cn("relative flex items-center rounded-xl border bg-white/[0.03] transition-all", focusedField === "email" ? "border-gold-500/50 ring-1 ring-gold-500/20" : "border-white/10")}>
-                    <Mail className="absolute left-4 w-4 h-4 text-white/30" />
+                <div className="space-y-1.5">
+                  <label htmlFor="email" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Email Address</label>
+                  <div className="relative">
+                    <Mail className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary")} />
                     <input
                       id="email"
                       name="email"
@@ -159,16 +166,16 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       onFocus={() => setFocusedField("email")}
                       onBlur={() => setFocusedField(null)}
-                      className="w-full bg-transparent py-3 pl-11 pr-4 text-sm text-white outline-none"
-                      placeholder="john@example.com"
+                      className="surface-input h-11 pl-11 text-sm"
+                      placeholder="Email Address"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-xs font-medium text-white/60 uppercase tracking-wider">Phone Number</label>
-                  <div className={cn("relative flex items-center rounded-xl border bg-white/[0.03] transition-all", focusedField === "phone" ? "border-gold-500/50 ring-1 ring-gold-500/20" : "border-white/10")}>
-                    <Phone className="absolute left-4 w-4 h-4 text-white/30" />
+                <div className="space-y-1.5">
+                  <label htmlFor="phone" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Phone Number</label>
+                  <div className="relative">
+                    <Phone className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "phone" ? "text-brand-orange" : "text-txt-tertiary")} />
                     <input
                       id="phone"
                       name="phone"
@@ -176,8 +183,8 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       onFocus={() => setFocusedField("phone")}
                       onBlur={() => setFocusedField(null)}
-                      className="w-full bg-transparent py-3 pl-11 pr-4 text-sm text-white outline-none"
-                      placeholder="+91 98765 43210"
+                      className="surface-input h-11 pl-11 text-sm"
+                      placeholder="Phone Number"
                     />
                   </div>
                 </div>
@@ -185,7 +192,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white font-semibold text-sm hover:bg-white/10 transition-all"
+                  className="btn-primary w-full h-11 text-sm font-bold mt-2"
                 >
                   Continue to Security
                   <ArrowRight className="w-4 h-4" />
@@ -193,10 +200,10 @@ export default function RegisterPage() {
               </div>
             ) : (
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="space-y-2">
-                  <label htmlFor="password" className="text-xs font-medium text-white/60 uppercase tracking-wider">Create Password</label>
-                  <div className={cn("relative flex items-center rounded-xl border bg-white/[0.03] transition-all", focusedField === "password" ? "border-gold-500/50 ring-1 ring-gold-500/20" : "border-white/10")}>
-                    <Lock className="absolute left-4 w-4 h-4 text-white/30" />
+                <div className="space-y-1.5">
+                  <label htmlFor="password" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Create Password</label>
+                  <div className="relative">
+                    <Lock className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary")} />
                     <input
                       id="password"
                       name="password"
@@ -205,16 +212,16 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       onFocus={() => setFocusedField("password")}
                       onBlur={() => setFocusedField(null)}
-                      className="w-full bg-transparent py-3 pl-11 pr-4 text-sm text-white outline-none"
+                      className="surface-input h-11 pl-11 text-sm"
                       placeholder="••••••••"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="text-xs font-medium text-white/60 uppercase tracking-wider">Confirm Password</label>
-                  <div className={cn("relative flex items-center rounded-xl border bg-white/[0.03] transition-all", focusedField === "confirmPassword" ? "border-gold-500/50 ring-1 ring-gold-500/20" : "border-white/10")}>
-                    <ShieldCheck className="absolute left-4 w-4 h-4 text-white/30" />
+                <div className="space-y-1.5">
+                  <label htmlFor="confirmPassword" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Confirm Password</label>
+                  <div className="relative">
+                    <ShieldCheck className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "confirmPassword" ? "text-brand-orange" : "text-txt-tertiary")} />
                     <input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -223,27 +230,34 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       onFocus={() => setFocusedField("confirmPassword")}
                       onBlur={() => setFocusedField(null)}
-                      className="w-full bg-transparent py-3 pl-11 pr-4 text-sm text-white outline-none"
+                      className="surface-input h-11 pl-11 text-sm"
                       placeholder="••••••••"
                     />
                   </div>
                 </div>
 
-                <div className="pt-4 flex flex-col gap-3">
+                <div className="pt-2 space-y-3">
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gold-500 text-obsidian-950 font-bold text-sm hover:bg-gold-600 transition-all shadow-lg shadow-gold-500/20"
+                    className="btn-primary w-full h-11 text-sm font-bold"
                   >
-                    {isLoading ? "Creating Account..." : "Complete Registration"}
-                    <CheckCircle2 className="w-4 h-4" />
+                    {isLoading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Complete Registration
+                        <CheckCircle2 className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="text-xs text-white/40 hover:text-white/60 py-2 transition-colors"
+                    className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-txt-tertiary hover:text-foreground transition-colors"
                   >
-                    Go back to details
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    Back to Details
                   </button>
                 </div>
               </div>
@@ -251,22 +265,28 @@ export default function RegisterPage() {
           </form>
 
           {/* Divider */}
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
-            <div className="relative flex justify-center text-xs uppercase tracking-widest text-white/20 bg-obsidian-900/50 px-4">Already a member?</div>
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-surface-border" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-surface-card px-3 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                Already a member?
+              </span>
+            </div>
           </div>
 
           <Link
             href="/login"
-            className="w-full flex items-center justify-center py-3.5 rounded-xl border border-white/10 text-white font-medium text-sm hover:bg-white/5 transition-all"
+            className="btn-ghost w-full h-11 text-xs font-bold border-2"
           >
             Sign In to your Account
           </Link>
         </motion.div>
 
         {/* Footer */}
-        <p className="text-center mt-10 text-xs text-white/20">
-          By joining, you agree to our <span className="text-white/40">Terms of Service</span> and <span className="text-white/40">Privacy Policy</span>.
+        <p className="text-center mt-6 text-[10px] text-txt-tertiary leading-relaxed">
+          By joining, you agree to our <Link href="/terms" className="text-brand-orange font-bold hover:underline">Terms</Link> and <Link href="/privacy" className="text-brand-orange font-bold hover:underline">Privacy</Link>.
         </p>
       </div>
     </div>

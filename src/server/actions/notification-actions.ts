@@ -1,0 +1,66 @@
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+
+export async function getNotifications(userId: string) {
+  try {
+    const notifications = await prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 20
+    });
+    return { success: true, data: notifications };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getAllSentNotifications() {
+  try {
+    const notifications = await prisma.notification.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { user: { select: { firstName: true, lastName: true } } },
+      take: 50
+    });
+    return { success: true, data: notifications };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function sendBroadcast(title: string, message: string, type: string) {
+  try {
+    const users = await prisma.user.findMany({ select: { id: true } });
+    
+    await prisma.notification.createMany({
+      data: users.map(user => ({
+        userId: user.id,
+        title,
+        body: message,
+        type: type as any,
+        isRead: false
+      }))
+    });
+
+    revalidatePath("/admin/notifications");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+
+export async function markAsRead(notificationId: string) {
+  try {
+    await prisma.notification.update({
+      where: { id: notificationId },
+      data: { isRead: true }
+    });
+    revalidatePath("/");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+

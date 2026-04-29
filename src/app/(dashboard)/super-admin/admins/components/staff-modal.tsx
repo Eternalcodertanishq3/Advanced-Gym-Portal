@@ -6,6 +6,14 @@ import { X, Loader2, Trash2 } from "lucide-react";
 import { inviteStaff, updateStaff, deleteStaff } from "@/actions/super-admin/staff-actions";
 import { toast } from "sonner";
 import { Role } from "@prisma/client";
+import { Portal } from "@/components/common/portal";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 interface StaffMember {
   id: string;
@@ -78,98 +86,114 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
   const [firstName, lastName] = staff?.name.split(" ") || ["", ""];
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-6 bg-obsidian-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-display font-bold text-white">
-                {staff ? "Edit Staff Member" : "Invite Staff Member"}
-              </h2>
-              <div className="flex items-center gap-2">
-                {staff && (
-                  <button 
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    className="p-2 hover:bg-red-500/10 rounded-lg text-red-500/50 hover:text-red-500 transition-colors disabled:opacity-50"
+    <Portal>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-black/60"
+              onClick={onClose}
+            />
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                className="pointer-events-auto w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-display font-bold text-foreground">
+                      {staff ? "Edit Staff Member" : "Invite Staff Member"}
+                    </h2>
+                    <div className="flex items-center gap-2">
+                      {staff && (
+                        <button 
+                          onClick={handleDelete}
+                          disabled={isDeleting}
+                          className="p-2 hover:bg-danger/10 rounded-lg text-danger/50 hover:text-danger transition-colors disabled:opacity-50"
+                        >
+                          {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                        </button>
+                      )}
+                      <button type="button" onClick={onClose} title="Close" className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-foreground/70">First Name</label>
+                    <input required name="firstName" type="text" defaultValue={firstName} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter first name" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-foreground/70">Last Name</label>
+                    <input required name="lastName" type="text" defaultValue={lastName} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter last name" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-foreground/70">Email Address</label>
+                  <input required name="email" type="email" defaultValue={staff?.email} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter email address" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-foreground/70">Phone Number</label>
+                    <input required name="phone" type="text" defaultValue={staff?.phone || ""} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter phone number" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-foreground/70">Status</label>
+                    <Select name="status" defaultValue={staff?.status || "ACTIVE"}>
+                      <SelectTrigger className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 h-11 text-foreground focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[110]">
+                        <SelectItem value="ACTIVE">Active</SelectItem>
+                        <SelectItem value="INACTIVE">Inactive</SelectItem>
+                        <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-foreground/70">Role</label>
+                  <Select name="role" required defaultValue={staff?.role || "ADMIN"}>
+                    <SelectTrigger className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 h-11 text-foreground focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[110]">
+                      <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectItem value="RECEPTIONIST">Receptionist</SelectItem>
+                      <SelectItem value="TRAINER">Trainer</SelectItem>
+                      <SelectItem value="WORKER">Worker</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="pt-6">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-3 bg-brand-orange text-white font-bold rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {isSubmitting ? (staff ? "Updating..." : "Inviting...") : (staff ? "Update Staff Member" : "Send Invitation")}
                   </button>
-                )}
-                <button type="button" onClick={onClose} title="Close" className="p-2 hover:bg-white/5 rounded-lg text-white/50 hover:text-white transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/70">First Name</label>
-                  <input required name="firstName" type="text" defaultValue={firstName} className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-colors" placeholder="John" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/70">Last Name</label>
-                  <input required name="lastName" type="text" defaultValue={lastName} className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-colors" placeholder="Doe" />
-                </div>
+              </form>
+                  </div>
+                </motion.div>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70">Email Address</label>
-                <input required name="email" type="email" defaultValue={staff?.email} className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-colors" placeholder="john@eaglegym.com" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/70">Phone Number</label>
-                  <input required name="phone" type="text" defaultValue={staff?.phone || ""} className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-colors" placeholder="+91 9876543210" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/70">Status</label>
-                  <select name="status" title="User Status" defaultValue={staff?.status || "ACTIVE"} className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-colors appearance-none">
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
-                    <option value="SUSPENDED">Suspended</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70">Role</label>
-                <select required name="role" title="User Role" defaultValue={staff?.role || "ADMIN"} className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-colors appearance-none">
-                  <option value="ADMIN">Admin</option>
-                  <option value="RECEPTIONIST">Receptionist</option>
-                  <option value="TRAINER">Trainer</option>
-                  <option value="WORKER">Worker</option>
-                </select>
-              </div>
-
-              <div className="pt-6">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-obsidian-950 font-bold rounded-xl shadow-[0_0_15px_rgba(255,215,0,0.3)] hover:shadow-[0_0_25px_rgba(255,215,0,0.5)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isSubmitting ? (staff ? "Updating..." : "Inviting...") : (staff ? "Update Staff Member" : "Send Invitation")}
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
+            </>
+          )}
+        </AnimatePresence>
+      </Portal>
+    );
 }

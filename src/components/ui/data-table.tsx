@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -58,22 +59,22 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {searchKey && (
-        <div className="flex items-center gap-2 max-w-sm rounded-xl border border-white/10 bg-obsidian-950/50 px-4 py-2.5 backdrop-blur-md shadow-inner transition-colors focus-within:border-white/30">
-          <Search className="h-4 w-4 text-white/40" />
+        <div className="flex items-center gap-2 max-w-sm rounded-xl border border-border bg-muted/30 px-4 py-2.5 backdrop-blur-md shadow-inner transition-colors focus-within:border-brand-orange/30">
+          <Search className="h-4 w-4 text-muted-foreground/60" />
           <input
             placeholder={searchPlaceholder}
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
-            className="w-full bg-transparent border-none outline-none text-sm text-white placeholder:text-white/30 focus:ring-0"
+            className="w-full bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground/50 focus:ring-0"
           />
         </div>
       )}
       
-      <div className="rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-obsidian-900/50">
+      <div className="rounded-2xl border border-border overflow-hidden shadow-2xl bg-muted/10">
         <Table>
-          <TableHeader className="bg-black/40">
+          <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -93,24 +94,30 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
+              table.getRowModel().rows.map((row, index) => (
+                <motion.tr
                   key={row.id}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.03 }}
                   data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-white/[0.03] transition-colors"
+                  className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
-                </TableRow>
+                </motion.tr>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-32 text-center text-white/50">
-                  <div className="flex flex-col items-center justify-center">
-                    <span className="text-sm">No results found.</span>
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={columns.length} className="h-32 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto">
+                      <Search className="w-5 h-5 text-muted-foreground/40" />
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">No results found.</span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -120,16 +127,16 @@ export function DataTable<TData, TValue>({
       </div>
       
       {/* Pagination Controls */}
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-end space-x-3 py-4">
         <button
-          className="px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold bg-white/5 text-white/80 hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="px-4 py-2 rounded-xl border border-border text-xs font-bold bg-card text-foreground hover:bg-muted shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           Previous
         </button>
         <button
-          className="px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold bg-white/5 text-white/80 hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="px-4 py-2 rounded-xl border border-border text-xs font-bold bg-card text-foreground hover:bg-muted shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

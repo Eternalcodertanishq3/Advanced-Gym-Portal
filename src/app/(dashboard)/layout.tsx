@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
+import { DashboardContainer } from "@/components/layout/dashboard-container";
 import type { Role } from "@/lib/constants";
 
 // ═══════════════════════════════════════════════════════════════
@@ -38,7 +39,7 @@ export default async function DashboardLayout({
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="lg:pl-[280px] transition-all duration-300">
+      <DashboardContainer>
         {/* Topbar */}
         <Topbar user={session.user} />
 
@@ -48,7 +49,7 @@ export default async function DashboardLayout({
             {children}
           </div>
         </main>
-      </div>
+      </DashboardContainer>
     </div>
   );
 }

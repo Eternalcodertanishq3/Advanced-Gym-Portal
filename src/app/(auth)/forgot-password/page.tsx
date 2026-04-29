@@ -7,10 +7,15 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+// ═══════════════════════════════════════════════════════════════
+// 🦅 EAGLE GYM — Dashboard Consistent Forgot Password Page
+// ═══════════════════════════════════════════════════════════════
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,35 +37,46 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-obsidian-950">
-      <div className="relative z-10 w-full max-w-md px-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+      {/* Premium Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-[440px] px-6">
         <motion.div
-          className="glass-card p-8 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="surface-card p-8 sm:p-10 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
         >
           {!isSent ? (
             <>
-              <div className="w-16 h-16 rounded-2xl bg-gold-500/10 flex items-center justify-center mx-auto mb-6">
-                <KeyRound className="w-8 h-8 text-gold-500" />
+              <div className="w-16 h-16 rounded-2xl bg-brand-orange/10 flex items-center justify-center mx-auto mb-6 border border-brand-orange/20">
+                <KeyRound className="w-8 h-8 text-brand-orange" />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">Forgot Password?</h1>
-              <p className="text-white/40 text-sm mb-8">
-                No worries, we'll send you reset instructions.
+              <h1 className="text-2xl font-bold text-foreground mb-2">Forgot Password?</h1>
+              <p className="text-txt-secondary text-sm mb-10 font-medium">
+                No worries, we'll send you reset instructions to your registered email.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2 text-left">
-                  <label htmlFor="email" className="text-xs font-medium text-white/60 uppercase tracking-wider">Email Address</label>
-                  <div className="relative flex items-center rounded-xl border border-white/10 bg-white/[0.03]">
-                    <Mail className="absolute left-4 w-4 h-4 text-white/30" />
+              <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="label-text">Email Address</label>
+                  <div className="relative group">
+                    <Mail className={cn(
+                      "absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors",
+                      isFocused ? "text-brand-orange" : "text-txt-tertiary"
+                    )} />
                     <input
                       id="email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm text-white outline-none"
-                      placeholder="you@example.com"
+                      onFocus={() => setIsFocused(true)}
+                      onBlur={() => setIsFocused(false)}
+                      className="surface-input pl-11"
+                      placeholder="admin@eaglegym.in"
                     />
                   </div>
                 </div>
@@ -68,37 +84,47 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-3.5 rounded-xl bg-gold-500 text-obsidian-950 font-bold text-sm hover:bg-gold-600 transition-all shadow-lg shadow-gold-500/20"
+                  className="btn-primary w-full h-12 text-base font-bold shadow-brand-glow"
                 >
-                  {isLoading ? "Sending..." : "Reset Password"}
+                  {isLoading ? (
+                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      Send Reset Link
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
                 </button>
               </form>
             </>
           ) : (
-            <div className="animate-in fade-in zoom-in duration-300">
-              <div className="w-16 h-16 rounded-2xl bg-gold-500 flex items-center justify-center mx-auto mb-6">
-                <Mail className="w-8 h-8 text-obsidian-950" />
+            <div className="animate-in fade-in zoom-in duration-500">
+              <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6 border border-success/20">
+                <Mail className="w-8 h-8 text-success" />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">Check your email</h1>
-              <p className="text-white/40 text-sm mb-8">
-                We've sent a password reset link to <span className="text-white">{email}</span>
+              <h1 className="text-2xl font-bold text-foreground mb-2">Check your email</h1>
+              <p className="text-txt-secondary text-sm mb-10 font-medium leading-relaxed">
+                We've sent a password reset link to <br/>
+                <span className="text-foreground font-bold">{email}</span>
               </p>
               <button
                 onClick={() => setIsSent(false)}
-                className="text-gold-400 hover:text-gold-300 text-sm font-medium transition-colors"
+                className="text-brand-orange hover:text-brand-orange-hover text-sm font-bold transition-colors underline underline-offset-4"
               >
                 Didn't receive the email? Click to retry
               </button>
             </div>
           )}
 
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 mt-8 text-xs text-white/40 hover:text-white/60 transition-colors"
-          >
-            <ArrowLeft className="w-3 h-3" />
-            Back to Login
-          </Link>
+          <div className="mt-10 pt-6 border-t border-surface-border">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 text-sm font-bold text-txt-tertiary hover:text-foreground transition-all group"
+            >
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              Back to Sign In
+            </Link>
+          </div>
         </motion.div>
       </div>
     </div>

@@ -58,7 +58,7 @@ export function DashboardClient({ stats, recentLogs }: Props) {
             value={stats.totalRevenue}
             trend="+0.0%"
             trendUp={true}
-            color="gold"
+            color="orange"
             sparklineData={[0, 0, 0, 0, stats.totalRevenue]}
           />
         </motion.div>
@@ -70,7 +70,7 @@ export function DashboardClient({ stats, recentLogs }: Props) {
             value={stats.activeMembersCount}
             trend="Live"
             trendUp={true}
-            color="cyan"
+            color="info"
             sparklineData={[0, 0, 0, stats.activeMembersCount]}
           />
         </motion.div>
@@ -94,7 +94,7 @@ export function DashboardClient({ stats, recentLogs }: Props) {
             value="100%"
             trend="Stable"
             trendUp={true}
-            color="green"
+            color="success"
             sparklineData={[100, 100, 100, 100]}
           />
         </motion.div>
@@ -141,8 +141,8 @@ export function DashboardClient({ stats, recentLogs }: Props) {
             {quickLinks.map((link) => (
               <Link key={link.name} href={link.href} className="block">
                 <motion.div 
-                  whileHover={{ x: 5, backgroundColor: "hsl(var(--muted)/0.5)" }}
-                  className="flex items-center gap-3 p-3 rounded-xl transition-colors border border-transparent hover:border-border"
+                  whileHover={{ x: 5 }}
+                  className="flex items-center gap-3 p-3 rounded-xl transition-colors border border-transparent hover:border-border hover:bg-muted/50"
                 >
                   <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shrink-0", link.bg)}>
                     <link.icon className={cn("w-5 h-5", link.color)} />

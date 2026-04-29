@@ -111,7 +111,7 @@ const nextConfig = {
   },
 
   // Output configuration
-  output: "standalone",
+  // output: "standalone",
 
   // Powered by header
   poweredByHeader: false,

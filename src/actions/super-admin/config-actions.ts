@@ -35,6 +35,7 @@ export async function updateSystemConfig(data: Record<string, any>) {
     await Promise.all(operations);
 
     revalidatePath("/super-admin/system-config");
+    revalidatePath("/");
     return { success: true };
   } catch (error: any) {
     console.error("Failed to update system config:", error);

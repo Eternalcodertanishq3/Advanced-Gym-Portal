@@ -371,6 +371,7 @@ model Member {
   documents      Document[]
   notifications  Notification[]
   DietLog        DietLog[]
+  ptSessions     PTSession[]
 
   @@index([status])
   @@index([trainerId])
@@ -695,6 +696,7 @@ model PTSession {
   trainer   Trainer @relation(fields: [trainerId], references: [id])
 
   memberId    String
+  member      Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
   date        DateTime
   startTime   String // HH:MM
   endTime     String // HH:MM
@@ -1261,6 +1263,19 @@ model GymSetting {
 
   @@index([category])
   @@map("gym_settings")
+}
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  author     String
+  role       String?
+  quote      String   @db.Text
+  rating     Int      @default(5)
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("testimonials")
 }
 
 // ═══════════════════════════════════════════════════════════════

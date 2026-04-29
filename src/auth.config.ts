@@ -11,20 +11,33 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isSuperAdminRoute = nextUrl.pathname.startsWith("/super-admin");
+      const role = auth?.user?.role;
+      const pathname = nextUrl.pathname;
 
-      if (isSuperAdminRoute) {
-        if (isLoggedIn) {
-          if (auth.user.role === "SUPER_ADMIN") {
-            return true;
-          }
-          // Redirect unauthorized users to a general dashboard or home
-          return Response.redirect(new URL("/dashboard", nextUrl));
-        }
-        return false; // Redirect to login
-      } else if (isLoggedIn && nextUrl.pathname === "/login") {
-        return Response.redirect(new URL("/super-admin", nextUrl));
+      // Map roles to their dashboards
+      const dashboardMap: Record<string, string> = {
+        SUPER_ADMIN: "/super-admin",
+        ADMIN: "/admin",
+        RECEPTIONIST: "/receptionist",
+        TRAINER: "/trainer",
+        MEMBER: "/member",
+        WORKER: "/worker",
+      };
+
+      const userDashboard = role ? dashboardMap[role] || "/dashboard" : "/dashboard";
+
+      // Protect admin routes
+      if (pathname.startsWith("/super-admin")) {
+        if (!isLoggedIn) return false;
+        if (role !== "SUPER_ADMIN") return Response.redirect(new URL(userDashboard, nextUrl));
+        return true;
       }
+
+      // If logged in and on root or login, redirect to dashboard immediately
+      if (isLoggedIn && (pathname === "/" || pathname === "/login")) {
+        return Response.redirect(new URL(userDashboard, nextUrl));
+      }
+
       return true;
     },
     async jwt({ token, user }) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -12,42 +12,14 @@ import {
 } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 
-// ═══════════════════════════════════════════════════════════════
-// 🦅 EAGLE GYM — Attendance Heatmap
-// ═══════════════════════════════════════════════════════════════
+import { getAttendanceHeatmapData } from "@/server/actions/attendance-heatmap-actions";
+import { toast } from "sonner";
 
 interface DayData {
   date: string;
   count: number;
   intensity: number; // 0-4
 }
-
-const generateMockData = (year: number, month: number): DayData[] => {
-  const days: DayData[] = [];
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(year, month, day);
-    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-    const baseCount = isWeekend ? 280 : 180;
-    const randomVariation = Math.floor(Math.random() * 120) - 30;
-    const count = Math.max(50, baseCount + randomVariation);
-
-    let intensity = 0;
-    if (count > 300) intensity = 4;
-    else if (count > 250) intensity = 3;
-    else if (count > 200) intensity = 2;
-    else if (count > 150) intensity = 1;
-
-    days.push({
-      date: date.toISOString(),
-      count,
-      intensity,
-    });
-  }
-
-  return days;
-};
 
 const intensityColors = [
   "bg-white/5 hover:bg-white/10",    // 0 - Low
@@ -64,19 +36,51 @@ const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export function AttendanceHeatmap() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [hoveredDay, setHoveredDay] = useState<DayData | null>(null);
+  const [data, setData] = useState<DayData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  const data = generateMockData(year, month);
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      const res = await getAttendanceHeatmapData(year, month);
+      if (res.success && res.data) {
+        // Fill in missing days with 0 counts
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const monthData: DayData[] = [];
+        
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateStr = new Date(year, month, d).toISOString().split('T')[0];
+          const existing = res.data.find(item => item.date.startsWith(dateStr));
+          
+          if (existing) {
+            monthData.push(existing);
+          } else {
+            monthData.push({
+              date: new Date(year, month, d).toISOString(),
+              count: 0,
+              intensity: 0
+            });
+          }
+        }
+        setData(monthData);
+      } else {
+        toast.error("Failed to load attendance data");
+      }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, [year, month]);
 
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const daysInMonth = data.length;
 
   // Calculate stats
   const totalAttendance = data.reduce((sum, d) => sum + d.count, 0);
-  const avgDaily = Math.round(totalAttendance / daysInMonth);
-  const bestDay = data.reduce((max, d) => (d.count > max.count ? d : max), data[0]);
+  const avgDaily = daysInMonth > 0 ? Math.round(totalAttendance / daysInMonth) : 0;
+  const bestDay = data.length > 0 ? data.reduce((max, d) => (d.count > max.count ? d : max), data[0]) : { count: 0 };
   const peakDays = data.filter((d) => d.intensity === 4).length;
 
   const prevMonth = () => {
@@ -105,6 +109,7 @@ export function AttendanceHeatmap() {
         <div className="flex items-center gap-2">
           <button
             onClick={prevMonth}
+            aria-label="Previous month"
             className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -114,6 +119,7 @@ export function AttendanceHeatmap() {
           </span>
           <button
             onClick={nextMonth}
+            aria-label="Next month"
             className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
           >
             <ChevronRight className="w-4 h-4" />

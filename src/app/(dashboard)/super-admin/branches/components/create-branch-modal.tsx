@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { createBranch } from "@/actions/super-admin/branch-actions";
 import { toast } from "sonner";
+import { Portal } from "@/components/common/portal";
 
 interface Props {
   isOpen: boolean;
@@ -39,64 +40,70 @@ export function CreateBranchModal({ isOpen, onClose }: Props) {
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-6 bg-obsidian-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-display font-bold text-white">Create New Branch</h2>
-              <button onClick={onClose} title="Close" className="p-2 hover:bg-white/5 rounded-lg text-white/50 hover:text-white transition-colors">
-                <X className="w-5 h-5" />
-              </button>
+    <Portal>
+      <AnimatePresence>
+        {isOpen && (
+          <div className="fixed inset-0 z-[1000]">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60"
+              onClick={onClose}
+            />
+            <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                className="pointer-events-auto w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar"
+              >
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-display font-bold text-foreground">Create New Branch</h2>
+                    <button type="button" onClick={onClose} title="Close" className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <label htmlFor="createBranchName" className="text-sm font-bold text-foreground/70">Branch Name</label>
+                      <input id="createBranchName" required name="name" type="text" className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter branch name" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="createBranchLocation" className="text-sm font-bold text-foreground/70">Location (Short Area)</label>
+                      <input id="createBranchLocation" required name="location" type="text" className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter area/city" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="createBranchAddress" className="text-sm font-bold text-foreground/70">Full Address</label>
+                      <textarea id="createBranchAddress" name="address" rows={3} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter complete address..." />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="createBranchPhone" className="text-sm font-bold text-foreground/70">Contact Phone</label>
+                      <input id="createBranchPhone" name="phone" type="text" className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter contact phone" />
+                    </div>
+
+                    <div className="pt-6">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-3 bg-brand-orange text-white font-bold rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {isSubmitting ? "Creating Branch..." : "Create Branch"}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </motion.div>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70">Branch Name</label>
-                <input required name="name" type="text" className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-neon-green/50 transition-colors" placeholder="e.g. Eagle Gym - Downtown" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70">Location (Short Area)</label>
-                <input required name="location" type="text" className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-neon-green/50 transition-colors" placeholder="e.g. Downtown, NY" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70">Full Address</label>
-                <textarea name="address" rows={3} className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-neon-green/50 transition-colors" placeholder="Enter complete address..." />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70">Contact Phone</label>
-                <input name="phone" type="text" className="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-neon-green/50 transition-colors" placeholder="+1 (555) 000-0000" />
-              </div>
-
-              <div className="pt-6">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3 bg-gradient-to-r from-neon-green to-green-500 text-obsidian-950 font-bold rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:shadow-[0_0_25px_rgba(57,255,20,0.5)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isSubmitting ? "Creating Branch..." : "Create Branch"}
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          </div>
+        )}
+      </AnimatePresence>
+    </Portal>
   );
 }

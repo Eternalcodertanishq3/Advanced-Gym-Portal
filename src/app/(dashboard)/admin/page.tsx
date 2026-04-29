@@ -5,18 +5,14 @@ import { motion } from "framer-motion";
 import {
   Users,
   CreditCard,
-  TrendingUp,
-  Clock,
-  ArrowUpRight,
-  ArrowDownRight,
   Activity,
   Calendar,
-  Dumbbell,
-  AlertTriangle,
+  Clock,
   CheckCircle2,
   XCircle,
+  AlertTriangle,
 } from "lucide-react";
-import { cn, formatCurrency, formatNumber, delay } from "@/lib/utils";
+import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
@@ -24,6 +20,8 @@ import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { AttendanceHeatmap } from "@/components/dashboard/attendance-heatmap";
 import { UpcomingSchedule } from "@/components/dashboard/upcoming-schedule";
 import { SkeletonStatGrid, SkeletonChart } from "@/components/loaders/eagle-loader";
+import { getDashboardStats } from "@/server/actions/analytics-actions";
+import { toast } from "sonner";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Admin Dashboard
@@ -32,12 +30,17 @@ import { SkeletonStatGrid, SkeletonChart } from "@/components/loaders/eagle-load
 interface DashboardStats {
   totalMembers: number;
   activeMembers: number;
-  todayRevenue: number;
   monthlyRevenue: number;
+  revenueGrowth: number;
+  attendanceRate: number;
+  activeClasses: number;
+  todayRevenue: number;
   todayAttendance: number;
   pendingPayments: number;
   newMembersThisMonth: number;
   expiringSoon: number;
+  attendanceSparkline: number[];
+  revenueSparkline: number[];
 }
 
 const containerVariants = {
@@ -46,17 +49,17 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
-      delayChildren: 0.2,
+      delayChildren: 0.1,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
 
@@ -71,21 +74,22 @@ export default function AdminDashboardPage() {
     pendingPayments: 0,
     newMembersThisMonth: 0,
     expiringSoon: 0,
+    revenueGrowth: 0,
+    attendanceRate: 0,
+    activeClasses: 0,
+    attendanceSparkline: [],
+    revenueSparkline: [],
   });
 
   useEffect(() => {
     async function loadDashboard() {
-      await delay(800); // Simulate API call
-      setStats({
-        totalMembers: 1247,
-        activeMembers: 1089,
-        todayRevenue: 45200,
-        monthlyRevenue: 1245000,
-        todayAttendance: 342,
-        pendingPayments: 23,
-        newMembersThisMonth: 45,
-        expiringSoon: 12,
-      });
+      setIsLoading(true);
+      const res = await getDashboardStats();
+      if (res.success && res.data) {
+        setStats(res.data);
+      } else {
+        toast.error(res.error || "Failed to load dashboard data");
+      }
       setIsLoading(false);
     }
     loadDashboard();
@@ -93,7 +97,7 @@ export default function AdminDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 animate-pulse-fade">
         <SkeletonStatGrid count={4} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -113,58 +117,56 @@ export default function AdminDashboardPage() {
       className="space-y-8"
     >
       {/* Page Header */}
-      <motion.div variants={itemVariants} className="flex items-center justify-between">
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-white mb-1">
-            Admin <span className="text-gold-gradient">Dashboard</span>
+          <h1 className="font-display text-3xl font-bold text-foreground tracking-tight mb-1">
+            Admin <span className="text-brand-orange">Overview</span>
           </h1>
-          <p className="text-sm text-white/40">Welcome back! Here&apos;s what&apos;s happening at Eagle Gym.</p>
+          <p className="text-sm text-txt-secondary font-medium">Welcome back! Here's what's happening at Eagle Gym.</p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-green/10 border border-neon-green/20">
-          <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
-          <span className="text-xs text-neon-green font-medium">System Online</span>
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-success-soft border border-success/20">
+          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+          <span className="text-xs text-success font-bold tracking-wide uppercase">System Online</span>
         </div>
       </motion.div>
 
       {/* Stats Grid */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           icon={Users}
           label="Total Members"
           value={stats.totalMembers}
           trend="+12%"
           trendUp
-          sparklineData={[820, 932, 901, 1034, 1090, 1130, 1247]}
-          color="gold"
+          sparklineData={stats.attendanceSparkline || []}
+          color="navy"
         />
         <StatCard
           icon={CreditCard}
-          label="Today&apos;s Revenue"
-          value={formatCurrency(stats.todayRevenue, { showSymbol: true, decimals: 0 })}
-          trend="+8.5%"
-          trendUp
-          sparklineData={[32000, 38000, 35000, 42000, 39000, 41000, 45200]}
-          color="green"
-          subtitle="vs yesterday ₹41,600"
+          label="Monthly Revenue"
+          value={formatCurrency(stats.monthlyRevenue, { showSymbol: true, decimals: 0 })}
+          trend={`+${stats.revenueGrowth}%`}
+          trendUp={stats.revenueGrowth >= 0}
+          sparklineData={stats.revenueSparkline || []}
+          color="success"
+          subtitle={`₹${formatCurrency(stats.todayRevenue, { showSymbol: false, decimals: 0 })} today`}
         />
         <StatCard
           icon={Activity}
-          label="Active Now"
+          label="Checked In Today"
           value={stats.todayAttendance}
-          trend="+5.2%"
           trendUp
-          sparklineData={[280, 310, 295, 340, 320, 355, 342]}
-          color="cyan"
+          sparklineData={stats.attendanceSparkline || []}
+          color="info"
           subtitle="Peak: 6:00 PM - 8:00 PM"
         />
         <StatCard
           icon={AlertTriangle}
           label="Pending Dues"
           value={stats.pendingPayments}
-          trend="-3"
           trendUp={false}
-          color="crimson"
-          subtitle="₹1,24,500 total pending"
+          color="danger"
+          subtitle="Action required"
         />
       </motion.div>
 
@@ -200,30 +202,30 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Summary Cards */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <SummaryCard
           icon={Calendar}
           label="New This Month"
           value={stats.newMembersThisMonth}
-          color="gold"
+          color="orange"
         />
         <SummaryCard
           icon={Clock}
           label="Expiring Soon"
           value={stats.expiringSoon}
-          color="orange"
+          color="warning"
         />
         <SummaryCard
           icon={CheckCircle2}
           label="Active Subscriptions"
           value={stats.activeMembers}
-          color="green"
+          color="success"
         />
         <SummaryCard
           icon={XCircle}
           label="Inactive Members"
           value={stats.totalMembers - stats.activeMembers}
-          color="crimson"
+          color="danger"
         />
       </motion.div>
     </motion.div>
@@ -243,24 +245,24 @@ function SummaryCard({
   icon: React.ElementType;
   label: string;
   value: number | string;
-  color: "gold" | "green" | "cyan" | "crimson" | "orange";
+  color: "warning" | "success" | "info" | "danger" | "orange";
 }) {
   const colorMap = {
-    gold: "from-gold-500/20 to-gold-500/5 text-gold-400",
-    green: "from-neon-green/20 to-neon-green/5 text-neon-green",
-    cyan: "from-electric-cyan/20 to-electric-cyan/5 text-electric-cyan",
-    crimson: "from-crimson/20 to-crimson/5 text-crimson",
-    orange: "from-orange-500/20 to-orange-500/5 text-orange-400",
+    warning: "bg-warning-soft text-warning",
+    success: "bg-success-soft text-success",
+    info: "bg-info-soft text-info",
+    danger: "bg-danger-soft text-danger",
+    orange: "bg-brand-orange-soft text-brand-orange",
   };
 
   return (
-    <div className="glass-card p-4 flex items-center gap-4">
-      <div className={cn("w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center", colorMap[color])}>
-        <Icon className="w-5 h-5" />
+    <div className="surface-card p-5 flex items-center gap-4 transition-transform hover:-translate-y-1 duration-300">
+      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", colorMap[color])}>
+        <Icon className="w-6 h-6" />
       </div>
       <div>
-        <p className="text-2xl font-mono font-bold text-white">{formatNumber(value)}</p>
-        <p className="text-xs text-white/40">{label}</p>
+        <p className="text-2xl font-display font-bold text-foreground tracking-tight">{formatNumber(value)}</p>
+        <p className="label-text">{label}</p>
       </div>
     </div>
   );

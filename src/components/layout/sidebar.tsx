@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -56,13 +56,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore, useSidebarStore } from "@/stores/auth-store";
 import { getRoleDashboard, getRoleBadgeClass, getRoleLabel } from "@/lib/rbac";
 import { ROLES } from "@/lib/constants";
 import type { Role } from "@/lib/constants";
 
 // ═══════════════════════════════════════════════════════════════
-// 🦅 EAGLE GYM — Glassmorphism Sidebar
+// 🦅 EAGLE GYM — Athletic Clarity Sidebar
 // ═══════════════════════════════════════════════════════════════
 
 interface NavItem {
@@ -93,6 +93,7 @@ const navSections: Record<Role, NavSection[]> = {
       items: [
         { label: "Admins", href: "/super-admin/admins", icon: Shield },
         { label: "System Config", href: "/super-admin/system-config", icon: Settings },
+        { label: "Member Feedback", href: "/super-admin/testimonials", icon: MessageSquare },
         { label: "Subscription Plans", href: "/super-admin/subscription-plans", icon: Crown },
         { label: "Branches", href: "/super-admin/branches", icon: Building2 },
       ],
@@ -254,10 +255,9 @@ const navSections: Record<Role, NavSection[]> = {
 };
 
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { collapsed, mobileOpen, toggleCollapsed, toggleMobile, setMobileOpen } = useSidebarStore();
   const pathname = usePathname();
-  const { user: storeUser, setUser } = useAuthStore();
+  const { user: storeUser, setUser, logout } = useAuthStore();
   const { data: session } = useSession();
 
   // Sync session with store
@@ -271,8 +271,6 @@ export function Sidebar() {
   const role = (user?.role ?? "MEMBER") as Role;
   const sections = navSections[role] ?? navSections.MEMBER;
 
-  const toggleSidebar = () => setCollapsed(!collapsed);
-  const toggleMobile = () => setMobileOpen(!mobileOpen);
 
   return (
     <>
@@ -293,7 +291,7 @@ export function Sidebar() {
       <button
         onClick={toggleMobile}
         aria-label="Toggle Mobile Menu"
-        className="fixed top-4 left-4 z-30 lg:hidden w-10 h-10 rounded-xl glass-card flex items-center justify-center text-gold-400"
+        className="fixed top-4 left-4 z-30 lg:hidden w-10 h-10 rounded-xl bg-brand-navy shadow-sm flex items-center justify-center text-white"
       >
         <LayoutDashboard className="w-5 h-5" />
       </button>
@@ -302,22 +300,21 @@ export function Sidebar() {
       <motion.aside
         initial={false}
         animate={{
-          width: collapsed ? 80 : 280,
-          x: mobileOpen ? 0 : 0, // Always 0 on desktop, handled by classes
-          opacity: 1, // Always 1 on desktop
+          width: collapsed ? 80 : 260,
+          opacity: 1,
         }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
-          "fixed left-0 top-0 z-50 h-screen flex flex-col transition-all duration-300",
-          "bg-card/80 backdrop-blur-2xl border-r border-border shadow-sm",
+          "fixed left-0 top-0 z-50 h-screen flex flex-col",
+          "bg-brand-navy border-r border-brand-navy-light/10 shadow-lg",
           "lg:translate-x-0 lg:opacity-100",
-          !mobileOpen && "translate-x-[-100%] lg:translate-x-0",
-          collapsed ? "lg:w-20" : "lg:w-[280px]"
+          !mobileOpen && "translate-x-[-100%] lg:translate-x-0"
         )}
       >
         {/* Logo Area */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b border-border/50 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-            <span className="text-primary-foreground font-black text-xl italic tracking-tighter">E</span>
+        <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10 group">
+          <div className="w-10 h-10 rounded-xl bg-brand-orange flex items-center justify-center shrink-0 shadow-lg shadow-brand-orange/20 transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-3">
+            <span className="text-white font-display font-bold text-xl tracking-tight">E</span>
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -327,10 +324,10 @@ export function Sidebar() {
                 exit={{ opacity: 0, width: 0 }}
                 className="overflow-hidden"
               >
-                <h1 className="text-base font-black tracking-[0.2em] text-foreground uppercase leading-none italic">
+                <h1 className="text-lg font-display font-bold text-white tracking-tight leading-none">
                   Eagle Gym
                 </h1>
-                <p className="text-[10px] font-bold text-primary tracking-[0.3em] uppercase mt-1 opacity-80">
+                <p className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
                   {getRoleLabel(role)}
                 </p>
               </motion.div>
@@ -348,7 +345,7 @@ export function Sidebar() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="px-3 mb-2 text-[10px] font-semibold text-foreground/25 uppercase tracking-widest"
+                    className="px-3 mb-2 text-[10px] font-bold text-white/30 uppercase tracking-widest"
                   >
                     {section.title}
                   </motion.h3>
@@ -365,16 +362,16 @@ export function Sidebar() {
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
-                        "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative",
+                        "group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 relative",
                         isActive
                           ? "sidebar-item-active"
-                          : "text-foreground/50 hover:text-foreground/80 hover:bg-muted"
+                          : "text-white/70 hover:text-white hover:bg-white/10"
                       )}
                     >
                       <Icon
                         className={cn(
                           "w-5 h-5 shrink-0 transition-colors",
-                          isActive ? "text-liquid-gold" : "text-foreground/40 group-hover:text-foreground/60"
+                          isActive ? "text-white" : "text-white/50 group-hover:text-white"
                         )}
                       />
                       <AnimatePresence>
@@ -385,7 +382,7 @@ export function Sidebar() {
                             exit={{ opacity: 0, width: 0 }}
                             className={cn(
                               "text-sm font-medium whitespace-nowrap overflow-hidden",
-                              isActive ? "text-gold-400" : ""
+                              isActive ? "text-white font-semibold" : ""
                             )}
                           >
                             {item.label}
@@ -393,7 +390,7 @@ export function Sidebar() {
                         )}
                       </AnimatePresence>
                       {item.badge && !collapsed && (
-                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-crimson/20 text-crimson">
+                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-brand-orange text-white">
                           {item.badge}
                         </span>
                       )}
@@ -406,16 +403,16 @@ export function Sidebar() {
         </nav>
 
         {/* User Profile */}
-        <div className="p-3 border-t border-border/50">
+        <div className="p-3 border-t border-white/10">
           <div
             className={cn(
               "flex items-center gap-3 p-2 rounded-xl",
-              "bg-muted/50 border border-border/50"
+              "bg-black/20 border border-white/5"
             )}
           >
             <div
               className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+                "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 text-white bg-white/10",
                 getRoleBadgeClass(role)
               )}
             >
@@ -429,10 +426,10 @@ export function Sidebar() {
                   exit={{ opacity: 0, width: 0 }}
                   className="overflow-hidden flex-1 min-w-0"
                 >
-                  <p className="text-sm font-medium text-foreground/80 truncate">
+                  <p className="text-sm font-medium text-white truncate">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-[10px] text-foreground/30 truncate">{user?.email}</p>
+                  <p className="text-[10px] text-white/50 truncate">{user?.email}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -440,10 +437,13 @@ export function Sidebar() {
 
           {/* Logout */}
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => {
+              logout();
+              signOut({ callbackUrl: "/login" });
+            }}
             className={cn(
-              "mt-2 flex items-center gap-3 px-3 py-2.5 rounded-xl",
-              "text-foreground/40 hover:text-crimson hover:bg-crimson/10",
+              "mt-2 flex items-center gap-3 px-3 py-2.5 rounded-lg",
+              "text-white/50 hover:text-danger hover:bg-danger/10",
               "transition-all duration-200 w-full",
               collapsed ? "justify-center" : ""
             )}
@@ -466,17 +466,17 @@ export function Sidebar() {
 
         {/* Collapse Toggle (Desktop only) */}
         <button
-          onClick={toggleSidebar}
+          onClick={toggleCollapsed}
           aria-label={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          className="hidden lg:flex absolute -right-3 top-20 w-6 h-6 rounded-full bg-gold-500 text-obsidian-950 items-center justify-center shadow-lg shadow-gold-500/30 hover:scale-110 transition-transform"
+          className="hidden lg:flex absolute -right-3 top-20 w-6 h-6 rounded-full bg-brand-orange text-white items-center justify-center shadow-lg shadow-brand-orange/30 hover:scale-110 transition-transform"
         >
           {collapsed ? (
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="w-4 h-4 ml-0.5" />
           ) : (
-            <ChevronLeft className="w-3 h-3" />
+            <ChevronLeft className="w-4 h-4 mr-0.5" />
           )}
         </button>
       </motion.aside>
     </>
   );
-}
+}

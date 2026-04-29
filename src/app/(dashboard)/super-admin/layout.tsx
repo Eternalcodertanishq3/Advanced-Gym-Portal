@@ -15,17 +15,17 @@ export default function SuperAdminLayout({
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full glass-card p-4 rounded-2xl flex items-center gap-4 bg-gradient-to-r from-crimson/10 to-background border border-crimson/20"
+        className="w-full glass-card p-4 rounded-2xl flex items-center gap-4 bg-gradient-to-r from-crimson/5 via-background to-background border border-crimson/10 shadow-sm shadow-crimson/5"
       >
-        <div className="w-10 h-10 rounded-xl bg-crimson/20 flex items-center justify-center border border-crimson/30 shrink-0 shadow-[0_0_15px_rgba(255,49,49,0.2)]">
-          <ShieldAlert className="w-5 h-5 text-crimson" />
+        <div className="w-12 h-12 rounded-xl bg-crimson/10 flex items-center justify-center border border-crimson/20 shrink-0 shadow-[0_0_20px_rgba(255,49,49,0.1)]">
+          <ShieldAlert className="w-6 h-6 text-crimson" />
         </div>
         <div>
           <h2 className="text-sm font-bold text-foreground tracking-widest uppercase flex items-center gap-2">
             Super Admin Access Mode
-            <span className="w-2 h-2 rounded-full bg-crimson animate-pulse shadow-[0_0_8px_rgba(255,49,49,0.6)]" />
+            <span className="w-2 h-2 rounded-full bg-crimson animate-pulse shadow-[0_0_10px_rgba(255,49,49,0.8)]" />
           </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5 font-medium">
             God mode active. You have full system control and cross-branch administrative privileges.
           </p>
         </div>

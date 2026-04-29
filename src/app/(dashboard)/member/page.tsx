@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   QrCode,
@@ -9,22 +9,19 @@ import {
   TrendingUp,
   Calendar,
   Dumbbell,
-  Utensils,
-  Award,
-  ChevronRight,
   Clock,
   Zap,
-  Target,
   Droplets,
   Footprints,
   Star,
   Trophy,
-  ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
-import { cn, formatDate, formatCurrency } from "@/lib/utils";
-import { ProgressRing } from "@/components/common/progress-ring";
+import { cn, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
+import { getMemberDashboardStats } from "@/server/actions/member-dashboard-actions";
+import { SkeletonStatGrid, SkeletonChart } from "@/components/loaders/eagle-loader";
+import { useSession } from "next-auth/react";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Member Portal Dashboard
@@ -34,62 +31,63 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5 },
+    transition: { duration: 0.4 },
   },
 };
 
 export default function MemberDashboardPage() {
-  const [weeklyProgress] = useState([
-    { day: "Mon", completed: true, calories: 450 },
-    { day: "Tue", completed: true, calories: 520 },
-    { day: "Wed", completed: true, calories: 380 },
-    { day: "Thu", completed: false, calories: 0 },
-    { day: "Fri", completed: false, calories: 0 },
-    { day: "Sat", completed: false, calories: 0 },
-    { day: "Sun", completed: false, calories: 0 },
-  ]);
+  const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState<any>(null);
 
-  const memberStats = {
-    name: "Rahul Patel",
-    tier: "GOLD",
-    plan: "Gold Monthly",
-    planExpiry: "2026-05-15",
-    daysLeft: 18,
-    totalCheckIns: 142,
-    currentStreak: 5,
-    bestStreak: 12,
-    weightLost: 4.5,
-    workoutsCompleted: 38,
-    caloriesBurned: 18450,
-    xp: 2450,
-    level: 3,
-    nextLevelXP: 4000,
-    waterIntake: 1.8, // liters
-    waterGoal: 3.0,
+  useEffect(() => {
+    async function loadStats() {
+      if (!session?.user?.id) return;
+      setIsLoading(true);
+      const res = await getMemberDashboardStats(session.user.id);
+      if (res.success && res.data) {
+        setStats(res.data);
+      } else {
+        toast.error("Failed to load dashboard data.");
+      }
+      setIsLoading(false);
+    }
+    loadStats();
+  }, [session?.user?.id]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-pulse-fade">
+        <div className="h-16 bg-surface-elevated rounded-xl w-1/3 mb-8" />
+        <SkeletonStatGrid count={4} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <SkeletonChart />
+          </div>
+          <SkeletonChart />
+        </div>
+      </div>
+    );
+  }
+
+  const { weeklyProgress, todayWorkout, upcomingClasses } = stats || { 
+    weeklyProgress: [], 
+    todayWorkout: null, 
+    upcomingClasses: [] 
   };
 
-  const todayWorkout = {
-    name: "Upper Body Power",
-    exercises: 6,
-    estimatedTime: "45 min",
-    completed: 3,
-    total: 6,
-  };
-
-  const upcomingClasses = [
-    { id: "1", name: "Power Yoga", time: "Tomorrow, 6:00 AM", trainer: "Priya Sharma", booked: true },
-    { id: "2", name: "HIIT Blast", time: "Wed, 7:30 AM", trainer: "Rahul Patel", booked: true },
-    { id: "3", name: "Zumba Dance", time: "Fri, 6:00 PM", trainer: "Neha Gupta", booked: false },
-  ];
+  const daysLeft = stats?.expiresAt 
+    ? Math.ceil((new Date(stats.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
 
   return (
     <motion.div
@@ -101,51 +99,52 @@ export default function MemberDashboardPage() {
       {/* Welcome Header */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-white mb-1">
-            Hello, <span className="text-gold-gradient">{memberStats.name.split(" ")[0]}</span>
+          <h1 className="font-display text-3xl font-bold text-foreground mb-1">
+            Hello, <span className="text-brand-orange">{session?.user?.firstName || "Member"}</span>
           </h1>
-          <p className="text-sm text-white/40">Ready to crush your goals today?</p>
+          <p className="text-sm text-txt-secondary font-medium">Ready to crush your goals today?</p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/member/digital-card"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-card border-gold-500/20 hover:border-gold-500/40 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl surface-card border-brand-orange/20 hover:border-brand-orange/40 transition-colors"
           >
-            <QrCode className="w-4 h-4 text-gold-400" />
-            <span className="text-sm text-gold-400">My Card</span>
+            <QrCode className="w-4 h-4 text-brand-orange" />
+            <span className="text-sm font-semibold text-brand-orange">My Card</span>
           </Link>
         </div>
       </motion.div>
 
       {/* Stats Cards */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <MemberStatCard
           icon={Flame}
           label="Current Streak"
-          value={`${memberStats.currentStreak} days`}
+          value={`${stats?.streak || 0} days`}
           color="orange"
-          subtitle={`Best: ${memberStats.bestStreak}`}
+          subtitle="Keep it up!"
         />
         <MemberStatCard
           icon={Footprints}
           label="Total Check-ins"
-          value={memberStats.totalCheckIns.toString()}
-          color="gold"
+          value={stats?.totalAttendance?.toString() || "0"}
+          sparklineData={stats.attendanceSparkline || []}
+          color="navy"
           subtitle="Since joined"
         />
         <MemberStatCard
           icon={Zap}
-          label="Workouts"
-          value={memberStats.workoutsCompleted.toString()}
-          color="cyan"
+          label="Classes"
+          value={stats?.totalClasses?.toString() || "0"}
+          color="info"
           subtitle="Completed"
         />
         <MemberStatCard
           icon={TrendingUp}
-          label="Weight Lost"
-          value={`${memberStats.weightLost} kg`}
-          color="green"
-          subtitle="Keep going!"
+          label="Upcoming"
+          value={stats?.upcomingClasses?.toString() || "0"}
+          color="success"
+          subtitle="Booked classes"
         />
       </motion.div>
 
@@ -154,48 +153,48 @@ export default function MemberDashboardPage() {
         {/* Left Column - Progress & Workout */}
         <div className="lg:col-span-2 space-y-6">
           {/* Weekly Progress */}
-          <motion.div variants={itemVariants} className="glass-card p-6">
+          <motion.div variants={itemVariants} className="surface-card p-6">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-green/20 to-neon-green/5 flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-neon-green" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-success-soft flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-success" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Weekly Progress</h3>
-                  <p className="text-xs text-white/30">Keep the momentum going!</p>
+                  <h3 className="text-lg font-bold text-foreground">Weekly Progress</h3>
+                  <p className="text-sm text-txt-secondary">Keep the momentum going!</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-mono font-bold text-neon-green">
-                  {weeklyProgress.filter((d) => d.completed).length}/7
+                <p className="text-3xl font-display font-bold text-success">
+                  {weeklyProgress.filter((d: any) => d.completed).length}/7
                 </p>
-                <p className="text-[10px] text-white/20">days completed</p>
+                <p className="label-text">days completed</p>
               </div>
             </div>
 
-            <div className="flex items-end justify-between gap-2 h-32">
-              {weeklyProgress.map((day, index) => (
+            <div className="flex items-end justify-between gap-3 h-40">
+              {weeklyProgress.map((day: any, index: number) => (
                 <div key={day.day} className="flex-1 flex flex-col items-center gap-2">
                   <motion.div
                     className={cn(
-                      "w-full rounded-t-lg transition-all duration-500 relative group",
+                      "w-full rounded-t-xl transition-all duration-500 relative group",
                       day.completed
-                        ? "bg-gradient-to-t from-neon-green/60 to-neon-green/20"
-                        : "bg-white/5"
+                        ? "bg-success"
+                        : "bg-surface-elevated"
                     )}
                     initial={{ height: 0 }}
                     animate={{ height: day.completed ? `${(day.calories / 600) * 100}%` : "20%" }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
                   >
                     {day.completed && (
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="text-[10px] text-neon-green font-mono">{day.calories}</span>
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background px-2 py-1 rounded shadow-lg">
+                        <span className="text-xs font-bold">{day.calories} kcal</span>
                       </div>
                     )}
                   </motion.div>
                   <span className={cn(
-                    "text-xs",
-                    day.completed ? "text-neon-green font-medium" : "text-white/20"
+                    "text-sm font-medium",
+                    day.completed ? "text-success" : "text-txt-tertiary"
                   )}>
                     {day.day}
                   </span>
@@ -205,61 +204,59 @@ export default function MemberDashboardPage() {
           </motion.div>
 
           {/* Today's Workout */}
-          <motion.div variants={itemVariants} className="glass-card p-6">
+          <motion.div variants={itemVariants} className="surface-card p-6">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crimson/20 to-crimson/5 flex items-center justify-center">
-                  <Dumbbell className="w-5 h-5 text-crimson" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-danger-soft flex items-center justify-center">
+                  <Dumbbell className="w-6 h-6 text-danger" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Today&apos;s Workout</h3>
-                  <p className="text-xs text-white/30">{todayWorkout.name}</p>
+                  <h3 className="text-lg font-bold text-foreground">Today's Workout</h3>
+                  <p className="text-sm text-txt-secondary">{todayWorkout.name}</p>
                 </div>
               </div>
-              <span className="text-xs text-white/30 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
+              <span className="text-sm font-semibold text-txt-secondary flex items-center gap-1.5 bg-surface-elevated px-3 py-1.5 rounded-lg">
+                <Clock className="w-4 h-4" />
                 {todayWorkout.estimatedTime}
               </span>
             </div>
 
             <div className="space-y-3">
-              {[
-                { name: "Bench Press", sets: "4 x 10", completed: true },
-                { name: "Incline Dumbbell Press", sets: "3 x 12", completed: true },
-                { name: "Cable Fly", sets: "3 x 15", completed: true },
-                { name: "Overhead Press", sets: "4 x 8", completed: false },
-                { name: "Lateral Raises", sets: "3 x 15", completed: false },
-                { name: "Tricep Pushdown", sets: "3 x 12", completed: false },
-              ].map((exercise, index) => (
+              {!todayWorkout && (
+                <div className="p-8 text-center bg-surface-sunken rounded-xl border border-dashed border-border">
+                  <p className="text-sm text-txt-tertiary">No workout assigned for today.</p>
+                </div>
+              )}
+              {todayWorkout?.exerciseList?.map((exercise: any, index: number) => (
                 <div
                   key={index}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl transition-all",
-                    exercise.completed ? "bg-neon-green/5" : "bg-white/[0.02]"
+                    "flex items-center gap-4 p-4 rounded-xl transition-all border border-transparent",
+                    exercise.completed ? "bg-success-soft border-success/10" : "bg-surface-sunken"
                   )}
                 >
                   <div
                     className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center",
+                      "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm",
                       exercise.completed
-                        ? "bg-neon-green/20 text-neon-green"
-                        : "bg-white/5 text-white/20"
+                        ? "bg-success text-white"
+                        : "bg-surface-elevated text-txt-secondary"
                     )}
                   >
                     {exercise.completed ? (
-                      <Zap className="w-3 h-3" />
+                      <Zap className="w-4 h-4" />
                     ) : (
-                      <span className="text-xs">{index + 1}</span>
+                      <span>{index + 1}</span>
                     )}
                   </div>
                   <div className="flex-1">
                     <p className={cn(
-                      "text-sm",
-                      exercise.completed ? "text-white/60 line-through" : "text-white"
+                      "text-base font-semibold",
+                      exercise.completed ? "text-success line-through opacity-70" : "text-foreground"
                     )}>
                       {exercise.name}
                     </p>
-                    <p className="text-xs text-white/30">{exercise.sets}</p>
+                    <p className="text-sm text-txt-tertiary font-medium">{exercise.sets}</p>
                   </div>
                 </div>
               ))}
@@ -267,9 +264,9 @@ export default function MemberDashboardPage() {
 
             <Link
               href="/member/workout"
-              className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-gradient-to-r from-liquid-gold to-liquid-orange text-obsidian-950 font-semibold text-sm hover:brightness-110 transition-all"
+              className="mt-6 flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-brand-orange text-white font-bold text-base hover:bg-brand-orange/90 transition-all shadow-lg shadow-brand-orange/20"
             >
-              <Dumbbell className="w-4 h-4" />
+              <Dumbbell className="w-5 h-5" />
               Start Workout
             </Link>
           </motion.div>
@@ -278,103 +275,102 @@ export default function MemberDashboardPage() {
         {/* Right Column - Profile & Stats */}
         <div className="space-y-6">
           {/* Digital Card Preview */}
-          <motion.div variants={itemVariants} className="glass-card p-6 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 via-transparent to-transparent" />
+          <motion.div variants={itemVariants} className="surface-card p-6 relative overflow-hidden bg-brand-navy border-none text-white">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
             <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <span className={cn(
-                  "text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full",
-                  "bg-gold-500/20 text-gold-400 border border-gold-500/30"
-                )}>
-                  {memberStats.tier}
+              <div className="flex items-center justify-between mb-6">
+                <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-brand-orange/20 text-brand-orange border border-brand-orange/30">
+                  {stats?.subscriptionStatus || "MEMBER"}
                 </span>
-                <Crown className="w-5 h-5 text-gold-400" />
+                <Crown className="w-6 h-6 text-brand-orange" />
               </div>
-              <h3 className="text-xl font-display font-bold text-white mb-1">{memberStats.name}</h3>
-              <p className="text-xs text-white/40 mb-4">{memberStats.plan}</p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/30">Valid until</span>
-                  <span className="text-white/60">{formatDate(memberStats.planExpiry, "dd MMM yyyy")}</span>
+              <h3 className="text-2xl font-display font-bold text-white mb-1">{session?.user?.firstName || "Member"}</h3>
+              <p className="text-sm text-white/60 font-medium mb-6">{stats?.planName || "No active plan"}</p>
+              
+              <div className="space-y-3 bg-white/5 p-4 rounded-xl">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-white/50">Valid until</span>
+                  <span className="text-white font-semibold">
+                    {stats?.expiresAt ? formatDate(stats.expiresAt, "dd MMM yyyy") : "N/A"}
+                  </span>
                 </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/30">Days remaining</span>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-white/50">Days remaining</span>
                   <span className={cn(
-                    "font-mono font-bold",
-                    memberStats.daysLeft < 7 ? "text-crimson" : "text-neon-green"
+                    "font-display font-bold text-lg",
+                    daysLeft < 7 ? "text-danger" : "text-brand-orange"
                   )}>
-                    {memberStats.daysLeft}
+                    {daysLeft > 0 ? daysLeft : 0}
                   </span>
                 </div>
               </div>
-              <div className="mt-4 p-3 rounded-xl bg-white/5 flex items-center justify-center">
-                <div className="w-32 h-32 bg-white rounded-lg flex items-center justify-center">
-                  <QrCode className="w-24 h-24 text-obsidian-950" />
-                </div>
+
+              <div className="mt-6 p-4 rounded-xl bg-white flex flex-col items-center justify-center">
+                <QrCode className="w-24 h-24 text-brand-navy mb-2" />
+                <p className="text-[10px] uppercase tracking-wider font-bold text-brand-navy/50">Show at reception</p>
               </div>
-              <p className="text-center text-[10px] text-white/20 mt-2">Show this at reception</p>
             </div>
           </motion.div>
 
           {/* XP & Level */}
-          <motion.div variants={itemVariants} className="glass-card p-6">
-            <div className="flex items-center justify-between mb-4">
+          <motion.div variants={itemVariants} className="surface-card p-6">
+            <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 flex items-center justify-center">
-                  <Star className="w-5 h-5 text-purple-400" />
+                <div className="w-10 h-10 rounded-xl bg-brand-orange-soft flex items-center justify-center">
+                  <Star className="w-5 h-5 text-brand-orange" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white">Level {memberStats.level}</h3>
-                  <p className="text-xs text-white/30">Gold Member</p>
+                  <h3 className="text-base font-bold text-foreground">Level 3</h3>
+                  <p className="text-sm text-txt-secondary">Gold Member</p>
                 </div>
               </div>
-              <Trophy className="w-5 h-5 text-gold-400" />
+              <Trophy className="w-6 h-6 text-brand-orange" />
             </div>
 
-            <div className="mb-2">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-white/30">{memberStats.xp} XP</span>
-                <span className="text-white/30">{memberStats.nextLevelXP} XP</span>
+            <div className="mb-3">
+              <div className="flex items-center justify-between text-sm font-medium mb-2">
+                <span className="text-txt-secondary">2,450 XP</span>
+                <span className="text-foreground">4,000 XP</span>
               </div>
-              <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-3 rounded-full bg-surface-sunken overflow-hidden">
                 <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  className="h-full rounded-full bg-gradient-to-r from-brand-orange to-brand-gold"
                   initial={{ width: 0 }}
-                  animate={{ width: `${(memberStats.xp / memberStats.nextLevelXP) * 100}%` }}
+                  animate={{ width: `${(2450 / 4000) * 100}%` }}
                   transition={{ duration: 1, delay: 0.5 }}
                 />
               </div>
             </div>
-            <p className="text-xs text-white/20 text-center">
-              {memberStats.nextLevelXP - memberStats.xp} XP to Level {memberStats.level + 1}
+            <p className="text-xs font-semibold text-txt-tertiary text-center uppercase tracking-wider">
+              1,550 XP to Level 4
             </p>
           </motion.div>
 
           {/* Water Tracker */}
-          <motion.div variants={itemVariants} className="glass-card p-6">
-            <div className="flex items-center justify-between mb-4">
+          <motion.div variants={itemVariants} className="surface-card p-6">
+            <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center">
-                  <Droplets className="w-5 h-5 text-blue-400" />
+                <div className="w-10 h-10 rounded-xl bg-info-soft flex items-center justify-center">
+                  <Droplets className="w-5 h-5 text-info" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white">Hydration</h3>
-                  <p className="text-xs text-white/30">Daily goal: {memberStats.waterGoal}L</p>
+                  <h3 className="text-base font-bold text-foreground">Hydration</h3>
+                  <p className="text-sm text-txt-secondary">Daily goal: 3.0L</p>
                 </div>
               </div>
-              <span className="text-lg font-mono font-bold text-blue-400">
-                {memberStats.waterIntake}L
+              <span className="text-2xl font-display font-bold text-info">
+                1.8L
               </span>
             </div>
-            <div className="flex items-end justify-between gap-1 h-16">
+            <div className="flex items-end justify-between gap-1.5 h-16">
               {[...Array(8)].map((_, i) => {
-                const filled = (memberStats.waterIntake / memberStats.waterGoal) * 8 > i;
+                const filled = (1.8 / 3.0) * 8 > i;
                 return (
                   <motion.div
                     key={i}
                     className={cn(
-                      "flex-1 rounded-t-sm transition-all",
-                      filled ? "bg-blue-400/60" : "bg-white/5"
+                      "flex-1 rounded-sm transition-all",
+                      filled ? "bg-info" : "bg-surface-elevated"
                     )}
                     initial={{ height: 0 }}
                     animate={{ height: filled ? "100%" : "30%" }}
@@ -385,52 +381,43 @@ export default function MemberDashboardPage() {
             </div>
             <button
               onClick={() => toast.success("Water intake logged!")}
-              className="mt-3 w-full py-2 rounded-lg bg-blue-500/10 text-xs text-blue-400 hover:bg-blue-500/20 transition-colors"
+              className="mt-4 w-full py-3 rounded-xl bg-info-soft text-sm font-bold text-info hover:bg-info/20 transition-colors"
             >
               + Add Glass (250ml)
             </button>
           </motion.div>
-
           {/* Upcoming Classes */}
-          <motion.div variants={itemVariants} className="glass-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-white">Upcoming Classes</h3>
-              <Link href="/member/classes" className="text-xs text-gold-400 hover:text-gold-300">
-                View All
+          <motion.div variants={itemVariants} className="surface-card p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-foreground">Upcoming Classes</h3>
+              <Link href="/member/classes" className="text-sm font-bold text-brand-orange hover:underline">
+                Explore All
               </Link>
             </div>
-            <div className="space-y-3">
-              {upcomingClasses.map((cls) => (
-                <div
-                  key={cls.id}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
-                >
-                  <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center",
-                    cls.booked ? "bg-neon-green/10" : "bg-white/5"
-                  )}>
-                    <Calendar className={cn(
-                      "w-5 h-5",
-                      cls.booked ? "text-neon-green" : "text-white/20"
-                    )} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{cls.name}</p>
-                    <p className="text-xs text-white/30">{cls.time}</p>
-                    <p className="text-[10px] text-white/20">{cls.trainer}</p>
-                  </div>
-                  {cls.booked ? (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-neon-green/10 text-neon-green">
+            <div className="space-y-4">
+              {upcomingClasses.length === 0 && (
+                <div className="p-4 text-center bg-surface-sunken rounded-xl">
+                  <p className="text-sm text-txt-tertiary">No upcoming classes booked.</p>
+                </div>
+              )}
+              {upcomingClasses.map((item: any) => (
+                <div key={item.id} className="p-4 rounded-xl bg-surface-sunken border border-border/50">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-bold text-foreground">{item.name}</h4>
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-success-soft text-success">
                       Booked
                     </span>
-                  ) : (
-                    <button
-                      onClick={() => toast.success("Class booked!")}
-                      className="text-[10px] px-2 py-0.5 rounded-full bg-gold-500/10 text-gold-400 hover:bg-gold-500/20 transition-colors"
-                    >
-                      Book
-                    </button>
-                  )}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-txt-tertiary">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {item.time}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-brand-orange" />
+                      {item.trainer}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -451,35 +438,53 @@ function MemberStatCard({
   value,
   color,
   subtitle,
+  sparklineData,
 }: {
   icon: React.ElementType;
   label: string;
   value: string;
-  color: "gold" | "green" | "cyan" | "orange";
+  color: "navy" | "success" | "info" | "orange";
   subtitle?: string;
+  sparklineData?: number[];
 }) {
   const colorMap = {
-    gold: "from-gold-500/20 to-gold-500/5 text-gold-400",
-    green: "from-neon-green/20 to-neon-green/5 text-neon-green",
-    cyan: "from-electric-cyan/20 to-electric-cyan/5 text-electric-cyan",
-    orange: "from-orange-500/20 to-orange-500/5 text-orange-400",
+    navy: "bg-surface-elevated text-brand-navy",
+    success: "bg-success-soft text-success",
+    info: "bg-info-soft text-info",
+    orange: "bg-brand-orange-soft text-brand-orange",
   };
 
   return (
     <motion.div
-      className="glass-card p-5"
+      className="surface-card p-6"
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
     >
       <div className={cn(
-        "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center mb-3",
+        "w-12 h-12 rounded-xl flex items-center justify-center mb-4",
         colorMap[color]
       )}>
-        <Icon className="w-5 h-5" />
+        <Icon className="w-6 h-6" />
       </div>
-      <p className="text-lg font-mono font-bold text-white">{value}</p>
-      <p className="text-xs text-white/40 mt-0.5">{label}</p>
-      {subtitle && <p className="text-[10px] text-white/20 mt-1">{subtitle}</p>}
+      <p className="text-2xl font-display font-bold text-foreground">{value}</p>
+      <p className="text-sm font-semibold text-txt-secondary mt-1">{label}</p>
+      {subtitle && <p className="text-xs font-medium text-txt-tertiary mt-2">{subtitle}</p>}
+      
+      {sparklineData && sparklineData.length > 0 && (
+        <div className="mt-4 h-8 w-full overflow-hidden">
+          <svg className="w-full h-full" preserveAspectRatio="none">
+            <path
+              d={`M 0 ${32 - (sparklineData[0] / Math.max(...sparklineData, 1)) * 24} ${sparklineData.map((v, i) => 
+                `L ${(i / (sparklineData.length - 1)) * 100} ${32 - (v / Math.max(...sparklineData, 1)) * 24}`
+              ).join(' ')}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={color === 'orange' ? 'text-brand-orange' : color === 'success' ? 'text-success' : 'text-info'}
+            />
+          </svg>
+        </div>
+      )}
     </motion.div>
   );
 }

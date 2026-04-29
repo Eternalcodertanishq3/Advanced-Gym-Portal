@@ -5,12 +5,18 @@ import { motion } from "framer-motion";
 import { Lock, ShieldCheck, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+// ═══════════════════════════════════════════════════════════════
+// 🦅 EAGLE GYM — Dashboard Consistent Reset Password Page
+// ═══════════════════════════════════════════════════════════════
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,47 +38,63 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-obsidian-950">
-      <div className="relative z-10 w-full max-w-md px-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+      {/* Premium Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-[440px] px-6">
         <motion.div
-          className="glass-card p-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="surface-card p-8 sm:p-10"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
         >
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gold-500/10 flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-8 h-8 text-gold-500" />
+            <div className="w-16 h-16 rounded-2xl bg-brand-orange/10 flex items-center justify-center mx-auto mb-6 border border-brand-orange/20">
+              <Lock className="w-8 h-8 text-brand-orange" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Reset Password</h1>
-            <p className="text-white/40 text-sm">Enter your new password below.</p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Reset Password</h1>
+            <p className="text-txt-secondary text-sm font-medium">Create a new secure password for your account.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="space-y-2">
-                <label htmlFor="password" className="text-xs font-medium text-white/60 uppercase tracking-wider">New Password</label>
-                <div className="relative flex items-center rounded-xl border border-white/10 bg-white/[0.03]">
-                  <Lock className="absolute left-4 w-4 h-4 text-white/30" />
+                <label htmlFor="password" className="label-text">New Password</label>
+                <div className="relative">
+                  <Lock className={cn(
+                    "absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors",
+                    focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary"
+                  )} />
                   <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm text-white outline-none"
+                    onFocus={() => setFocusedField("password")}
+                    onBlur={() => setFocusedField(null)}
+                    className="surface-input pl-11"
                     placeholder="••••••••"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="text-xs font-medium text-white/60 uppercase tracking-wider">Confirm New Password</label>
-                <div className="relative flex items-center rounded-xl border border-white/10 bg-white/[0.03]">
-                  <ShieldCheck className="absolute left-4 w-4 h-4 text-white/30" />
+                <label htmlFor="confirmPassword" className="label-text">Confirm New Password</label>
+                <div className="relative">
+                  <ShieldCheck className={cn(
+                    "absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors",
+                    focusedField === "confirmPassword" ? "text-brand-orange" : "text-txt-tertiary"
+                  )} />
                   <input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm text-white outline-none"
+                    onFocus={() => setFocusedField("confirmPassword")}
+                    onBlur={() => setFocusedField(null)}
+                    className="surface-input pl-11"
                     placeholder="••••••••"
                   />
                 </div>
@@ -82,10 +104,16 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gold-500 text-obsidian-950 font-bold text-sm hover:bg-gold-600 transition-all shadow-lg shadow-gold-500/20"
+              className="btn-primary w-full h-12 text-base font-bold shadow-brand-glow"
             >
-              {isLoading ? "Updating..." : "Update Password"}
-              <CheckCircle2 className="w-4 h-4" />
+              {isLoading ? (
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Update Password
+                  <CheckCircle2 className="w-5 h-5" />
+                </>
+              )}
             </button>
           </form>
         </motion.div>

@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Dumbbell, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Dumbbell, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 // ═══════════════════════════════════════════════════════════════
-// 🦅 EAGLE GYM — Login Page with Sunrise Animation
+// 🦅 EAGLE GYM — Dashboard Consistent Login Page
 // ═══════════════════════════════════════════════════════════════
 
 const LoginPage = () => {
@@ -58,112 +58,57 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-obsidian-950">
-      {/* Animated Background */}
-      <div className="absolute inset-0">
-        {/* Stars */}
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-0.5 h-0.5 bg-white rounded-full"
-            style={{
-              top: `${Math.random() * 50}%`,
-              left: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: [0, 1, 0],
-              scale: [0, 1, 0],
-            }}
-            transition={{
-              duration: 2 + Math.random() * 3,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
-
-        {/* Sunrise Gradient */}
-        <motion.div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full"
-          style={{
-            background: "radial-gradient(ellipse at center, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.08) 40%, transparent 70%)",
-          }}
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 2, ease: "easeOut" }}
-        />
-
-        {/* Horizon Glow */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-px"
-          style={{
-            background: "linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), rgba(255, 165, 0, 0.3), transparent)",
-          }}
-        />
-
-        {/* Mesh Gradient Overlay */}
-        <div className="absolute inset-0 bg-mesh-gradient opacity-20" />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      {/* Premium Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-md px-6">
-        {/* Logo & Header */}
+      {/* Content Container */}
+      <div className="relative z-10 w-full max-w-[420px] px-6 py-8">
+        {/* Brand Identity */}
         <motion.div
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: -30 }}
+          className="text-center mb-6"
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
         >
-          {/* Animated Eagle Icon */}
-          <motion.div
-            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-liquid-gold via-liquid-amber to-liquid-orange mb-6 shadow-2xl shadow-gold-500/20"
-            animate={{
-              boxShadow: [
-                "0 0 30px rgba(255, 215, 0, 0.2)",
-                "0 0 60px rgba(255, 215, 0, 0.3)",
-                "0 0 30px rgba(255, 215, 0, 0.2)",
-              ],
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            <Dumbbell className="w-10 h-10 text-obsidian-950" />
-          </motion.div>
-
-          <h1 className="font-display text-4xl font-bold text-gold-gradient mb-2">
-            EAGLE GYM
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20 mb-3">
+            <Dumbbell className="w-7 h-7" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            EAGLE <span className="text-brand-orange">GYM</span>
           </h1>
-          <p className="text-white/40 text-sm tracking-widest uppercase">
-            Rise Above. Transform Beyond.
+          <p className="text-xs text-txt-secondary mt-1 font-medium">
+            Portal Access • Secure Authentication
           </p>
         </motion.div>
 
         {/* Login Card */}
         <motion.div
-          className="glass-card p-8"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          className="surface-card p-6 sm:p-8"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <div className="text-center mb-8">
-            <h2 className="text-xl font-semibold text-white mb-1">Welcome Back</h2>
-            <p className="text-sm text-white/40">Sign in to your account</p>
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-foreground">Welcome Back</h2>
+            <p className="text-xs text-txt-tertiary mt-0.5">Please enter your credentials</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-xs font-medium text-white/60 uppercase tracking-wider">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">
                 Email Address
               </label>
-              <div
-                className={cn(
-                  "relative flex items-center rounded-xl border bg-white/[0.03] transition-all duration-300",
-                  focusedField === "email"
-                    ? "border-gold-500/50 ring-1 ring-gold-500/20"
-                    : "border-white/10"
-                )}
-              >
-                <Mail className="absolute left-4 w-4 h-4 text-white/30" />
+              <div className="relative group">
+                <Mail className={cn(
+                  "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
+                  focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary"
+                )} />
                 <input
                   id="email"
                   type="email"
@@ -171,27 +116,31 @@ const LoginPage = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
-                  placeholder="you@example.com"
-                  className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-white/20 outline-none"
+                  placeholder="Email Address"
+                  className="surface-input h-11 pl-11 text-sm"
                   disabled={isLoading}
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-xs font-medium text-white/60 uppercase tracking-wider">
-                Password
-              </label>
-              <div
-                className={cn(
-                  "relative flex items-center rounded-xl border bg-white/[0.03] transition-all duration-300",
-                  focusedField === "password"
-                    ? "border-gold-500/50 ring-1 ring-gold-500/20"
-                    : "border-white/10"
-                )}
-              >
-                <Lock className="absolute left-4 w-4 h-4 text-white/30" />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">
+                  Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-[11px] font-bold text-brand-orange hover:text-brand-orange-hover transition-colors"
+                >
+                  Forgot?
+                </Link>
+              </div>
+              <div className="relative group">
+                <Lock className={cn(
+                  "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
+                  focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary"
+                )} />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -199,108 +148,99 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
-                  placeholder="Enter your password"
-                  className="w-full bg-transparent py-3.5 pl-11 pr-12 text-sm text-white placeholder:text-white/20 outline-none"
+                  placeholder="••••••••"
+                  className="surface-input h-11 pl-11 pr-11 text-sm"
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 text-white/30 hover:text-white/60 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-txt-tertiary hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer group">
+            {/* Remember Me */}
+            <div className="flex items-center py-1">
+              <label className="flex items-center gap-2 cursor-pointer select-none group">
                 <div
                   className={cn(
-                    "w-4 h-4 rounded border transition-all duration-200 flex items-center justify-center",
+                    "w-4.5 h-4.5 rounded border-2 transition-all duration-200 flex items-center justify-center",
                     rememberMe
-                      ? "bg-gold-500 border-gold-500"
-                      : "border-white/20 group-hover:border-white/40"
+                      ? "bg-brand-orange border-brand-orange"
+                      : "border-surface-border group-hover:border-brand-orange/50"
                   )}
                   onClick={() => setRememberMe(!rememberMe)}
                 >
-                  {rememberMe && <Sparkles className="w-3 h-3 text-obsidian-950" />}
+                  {rememberMe && <ShieldCheck className="w-3 h-3 text-white" />}
                 </div>
-                <span className="text-xs text-white/40 group-hover:text-white/60 transition-colors">
+                <span className="text-xs font-semibold text-txt-secondary group-hover:text-foreground transition-colors">
                   Remember me
                 </span>
               </label>
-              <Link
-                href="/forgot-password"
-                className="text-xs text-gold-400 hover:text-gold-300 transition-colors"
-              >
-                Forgot password?
-              </Link>
             </div>
 
-            {/* Submit Button */}
-            <motion.button
+            {/* Action Button */}
+            <button
               type="submit"
               disabled={isLoading}
-              className={cn(
-                "w-full flex items-center justify-center gap-2 py-3.5 rounded-xl",
-                "bg-gradient-to-r from-liquid-gold via-liquid-amber to-liquid-orange",
-                "text-obsidian-950 font-semibold text-sm",
-                "shadow-lg shadow-gold-500/20",
-                "hover:shadow-xl hover:shadow-gold-500/30 hover:brightness-110",
-                "active:scale-[0.98]",
-                "transition-all duration-200",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
-              whileTap={{ scale: 0.98 }}
+              className="btn-primary w-full h-11 text-sm font-bold active:scale-[0.98]"
             >
               {isLoading ? (
-                <motion.div
-                  className="w-5 h-5 border-2 border-obsidian-950/30 border-t-obsidian-950 rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                />
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  Sign In to Dashboard
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
-            </motion.button>
+            </button>
           </form>
 
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
+              <div className="w-full border-t border-surface-border" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-obsidian-900 px-4 text-xs text-white/30">or</span>
+              <span className="bg-surface-card px-3 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                New Member?
+              </span>
             </div>
           </div>
 
-          {/* Register Link */}
-          <p className="text-center text-sm text-white/40">
-            Don&apos;t have an account?{" "}
+          {/* Join Link */}
+          <div className="text-center">
             <Link
               href="/register"
-              className="text-gold-400 hover:text-gold-300 font-medium transition-colors"
+              className="text-xs font-bold text-brand-orange hover:text-brand-orange-hover transition-colors inline-flex items-center gap-1 group"
             >
-              Join Eagle Gym
+              Join Eagle Gym Today
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
-          </p>
+          </div>
+
+          {/* Social Proof/Trust */}
+          <div className="mt-6 pt-4 border-t border-surface-border text-center">
+            <p className="text-[10px] text-txt-tertiary font-medium">
+              Authorized personnel only. Access monitored.
+            </p>
+          </div>
         </motion.div>
 
-        {/* Footer */}
-        <motion.p
-          className="text-center mt-8 text-xs text-white/20"
+        {/* Branding Footer */}
+        <motion.div
+          className="mt-6 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 0.5 }}
         >
-          Sunrise Complex, Vrindavan Chowkdi, Vadodara
-        </motion.p>
+          <p className="text-[10px] text-txt-tertiary uppercase tracking-wider">
+            © {new Date().getFullYear()} Eagle Gym • <span className="text-brand-orange font-bold">Athletic Clarity</span>
+          </p>
+        </motion.div>
       </div>
     </div>
   );

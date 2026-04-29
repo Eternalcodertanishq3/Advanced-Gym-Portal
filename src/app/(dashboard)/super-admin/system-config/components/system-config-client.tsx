@@ -2,10 +2,19 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Save, ServerCrash, Loader2 } from "lucide-react";
+import { Save, ServerCrash, Loader2, Bell, ShieldCheck, Languages, Users, Zap, MessageSquare } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { updateSystemConfig } from "@/actions/super-admin/config-actions";
 import { toast } from "sonner";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
   initialConfig: Record<string, any>;
@@ -21,8 +30,27 @@ export function SystemConfigClient({ initialConfig }: Props) {
 
     const formData = new FormData(e.currentTarget);
     const data: Record<string, any> = {};
+    
+    // Standard inputs
     formData.forEach((value, key) => {
       data[key] = value;
+    });
+
+    // Handle checkboxes/switches that might be missing from FormData when unchecked
+    const form = e.currentTarget;
+    const switches = ["emailNotifications", "whatsappAlerts", "smsMarketing", "enforce2fa"];
+    switches.forEach(name => {
+      const input = form.querySelector(`input[name="${name}"]`) as HTMLInputElement;
+      if (input) {
+        data[name] = input.value === "on" ? "true" : "false";
+      } else {
+        // If the Radix switch is not rendering a native input correctly in this environment, 
+        // we fallback to checking the data-state of the button
+        const button = form.querySelector(`button[name="${name}"]`);
+        if (button) {
+          data[name] = button.getAttribute("data-state") === "checked" ? "true" : "false";
+        }
+      }
     });
 
     const res = await updateSystemConfig(data);
@@ -39,115 +67,590 @@ export function SystemConfigClient({ initialConfig }: Props) {
   return (
     <div className="space-y-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-wide font-display flex items-center gap-3">
-          <ServerCrash className="w-6 h-6 text-orange-400" />
+        <h1 className="text-2xl font-bold text-foreground tracking-wide font-display flex items-center gap-3">
+          <ServerCrash className="w-6 h-6 text-brand-orange" />
           System Configuration
         </h1>
-        <p className="text-sm text-white/50 mt-1">Manage global gym variables and system behaviors.</p>
+        <p className="text-sm text-muted-foreground mt-1">Manage global gym variables and system behaviors.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left Col - Navigation */}
         <div className="space-y-2">
-          {["General Settings", "Localization", "Notifications", "Security"].map((item) => (
+          {[
+            { id: "General Settings", icon: Save },
+            { id: "Social Links", icon: Users },
+            { id: "Marketing Content", icon: Zap },
+            { id: "Testimonial Fallbacks", icon: MessageSquare },
+            { id: "Localization", icon: Languages },
+            { id: "Notifications", icon: Bell },
+            { id: "Security", icon: ShieldCheck }
+          ].map((item) => (
             <button 
-              key={item} 
-              onClick={() => setActiveTab(item)}
+              key={item.id} 
+              onClick={() => setActiveTab(item.id)}
               className={cn(
-                "w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors",
-                activeTab === item ? "bg-white/10 text-white border border-white/10" : "text-white/50 hover:bg-white/5 hover:text-white"
+                "w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center gap-3",
+                activeTab === item.id 
+                  ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20 shadow-[0_0_15px_rgba(232,93,38,0.1)] font-bold" 
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
             >
-              {item}
+              <item.icon className="w-4 h-4" />
+              {item.id}
             </button>
           ))}
         </div>
 
         {/* Right Col - Forms */}
         <div className="md:col-span-2 space-y-6">
-          <form onSubmit={handleSubmit} className="glass-card p-6 rounded-2xl border border-white/5 space-y-6 bg-obsidian-900/50 backdrop-blur-xl">
+          <form onSubmit={handleSubmit} className="surface-card-static p-6 sm:p-8 space-y-6">
             {activeTab === "General Settings" && (
               <>
-                <h2 className="text-lg font-display text-white border-b border-white/10 pb-2">General Details</h2>
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2">General Details</h2>
                 
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-white/70 uppercase tracking-wider">Gym Name</label>
-                    <input 
-                      name="gymName"
-                      type="text" 
-                      title="Gym Name"
-                      defaultValue={initialConfig.gymName || "Eagle Gym"}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-all"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label htmlFor="gymName" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gym Name</label>
+                      <input 
+                        id="gymName"
+                        name="gymName"
+                        type="text" 
+                        title="Gym Name"
+                        defaultValue={initialConfig.gymName || ""}
+                        placeholder="Enter your gym's official name"
+                        className="surface-input"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="gymLogo" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gym Logo URL</label>
+                      <input 
+                        id="gymLogo"
+                        name="gymLogo"
+                        type="text" 
+                        title="Gym Logo"
+                        defaultValue={initialConfig.gymLogo || "/logo.png"}
+                        placeholder="e.g. /logo.png"
+                        className="surface-input"
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-white/70 uppercase tracking-wider">Support Email</label>
+                      <label htmlFor="supportEmail" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Support Email</label>
                       <input 
+                        id="supportEmail"
                         name="supportEmail"
                         type="email" 
                         title="Support Email"
-                        defaultValue={initialConfig.supportEmail || "support@eaglegym.com"}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-all"
+                        defaultValue={initialConfig.supportEmail || ""}
+                        placeholder="Enter support email"
+                        className="surface-input"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-white/70 uppercase tracking-wider">Contact Phone</label>
+                      <label htmlFor="contactPhone" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Contact Phone</label>
                       <input 
+                        id="contactPhone"
                         name="contactPhone"
                         type="text" 
                         title="Contact Phone"
-                        defaultValue={initialConfig.contactPhone || "+91 98765 43210"}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-all"
+                        defaultValue={initialConfig.contactPhone || ""}
+                        placeholder="Enter contact phone"
+                        className="surface-input"
                       />
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="gymAddress" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gym Address</label>
+                    <textarea 
+                      id="gymAddress"
+                      name="gymAddress"
+                      title="Gym Address"
+                      defaultValue={initialConfig.gymAddress || ""}
+                      placeholder="Enter the full physical address of the gym"
+                      rows={2}
+                      className="surface-input resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="gymMission" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gym Mission / Brand Bio</label>
+                    <textarea 
+                      id="gymMission"
+                      name="gymMission"
+                      title="Gym Mission"
+                      defaultValue={initialConfig.gymMission || "Rise above your limits. Transform your life with our elite trainers, state-of-the-art equipment, and a community built on grit and ambition."}
+                      placeholder="Enter a brief mission statement or brand bio for the footer"
+                      rows={3}
+                      className="surface-input resize-none"
+                    />
+                  </div>
                 </div>
 
-                <h2 className="text-lg font-display text-white border-b border-white/10 pb-2 mt-8">Operational Hours</h2>
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2 mt-8">Operational Hours</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-white/70 uppercase tracking-wider">Opening Time</label>
+                    <label htmlFor="openingTime" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Opening Time</label>
                     <input 
+                      id="openingTime"
                       name="openingTime"
                       type="time" 
                       title="Opening Time"
-                      defaultValue={initialConfig.openingTime || "05:00"}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-all [color-scheme:dark]"
+                      placeholder="Select opening time"
+                      defaultValue={initialConfig.openingTime || ""}
+                      className="surface-input [color-scheme:light]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-white/70 uppercase tracking-wider">Closing Time</label>
+                    <label htmlFor="closingTime" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Closing Time</label>
                     <input 
+                      id="closingTime"
                       name="closingTime"
                       type="time" 
                       title="Closing Time"
-                      defaultValue={initialConfig.closingTime || "23:00"}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-gold-500/50 transition-all [color-scheme:dark]"
+                      placeholder="Select closing time"
+                      defaultValue={initialConfig.closingTime || ""}
+                      className="surface-input [color-scheme:light]"
                     />
                   </div>
                 </div>
               </>
             )}
 
-            {activeTab !== "General Settings" && (
-              <div className="py-20 text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto">
-                  <Save className="w-6 h-6 text-white/20" />
+            {activeTab === "Social Links" && (
+              <>
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2">Social Media Presence</h2>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="instagramUrl" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Instagram URL</label>
+                    <input 
+                      id="instagramUrl"
+                      name="instagramUrl"
+                      type="url" 
+                      title="Instagram URL"
+                      defaultValue={initialConfig.instagramUrl || ""}
+                      placeholder="https://instagram.com/eaglegym"
+                      className="surface-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="facebookUrl" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Facebook URL</label>
+                    <input 
+                      id="facebookUrl"
+                      name="facebookUrl"
+                      type="url" 
+                      title="Facebook URL"
+                      defaultValue={initialConfig.facebookUrl || ""}
+                      placeholder="https://facebook.com/eaglegym"
+                      className="surface-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="twitterUrl" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Twitter URL</label>
+                    <input 
+                      id="twitterUrl"
+                      name="twitterUrl"
+                      type="url" 
+                      title="Twitter URL"
+                      defaultValue={initialConfig.twitterUrl || ""}
+                      placeholder="https://twitter.com/eaglegym"
+                      className="surface-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="youtubeUrl" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">YouTube URL</label>
+                    <input 
+                      id="youtubeUrl"
+                      name="youtubeUrl"
+                      type="url" 
+                      title="YouTube URL"
+                      defaultValue={initialConfig.youtubeUrl || ""}
+                      placeholder="https://youtube.com/@eaglegym"
+                      className="surface-input"
+                    />
+                  </div>
                 </div>
-                <p className="text-white/40 text-sm italic">Configuring {activeTab} will be available in the next system update.</p>
-              </div>
+              </>
+            )}
+
+            {activeTab === "Marketing Content" && (
+              <>
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2">Hero Section</h2>
+                <div className="space-y-4 pt-2">
+                  <div className="space-y-2">
+                    <label htmlFor="heroTitle" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Hero Title</label>
+                    <input 
+                      id="heroTitle"
+                      name="heroTitle"
+                      type="text" 
+                      title="Hero Title"
+                      defaultValue={initialConfig.heroTitle || "UNLEASH YOUR ELITE SELF."}
+                      placeholder="e.g. UNLEASH YOUR ELITE SELF."
+                      className="surface-input"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="heroSubtitle" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Hero Subtitle</label>
+                    <input 
+                      id="heroSubtitle"
+                      name="heroSubtitle"
+                      type="text" 
+                      title="Hero Subtitle"
+                      defaultValue={initialConfig.heroSubtitle || "Rise Above. Transform Beyond."}
+                      placeholder="e.g. Rise Above. Transform Beyond."
+                      className="surface-input"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="heroImage" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Hero Image</label>
+                    <input 
+                      id="heroImage"
+                      name="heroImage"
+                      type="text" 
+                      title="Hero Image"
+                      defaultValue={initialConfig.heroImage || "/images/hero-bg.png"}
+                      placeholder="e.g. /images/hero-bg.png"
+                      className="surface-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-6 mt-8">
+                  {/* Philosophy Section */}
+                  <div className="p-5 rounded-2xl bg-muted/30 border border-border space-y-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Zap className="w-5 h-5 text-brand-orange" />
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Philosophy Section</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <label htmlFor="aboutTitle" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Title</label>
+                        <input 
+                          id="aboutTitle"
+                          name="aboutTitle"
+                          type="text" 
+                          title="Philosophy Title"
+                          defaultValue={initialConfig.aboutTitle || "Our Philosophy"}
+                          className="surface-input"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="aboutSubtitle" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Subtitle</label>
+                        <input 
+                          id="aboutSubtitle"
+                          name="aboutSubtitle"
+                          type="text" 
+                          title="Philosophy Subtitle"
+                          defaultValue={initialConfig.aboutSubtitle || "BUILT ON GRIT, DRIVEN BY RESULTS."}
+                          className="surface-input"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="aboutDescription" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Philosophy Description</label>
+                      <textarea 
+                        id="aboutDescription"
+                        name="aboutDescription"
+                        title="Philosophy Description"
+                        defaultValue={initialConfig.aboutDescription || ""}
+                        placeholder="Enter a detailed philosophy description"
+                        rows={3}
+                        className="surface-input resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2 mt-8">Features Section</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <label htmlFor="featuresTitle" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Features Title</label>
+                    <input 
+                      id="featuresTitle"
+                      name="featuresTitle"
+                      type="text" 
+                      title="Features Title"
+                      defaultValue={initialConfig.featuresTitle || "EVERYTHING YOU NEED TO"}
+                      className="surface-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="featuresSubtitle" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Features Subtitle</label>
+                    <input 
+                      id="featuresSubtitle"
+                      name="featuresSubtitle"
+                      type="text" 
+                      title="Features Subtitle"
+                      defaultValue={initialConfig.featuresSubtitle || "BECOME LIMITLESS."}
+                      className="surface-input"
+                    />
+                  </div>
+                </div>
+
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2 mt-8">Mid-Page Branding</h2>
+                <div className="space-y-4 pt-2">
+                  <div className="space-y-2">
+                    <label htmlFor="midPageQuote" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quote Text</label>
+                    <textarea 
+                      id="midPageQuote"
+                      name="midPageQuote"
+                      title="Mid-Page Quote"
+                      defaultValue={initialConfig.midPageQuote || "THE ONLY BAD WORKOUT IS THE ONE THAT DIDN'T HAPPEN."}
+                      placeholder="Enter an inspirational quote"
+                      rows={2}
+                      className="surface-input resize-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="midPageQuoteAuthor" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quote Author/Label</label>
+                    <input 
+                      id="midPageQuoteAuthor"
+                      name="midPageQuoteAuthor"
+                      type="text" 
+                      title="Quote Author"
+                      defaultValue={initialConfig.midPageQuoteAuthor || "Elite Community"}
+                      placeholder="e.g. Elite Community"
+                      className="surface-input"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "Testimonial Fallbacks" && (
+              <>
+                <div className="flex items-center justify-between border-b border-border pb-2 mb-6">
+                  <h2 className="text-lg font-display text-foreground">Testimonial Fallbacks</h2>
+                  <Link 
+                    href="/super-admin/testimonials" 
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-orange/10 text-brand-orange text-xs font-bold hover:bg-brand-orange/20 transition-all"
+                  >
+                    Manage Member Feedback
+                  </Link>
+                </div>
+
+                <div className="space-y-6">
+                  <p className="text-[11px] text-muted-foreground bg-primary/5 border border-primary/10 p-4 rounded-xl leading-relaxed">
+                    <span className="font-bold text-brand-orange uppercase tracking-wider">How this works:</span><br />
+                    The landing page prioritizes approved feedback from the <strong>Member Feedback</strong> section. If there isn't enough dynamic content to fill the slider, the system will use these manual fallbacks as a backup.
+                  </p>
+
+                  <div className="p-5 rounded-2xl bg-muted/30 border border-border space-y-6">
+                    {/* Testimonial 1 */}
+                    <div className="space-y-5">
+                      <div className="flex items-center gap-2 text-brand-orange">
+                        <MessageSquare className="w-4 h-4" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Fallback Testimonial #1</span>
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="testimonialQuote" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Quote</label>
+                        <textarea 
+                          id="testimonialQuote"
+                          name="testimonialQuote"
+                          title="Testimonial Quote 1"
+                          defaultValue={initialConfig.testimonialQuote || "Eagle Gym completely changed my perspective on fitness. The environment is unmatched."}
+                          rows={3}
+                          className="surface-input resize-none"
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <label htmlFor="testimonialAuthor" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Author Name</label>
+                          <input 
+                            id="testimonialAuthor"
+                            name="testimonialAuthor"
+                            type="text" 
+                            title="Testimonial Author 1"
+                            defaultValue={initialConfig.testimonialAuthor || "Siddharth Varma"}
+                            className="surface-input"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label htmlFor="testimonialRole" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Role/Designation</label>
+                          <input 
+                            id="testimonialRole"
+                            name="testimonialRole"
+                            type="text" 
+                            title="Testimonial Role 1"
+                            defaultValue={initialConfig.testimonialRole || "Pro Athlete"}
+                            className="surface-input"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Testimonial 2 */}
+                    <div className="space-y-5 pt-6 border-t border-border">
+                      <div className="flex items-center gap-2 text-brand-orange">
+                        <MessageSquare className="w-4 h-4" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Fallback Testimonial #2</span>
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="testimonialQuote2" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Quote</label>
+                        <textarea 
+                          id="testimonialQuote2"
+                          name="testimonialQuote2"
+                          title="Testimonial Quote 2"
+                          defaultValue={initialConfig.testimonialQuote2 || ""}
+                          placeholder="Enter second testimonial (optional)"
+                          rows={3}
+                          className="surface-input resize-none"
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <label htmlFor="testimonialAuthor2" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Author Name</label>
+                          <input 
+                            id="testimonialAuthor2"
+                            name="testimonialAuthor2"
+                            type="text" 
+                            title="Testimonial Author 2"
+                            defaultValue={initialConfig.testimonialAuthor2 || ""}
+                            className="surface-input"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label htmlFor="testimonialRole2" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Role/Designation</label>
+                          <input 
+                            id="testimonialRole2"
+                            name="testimonialRole2"
+                            type="text" 
+                            title="Testimonial Role 2"
+                            defaultValue={initialConfig.testimonialRole2 || ""}
+                            className="surface-input"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "Localization" && (
+              <>
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2">Localization</h2>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Timezone</label>
+                      <Select name="timezone" defaultValue={initialConfig.timezone || "UTC"}>
+                        <SelectTrigger className="surface-input h-11 flex items-center justify-between">
+                          <SelectValue placeholder="Select timezone" />
+                        </SelectTrigger>
+                      <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[50]">
+                        <SelectItem value="UTC">UTC (GMT+0)</SelectItem>
+                        <SelectItem value="IST">IST (GMT+5:30)</SelectItem>
+                        <SelectItem value="EST">EST (GMT-5)</SelectItem>
+                        <SelectItem value="PST">PST (GMT-8)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Currency</label>
+                      <Select name="currency" defaultValue={initialConfig.currency || "USD"}>
+                        <SelectTrigger className="surface-input h-11 flex items-center justify-between">
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[50]">
+                          <SelectItem value="USD">USD ($)</SelectItem>
+                          <SelectItem value="INR">INR (₹)</SelectItem>
+                          <SelectItem value="EUR">EUR (€)</SelectItem>
+                          <SelectItem value="GBP">GBP (£)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Date Format</label>
+                      <Select name="dateFormat" defaultValue={initialConfig.dateFormat || "DD/MM/YYYY"}>
+                        <SelectTrigger className="w-full bg-muted/30 border border-border rounded-xl px-4 py-2.5 h-11 text-foreground focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all">
+                          <SelectValue placeholder="Select date format" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[50]">
+                          <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                          <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                          <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "Notifications" && (
+              <>
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2">System Notifications</h2>
+                <div className="space-y-6 pt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-bold text-foreground">Email Notifications</label>
+                      <p className="text-xs text-muted-foreground">Receive system alerts and daily reports via email.</p>
+                    </div>
+                    <Switch name="emailNotifications" defaultChecked={initialConfig.emailNotifications === "true"} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-bold text-foreground">WhatsApp Alerts</label>
+                      <p className="text-xs text-muted-foreground">Send member reminders and receipts via WhatsApp.</p>
+                    </div>
+                    <Switch name="whatsappAlerts" defaultChecked={initialConfig.whatsappAlerts === "true"} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-bold text-foreground">Marketing SMS</label>
+                      <p className="text-xs text-muted-foreground">Enable bulk SMS for promotional campaigns.</p>
+                    </div>
+                    <Switch name="smsMarketing" defaultChecked={initialConfig.smsMarketing === "true"} />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "Security" && (
+              <>
+                <h2 className="text-lg font-display text-foreground border-b border-border pb-2">Security Settings</h2>
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-bold text-foreground">Two-Factor Authentication</label>
+                      <p className="text-xs text-muted-foreground">Force admins to use 2FA for system access.</p>
+                    </div>
+                    <Switch name="enforce2fa" defaultChecked={initialConfig.enforce2fa === "true"} />
+                  </div>
+                  
+                  <div className="space-y-2 pt-4">
+                    <label htmlFor="sessionTimeout" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Session Timeout (Minutes)</label>
+                    <input 
+                      id="sessionTimeout"
+                      name="sessionTimeout"
+                      type="number" 
+                      title="Session Timeout in Minutes"
+                      placeholder="e.g. 60"
+                      defaultValue={initialConfig.sessionTimeout || "60"}
+                      className="surface-input"
+                    />
+                  </div>
+                </div>
+              </>
             )}
 
             <div className="pt-6 flex justify-end border-t border-white/5 mt-6">
               <motion.button 
                 type="submit"
-                disabled={isSubmitting || activeTab !== "General Settings"}
+                disabled={isSubmitting}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-6 py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-obsidian-950 font-bold rounded-xl shadow-[0_0_15px_rgba(255,215,0,0.3)] flex items-center gap-2 disabled:opacity-50 disabled:grayscale"
+                className="px-6 py-2.5 bg-brand-orange text-white font-bold rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:grayscale"
               >
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {isSubmitting ? "Saving..." : "Save Configurations"}

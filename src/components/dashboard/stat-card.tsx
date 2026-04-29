@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, type LucideIcon
 import { cn, formatNumber, formatCurrency } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
-// 🦅 EAGLE GYM — Glass Stat Card with Sparkline
+// 🦅 EAGLE GYM — Athletic Clarity Stat Card
 // ═══════════════════════════════════════════════════════════════
 
 interface StatCardProps {
@@ -16,51 +16,60 @@ interface StatCardProps {
   trend?: string;
   trendUp?: boolean;
   sparklineData?: number[];
-  color?: "gold" | "green" | "cyan" | "crimson" | "purple";
+  color?: "orange" | "navy" | "success" | "danger" | "warning" | "info" | "purple";
   subtitle?: string;
   className?: string;
 }
 
 const colorMap = {
-  gold: {
-    bg: "from-gold-500/20 to-gold-500/5",
-    text: "text-gold-400",
-    border: "border-gold-500/20",
-    iconBg: "bg-gold-500/10",
-    sparkline: "#FFD700",
-    glow: "shadow-gold-500/10",
+  orange: {
+    bg: "bg-brand-orange-soft",
+    text: "text-brand-orange",
+    border: "border-brand-orange/20",
+    sparkline: "#E85D26",
+    accent: "bg-brand-orange",
   },
-  green: {
-    bg: "from-neon-green/20 to-neon-green/5",
-    text: "text-neon-green",
-    border: "border-neon-green/20",
-    iconBg: "bg-neon-green/10",
-    sparkline: "#39FF14",
-    glow: "shadow-neon-green/10",
+  navy: {
+    bg: "bg-brand-navy-light/20",
+    text: "text-brand-navy",
+    border: "border-brand-navy/20",
+    sparkline: "#1A3A4A",
+    accent: "bg-brand-navy",
   },
-  cyan: {
-    bg: "from-electric-cyan/20 to-electric-cyan/5",
-    text: "text-electric-cyan",
-    border: "border-electric-cyan/20",
-    iconBg: "bg-electric-cyan/10",
-    sparkline: "#00F0FF",
-    glow: "shadow-electric-cyan/10",
+  success: {
+    bg: "bg-success-soft",
+    text: "text-success",
+    border: "border-success/20",
+    sparkline: "#16A34A",
+    accent: "bg-success",
   },
-  crimson: {
-    bg: "from-crimson/20 to-crimson/5",
-    text: "text-crimson",
-    border: "border-crimson/20",
-    iconBg: "bg-crimson/10",
-    sparkline: "#FF3131",
-    glow: "shadow-crimson/10",
+  danger: {
+    bg: "bg-danger-soft",
+    text: "text-danger",
+    border: "border-danger/20",
+    sparkline: "#DC2626",
+    accent: "bg-danger",
+  },
+  warning: {
+    bg: "bg-warning-soft",
+    text: "text-warning",
+    border: "border-warning/20",
+    sparkline: "#D97706",
+    accent: "bg-warning",
+  },
+  info: {
+    bg: "bg-info-soft",
+    text: "text-info",
+    border: "border-info/20",
+    sparkline: "#2563EB",
+    accent: "bg-info",
   },
   purple: {
-    bg: "from-purple-500/20 to-purple-500/5",
-    text: "text-purple-400",
-    border: "border-purple-500/20",
-    iconBg: "bg-purple-500/10",
-    sparkline: "#A855F7",
-    glow: "shadow-purple-500/10",
+    bg: "bg-purple-100 dark:bg-purple-900/20",
+    text: "text-purple-600 dark:text-purple-400",
+    border: "border-purple-200 dark:border-purple-800/50",
+    sparkline: "#9333EA",
+    accent: "bg-purple-600",
   },
 };
 
@@ -101,10 +110,10 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   if (!data || data.length < 2) return null;
 
   return (
-    <svg ref={svgRef} viewBox="0 0 120 40" className="w-full h-10 opacity-60">
+    <svg ref={svgRef} viewBox="0 0 120 40" className="w-full h-10 opacity-70">
       <defs>
         <linearGradient id={`sparklineGradient-${color}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+          <stop offset="0%" stopColor={color} stopOpacity="0.2" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -112,7 +121,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
         d={pathD}
         fill="none"
         stroke={color}
-        strokeWidth="2"
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -132,11 +141,14 @@ export function StatCard({
   trend,
   trendUp = true,
   sparklineData,
-  color = "gold",
+  color = "navy",
   subtitle,
   className,
 }: StatCardProps) {
-  const colors = colorMap[color];
+  // Default to navy if old color like "gold" is passed
+  const colorKey = colorMap[color as keyof typeof colorMap] ? color : "navy";
+  const colors = colorMap[colorKey as keyof typeof colorMap];
+  
   const [displayValue, setDisplayValue] = useState(0);
   const isNumeric = typeof value === "number";
 
@@ -170,33 +182,26 @@ export function StatCard({
     : value;
 
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
+    <div
       className={cn(
-        "glass-card p-6 h-full group relative cursor-pointer",
+        "surface-card p-6 h-full group relative transition-all duration-300",
         className
       )}
     >
-      {/* Decorative Background Glow */}
-      <div className={cn(
-        "absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-0 group-hover:opacity-10 transition-opacity duration-500",
-        colors.bg
-      )} />
-      
       <div className="relative z-10 flex flex-col h-full">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-5">
           <div className={cn(
-            "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg border",
+            "w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105",
             colors.bg,
-            colors.border
+            colors.text
           )}>
-            <Icon className={cn("w-6 h-6", colors.text)} />
+            <Icon className="w-6 h-6" />
           </div>
           
           {trend && (
             <div className={cn(
-              "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all duration-300",
-              trendUp ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+              "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold",
+              trendUp ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
             )}>
               {trendUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
               {trend}
@@ -204,16 +209,16 @@ export function StatCard({
           )}
         </div>
 
-        <div className="space-y-1 mb-4">
-          <h3 className="text-3xl font-bold text-foreground tracking-tight flex items-baseline gap-1">
+        <div className="space-y-1 mb-2">
+          <h3 className="stat-number text-3xl font-display font-bold text-foreground tracking-tight flex items-baseline gap-1">
             {formattedValue}
           </h3>
-          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-[0.1em] uppercase">
+          <p className="label-text">
             {label}
           </p>
         </div>
 
-        {subtitle && <p className="text-xs text-muted-foreground/40 mt-auto">{subtitle}</p>}
+        {subtitle && <p className="text-xs text-txt-tertiary mt-auto">{subtitle}</p>}
 
         {sparklineData && (
           <div className="mt-4 -mx-2">
@@ -225,10 +230,10 @@ export function StatCard({
       {/* Bottom accent line */}
       <div
         className={cn(
-          "absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-500",
-          colors.bg
+          "absolute bottom-0 left-0 right-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-[calc(var(--radius)-1px)]",
+          colors.accent
         )}
       />
-    </motion.div>
+    </div>
   );
 }

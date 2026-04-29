@@ -85,7 +85,7 @@ export function PhotoComparison({
         {/* Dark gradient overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20 pointer-events-none" />
         
-        <div className="absolute top-4 right-4 bg-gold-500/80 backdrop-blur-md px-3 py-1.5 rounded-full text-xs text-black font-mono font-bold shadow-[0_0_15px_rgba(255,215,0,0.3)] flex items-center gap-2 whitespace-nowrap">
+        <div className="absolute top-4 right-4 bg-brand-orange/80 backdrop-blur-md px-3 py-1.5 rounded-full text-xs text-white font-mono font-bold shadow-lg shadow-brand-orange/20 flex items-center gap-2 whitespace-nowrap">
           <span className="w-2 h-2 rounded-full bg-white shadow-sm" />
           AFTER: {afterDate}
         </div>

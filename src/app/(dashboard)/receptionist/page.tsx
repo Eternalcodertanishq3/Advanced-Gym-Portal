@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   QrCode,
@@ -19,6 +19,8 @@ import {
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { toast } from "sonner";
+import { getReceptionistDashboardStats } from "@/server/actions/receptionist-actions";
+import { SkeletonStatGrid } from "@/components/loaders/eagle-loader";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Receptionist Dashboard
@@ -28,28 +30,39 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
 
 export default function ReceptionistDashboardPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState<any>(null);
   const [checkInQuery, setCheckInQuery] = useState("");
-  const [recentCheckIns, setRecentCheckIns] = useState([
-    { id: "1", name: "Rahul Patel", time: "06:15 AM", status: "checked-in" },
-    { id: "2", name: "Priya Sharma", time: "06:42 AM", status: "checked-in" },
-    { id: "3", name: "Amit Kumar", time: "07:10 AM", status: "checked-out" },
-    { id: "4", name: "Neha Gupta", time: "07:35 AM", status: "checked-in" },
-    { id: "5", name: "Vikram Singh", time: "08:00 AM", status: "checked-in" },
-  ]);
+  const [recentCheckIns, setRecentCheckIns] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadStats() {
+      setIsLoading(true);
+      const res = await getReceptionistDashboardStats();
+      if (res.success && res.data) {
+        setStats(res.data);
+        setRecentCheckIns(res.data.recentCheckIns || []);
+      } else {
+        toast.error("Failed to load stats.");
+      }
+      setIsLoading(false);
+    }
+    loadStats();
+  }, []);
 
   const handleQuickCheckIn = () => {
     if (!checkInQuery.trim()) {
@@ -60,6 +73,15 @@ export default function ReceptionistDashboardPage() {
     setCheckInQuery("");
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-pulse-fade">
+        <div className="h-16 bg-surface-elevated rounded-xl w-1/3 mb-8" />
+        <SkeletonStatGrid count={4} />
+      </div>
+    );
+  }
+
   return (
     <motion.div
       variants={containerVariants}
@@ -68,83 +90,81 @@ export default function ReceptionistDashboardPage() {
       className="space-y-8"
     >
       {/* Page Header */}
-      <motion.div variants={itemVariants} className="flex items-center justify-between">
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-white mb-1">
-            Reception <span className="text-gold-gradient">Desk</span>
+          <h1 className="font-display text-3xl font-bold text-foreground mb-1">
+            Reception <span className="text-brand-orange">Desk</span>
           </h1>
-          <p className="text-sm text-white/40">Quick actions for daily operations</p>
+          <p className="text-sm text-txt-secondary font-medium">Quick actions for daily operations</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-electric-cyan/10 border border-electric-cyan/20">
-          <Clock className="w-3 h-3 text-electric-cyan" />
-          <span className="text-xs text-electric-cyan font-mono">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-info-soft border border-info/20">
+          <Clock className="w-3 h-3 text-info" />
+          <span className="text-xs text-info font-bold tracking-wide">
             {new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
       </motion.div>
 
       {/* Quick Action Cards */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <QuickActionCard
           icon={QrCode}
           label="Quick Check-In"
           description="Scan QR or search member"
-          color="gold"
+          color="orange"
           href="/receptionist/check-in"
         />
         <QuickActionCard
           icon={UserPlus}
           label="Walk-In Register"
           description="New member registration"
-          color="green"
+          color="success"
           href="/receptionist/walk-in"
         />
         <QuickActionCard
           icon={CreditCard}
           label="Collect Payment"
           description="Record cash/card/UPI"
-          color="cyan"
+          color="info"
           href="/receptionist/payments"
         />
         <QuickActionCard
           icon={Users}
           label="View Members"
           description="Search & view profiles"
-          color="purple"
+          color="navy"
           href="/receptionist/members"
         />
       </motion.div>
 
       {/* Stats Row */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           icon={Users}
           label="Checked In Today"
-          value={142}
+          value={stats?.todayCheckIns || 0}
           trend="+12"
           trendUp
-          color="green"
+          color="success"
         />
         <StatCard
           icon={CreditCard}
           label="Today's Collection"
-          value={formatCurrency(45200, { showSymbol: true, decimals: 0 })}
-          trend="+₹8,500"
-          trendUp
-          color="gold"
+          value={formatCurrency(stats?.todayCollection || 0, { showSymbol: true, decimals: 0 })}
+          color="orange"
         />
         <StatCard
           icon={UserPlus}
           label="New Registrations"
-          value={3}
-          color="cyan"
+          value={stats?.newWalkIns || 0}
+          color="info"
         />
         <StatCard
           icon={Bell}
           label="Pending Dues"
-          value={23}
-          color="crimson"
-          subtitle="₹1,24,500 total"
+          value={stats?.pendingPayments || 0}
+          color="danger"
+          subtitle="Follow-up needed"
         />
       </motion.div>
 
@@ -152,32 +172,32 @@ export default function ReceptionistDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Quick Check-In */}
         <motion.div variants={itemVariants} className="lg:col-span-2">
-          <div className="glass-card p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500/20 to-gold-500/5 flex items-center justify-center">
-                <QrCode className="w-5 h-5 text-gold-400" />
+          <div className="surface-card p-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-brand-orange-soft flex items-center justify-center">
+                <QrCode className="w-6 h-6 text-brand-orange" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Quick Check-In</h3>
-                <p className="text-xs text-white/30">Search by name, phone, or member ID</p>
+                <h3 className="text-lg font-bold text-foreground">Quick Check-In</h3>
+                <p className="text-sm text-txt-secondary">Search by name, phone, or member ID</p>
               </div>
             </div>
 
-            <div className="flex gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-txt-tertiary" />
                 <input
                   type="text"
                   placeholder="Enter member name or ID..."
                   value={checkInQuery}
                   onChange={(e) => setCheckInQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleQuickCheckIn()}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold-500/30 transition-all"
+                  className="w-full bg-surface-sunken border border-border rounded-xl py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-txt-tertiary outline-none focus:border-brand-orange/50 focus:ring-2 focus:ring-brand-orange/20 transition-all"
                 />
               </div>
               <button
                 onClick={handleQuickCheckIn}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-liquid-gold to-liquid-orange text-obsidian-950 font-semibold text-sm hover:brightness-110 transition-all active:scale-95 flex items-center gap-2"
+                className="px-6 py-3 rounded-xl bg-brand-orange text-white font-bold text-sm hover:bg-brand-orange/90 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 Check In
@@ -186,40 +206,43 @@ export default function ReceptionistDashboardPage() {
 
             {/* Recent Check-Ins */}
             <div>
-              <h4 className="text-xs font-medium text-white/30 uppercase tracking-wider mb-3">
+              <h4 className="text-xs font-bold text-txt-tertiary uppercase tracking-wider mb-4">
                 Recent Activity
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {recentCheckIns.map((checkIn, index) => (
                   <motion.div
                     key={checkIn.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                    className="flex items-center justify-between p-4 rounded-xl bg-surface-sunken border border-border/50 hover:border-border transition-colors"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div
                         className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold",
+                          "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold",
                           checkIn.status === "checked-in"
-                            ? "bg-neon-green/10 text-neon-green"
-                            : "bg-white/5 text-white/30"
+                            ? "bg-success text-white shadow-sm"
+                            : "bg-surface-elevated text-txt-secondary"
                         )}
                       >
-                        {checkIn.name.split(" ").map((n) => n[0]).join("")}
+                        {checkIn.name.split(" ").map((n: string) => n[0]).join("")}
                       </div>
                       <div>
-                        <p className="text-sm text-white">{checkIn.name}</p>
-                        <p className="text-xs text-white/30">{checkIn.time}</p>
+                        <p className="text-sm font-bold text-foreground">{checkIn.name}</p>
+                        <p className="text-xs font-medium text-txt-tertiary flex items-center gap-1 mt-0.5">
+                          <Clock className="w-3 h-3" />
+                          {checkIn.time}
+                        </p>
                       </div>
                     </div>
                     <span
                       className={cn(
-                        "text-xs px-2 py-0.5 rounded-full font-medium",
+                        "text-xs px-3 py-1 rounded-full font-bold tracking-wide uppercase",
                         checkIn.status === "checked-in"
-                          ? "bg-neon-green/10 text-neon-green"
-                          : "bg-white/5 text-white/30"
+                          ? "bg-success-soft text-success"
+                          : "bg-surface-elevated text-txt-secondary"
                       )}
                     >
                       {checkIn.status === "checked-in" ? "Checked In" : "Checked Out"}
@@ -233,63 +256,58 @@ export default function ReceptionistDashboardPage() {
 
         {/* Today's Summary */}
         <motion.div variants={itemVariants}>
-          <div className="glass-card p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-electric-cyan/20 to-electric-cyan/5 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-electric-cyan" />
+          <div className="surface-card p-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-info-soft flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-info" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Today&apos;s Summary</h3>
-                <p className="text-xs text-white/30">Overview for {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long" })}</p>
+                <h3 className="text-lg font-bold text-foreground">Today's Summary</h3>
+                <p className="text-sm text-txt-secondary">Overview for {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <SummaryRow
                 icon={Users}
                 label="Total Check-ins"
-                value="142"
-                change="+12"
+                value={stats?.todayCheckIns?.toString() || "0"}
                 positive
               />
               <SummaryRow
                 icon={CreditCard}
                 label="Revenue"
-                value="₹45,200"
-                change="+₹8,500"
+                value={formatCurrency(stats?.todayCollection || 0, { showSymbol: true, decimals: 0 })}
                 positive
               />
               <SummaryRow
                 icon={UserPlus}
                 label="New Members"
-                value="3"
-                change="+2"
+                value={stats?.newWalkIns?.toString() || "0"}
                 positive
               />
               <SummaryRow
                 icon={Zap}
                 label="Peak Hour"
                 value="6:00 PM"
-                change="Busy"
                 neutral
               />
               <SummaryRow
                 icon={TrendingUp}
                 label="Occupancy"
                 value="78%"
-                change="+5%"
                 positive
               />
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5">
-              <div className="flex items-center justify-between text-xs text-white/30">
+            <div className="mt-6 pt-5 border-t border-border">
+              <div className="flex items-center justify-between text-sm font-medium text-txt-secondary mb-2">
                 <span>Shift started at</span>
-                <span className="text-white/60 font-mono">6:00 AM</span>
+                <span className="text-foreground">6:00 AM</span>
               </div>
-              <div className="flex items-center justify-between text-xs text-white/30 mt-1">
+              <div className="flex items-center justify-between text-sm font-medium text-txt-secondary">
                 <span>Shift ends at</span>
-                <span className="text-white/60 font-mono">2:00 PM</span>
+                <span className="text-foreground">2:00 PM</span>
               </div>
             </div>
           </div>
@@ -313,39 +331,39 @@ function QuickActionCard({
   icon: React.ElementType;
   label: string;
   description: string;
-  color: "gold" | "green" | "cyan" | "purple";
+  color: "orange" | "success" | "info" | "navy";
   href: string;
 }) {
   const colorMap = {
-    gold: "from-gold-500/20 to-gold-500/5 text-gold-400 hover:shadow-gold-500/10",
-    green: "from-neon-green/20 to-neon-green/5 text-neon-green hover:shadow-neon-green/10",
-    cyan: "from-electric-cyan/20 to-electric-cyan/5 text-electric-cyan hover:shadow-electric-cyan/10",
-    purple: "from-purple-500/20 to-purple-500/5 text-purple-400 hover:shadow-purple-500/10",
+    orange: "bg-brand-orange-soft text-brand-orange",
+    success: "bg-success-soft text-success",
+    info: "bg-info-soft text-info",
+    navy: "bg-brand-navy-soft text-brand-navy",
   };
 
   return (
     <motion.a
       href={href}
       className={cn(
-        "group flex flex-col p-5 rounded-2xl glass-card border border-white/5",
-        "hover:border-gold-500/20 transition-all duration-300",
-        "active:scale-[0.98]"
+        "group flex flex-col p-6 rounded-2xl surface-card border-2 border-transparent",
+        "hover:border-border transition-all duration-300",
+        "active:scale-[0.98] hover:shadow-lg"
       )}
       whileHover={{ y: -4 }}
     >
       <div
         className={cn(
-          "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4",
+          "w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110",
           colorMap[color]
         )}
       >
-        <Icon className="w-5 h-5" />
+        <Icon className="w-6 h-6" />
       </div>
-      <h3 className="text-sm font-semibold text-white mb-1">{label}</h3>
-      <p className="text-xs text-white/30">{description}</p>
-      <div className="mt-3 flex items-center gap-1 text-xs text-white/20 group-hover:text-gold-400 transition-colors">
+      <h3 className="text-base font-bold text-foreground mb-1">{label}</h3>
+      <p className="text-sm font-medium text-txt-secondary">{description}</p>
+      <div className="mt-4 flex items-center gap-1.5 text-sm font-bold text-txt-tertiary group-hover:text-brand-orange transition-colors">
         <span>Open</span>
-        <ArrowRight className="w-3 h-3" />
+        <ArrowRight className="w-4 h-4" />
       </div>
     </motion.a>
   );
@@ -366,29 +384,31 @@ function SummaryRow({
   icon: React.ElementType;
   label: string;
   value: string;
-  change: string;
+  change?: string;
   positive?: boolean;
   neutral?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02]">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-          <Icon className="w-4 h-4 text-white/40" />
+    <div className="flex items-center justify-between p-4 rounded-xl bg-surface-sunken">
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-lg bg-surface-elevated flex items-center justify-center">
+          <Icon className="w-5 h-5 text-txt-secondary" />
         </div>
         <div>
-          <p className="text-xs text-white/40">{label}</p>
-          <p className="text-sm font-medium text-white">{value}</p>
+          <p className="text-xs font-bold text-txt-tertiary tracking-wide uppercase mb-0.5">{label}</p>
+          <p className="text-base font-bold text-foreground">{value}</p>
         </div>
       </div>
-      <span
-        className={cn(
-          "text-xs font-medium",
-          positive ? "text-neon-green" : neutral ? "text-white/40" : "text-crimson"
-        )}
-      >
-        {change}
-      </span>
+      {change && (
+        <span
+          className={cn(
+            "text-xs px-2.5 py-1 rounded-full font-bold",
+            positive ? "bg-success-soft text-success" : neutral ? "bg-surface-elevated text-txt-secondary" : "bg-danger-soft text-danger"
+          )}
+        >
+          {change}
+        </span>
+      )}
     </div>
   );
 }

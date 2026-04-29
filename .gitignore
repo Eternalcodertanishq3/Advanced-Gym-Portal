@@ -35,4 +35,4 @@ yarn-error.log*
 next-env.d.ts
 
 # prisma
-/prisma/migrations
+# /prisma/migrations is removed to allow tracking schema changes
