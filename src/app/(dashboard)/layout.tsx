@@ -9,6 +9,8 @@ import type { Role } from "@/lib/constants";
 // 🦅 EAGLE GYM — Protected Dashboard Layout
 // ═══════════════════════════════════════════════════════════════
 
+import { getMemberFeatures } from "@/lib/membership";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -21,6 +23,7 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const allowedFeatures = await getMemberFeatures();
   const userRole = session.user.role as Role;
 
   // Redirect suspended users
@@ -36,7 +39,10 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       {/* Sidebar */}
-      <Sidebar user={session.user as any} />
+      <Sidebar 
+        user={session.user as any} 
+        allowedFeatures={allowedFeatures} 
+      />
 
       {/* Main Content Area */}
       <DashboardContainer>

@@ -71,6 +71,7 @@ interface NavItem {
   icon: LucideIcon;
   requiredRole?: Role[];
   badge?: string;
+  requiredFeature?: string;
 }
 
 interface NavSection {
@@ -188,49 +189,49 @@ const navSections: Record<Role, NavSection[]> = {
       title: "Overview",
       items: [
         { label: "Dashboard", href: "/member", icon: LayoutDashboard },
-        { label: "Digital Card", href: "/member/digital-card", icon: QrCode },
+        { label: "Digital Card", href: "/member/digital-card", icon: QrCode, requiredFeature: "gym_access" },
         { label: "My Subscription", href: "/member/subscription", icon: Crown },
       ],
     },
     {
       title: "Fitness",
       items: [
-        { label: "Workout Plan", href: "/member/workout", icon: Dumbbell },
-        { label: "Diet Plan", href: "/member/diet", icon: Utensils },
-        { label: "Progress", href: "/member/progress", icon: TrendingUp },
-        { label: "Progress Photos", href: "/member/progress/photos", icon: Camera },
-        { label: "Goals", href: "/member/progress", icon: Target },
+        { label: "Workout Plan", href: "/member/workout", icon: Dumbbell, requiredFeature: "gym_access" },
+        { label: "Diet Plan", href: "/member/diet", icon: Utensils, requiredFeature: "diet_plan" },
+        { label: "Progress", href: "/member/progress", icon: TrendingUp, requiredFeature: "gym_access" },
+        { label: "Progress Photos", href: "/member/progress/photos", icon: Camera, requiredFeature: "mobile_app" },
+        { label: "Goals", href: "/member/progress", icon: Target, requiredFeature: "gym_access" },
       ],
     },
     {
       title: "Activities",
       items: [
-        { label: "Book Classes", href: "/member/classes", icon: Calendar },
-        { label: "My Bookings", href: "/member/classes/my-bookings", icon: BookOpen },
-        { label: "My Trainer", href: "/member/trainer", icon: UserCog },
+        { label: "Book Classes", href: "/member/classes", icon: Calendar, requiredFeature: "group_classes" },
+        { label: "My Bookings", href: "/member/classes/my-bookings", icon: BookOpen, requiredFeature: "group_classes" },
+        { label: "My Trainer", href: "/member/trainer", icon: UserCog, requiredFeature: "pt_sessions" },
       ],
     },
     {
       title: "Gamification",
       items: [
-        { label: "Achievements", href: "/member/achievements", icon: Award },
-        { label: "Leaderboard", href: "/member/leaderboard", icon: Trophy },
-        { label: "Challenges", href: "/member/challenges", icon: Flame },
+        { label: "Achievements", href: "/member/achievements", icon: Award, requiredFeature: "mobile_app" },
+        { label: "Leaderboard", href: "/member/leaderboard", icon: Trophy, requiredFeature: "mobile_app" },
+        { label: "Challenges", href: "/member/challenges", icon: Flame, requiredFeature: "mobile_app" },
       ],
     },
     {
       title: "Wellness",
       items: [
-        { label: "Nutrition Log", href: "/member/nutrition", icon: Droplets },
-        { label: "Supplements", href: "/member/nutrition/supplements", icon: Pill },
-        { label: "Messages", href: "/member/messages", icon: MessageSquare },
+        { label: "Nutrition Log", href: "/member/nutrition", icon: Droplets, requiredFeature: "diet_plan" },
+        { label: "Supplements", href: "/member/nutrition/supplements", icon: Pill, requiredFeature: "diet_plan" },
+        { label: "Messages", href: "/member/messages", icon: MessageSquare, requiredFeature: "mobile_app" },
       ],
     },
     {
       title: "Account",
       items: [
         { label: "Payments", href: "/member/payments", icon: CreditCard },
-        { label: "Refer & Earn", href: "/member/refer", icon: Share2 },
+        { label: "Refer & Earn", href: "/member/refer", icon: Share2, requiredFeature: "mobile_app" },
         { label: "Profile", href: "/member/profile", icon: UserCog },
       ],
     },
@@ -265,15 +266,31 @@ interface SidebarProps {
     status: string;
     avatar?: string | null;
   };
+  allowedFeatures?: string[];
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
   const { collapsed, mobileOpen, toggleCollapsed, toggleMobile, setMobileOpen } = useSidebarStore();
   const { logout } = useAuthStore();
   const pathname = usePathname();
 
   const role = (user?.role ?? "MEMBER") as Role;
-  const sections = React.useMemo(() => navSections[role] ?? navSections.MEMBER, [role]);
+  const sections = React.useMemo(() => {
+    const rawSections = navSections[role] ?? navSections.MEMBER;
+    
+    // Filter for members based on features
+    if (role === "MEMBER") {
+      return rawSections.map(section => ({
+        ...section,
+        items: section.items.filter(item => {
+          if (!item.requiredFeature) return true;
+          return allowedFeatures.includes(item.requiredFeature);
+        })
+      })).filter(section => section.items.length > 0);
+    }
+
+    return rawSections;
+  }, [role, allowedFeatures]);
 
 
   return (
