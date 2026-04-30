@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -269,6 +269,7 @@ interface SidebarProps {
 
 export function Sidebar({ user }: SidebarProps) {
   const { collapsed, mobileOpen, toggleCollapsed, toggleMobile, setMobileOpen } = useSidebarStore();
+  const { logout } = useAuthStore();
   const pathname = usePathname();
 
   const role = (user?.role ?? "MEMBER") as Role;

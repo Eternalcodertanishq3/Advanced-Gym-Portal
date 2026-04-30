@@ -11,6 +11,10 @@ export async function StatsGrid() {
     totalRevenue: 0,
     activeMembersCount: 0,
     activeStaffCount: 0,
+    revenueTrend: "+0.0%",
+    membersTrend: "Live",
+    revenueSparkline: [0, 0, 0, 0, 0, 0, 0],
+    membersSparkline: [0, 0, 0, 0, 0, 0, 0]
   };
 
   const currentStats = stats || defaultStats;
@@ -21,19 +25,19 @@ export async function StatsGrid() {
         icon={DollarSign}
         label="Total System Revenue"
         value={currentStats.totalRevenue}
-        trend="+0.0%"
-        trendUp={true}
+        trend={currentStats.revenueTrend}
+        trendUp={!currentStats.revenueTrend.startsWith('-')}
         color="orange"
-        sparklineData={[0, 0, 0, 0, currentStats.totalRevenue]}
+        sparklineData={currentStats.revenueSparkline}
       />
       <StatCard
         icon={Users}
         label="Active Gym Members"
         value={currentStats.activeMembersCount}
-        trend="Live"
-        trendUp={true}
+        trend={currentStats.membersTrend}
+        trendUp={!currentStats.membersTrend.startsWith('-')}
         color="info"
-        sparklineData={[0, 0, 0, currentStats.activeMembersCount]}
+        sparklineData={currentStats.membersSparkline}
       />
       <StatCard
         icon={Shield}
