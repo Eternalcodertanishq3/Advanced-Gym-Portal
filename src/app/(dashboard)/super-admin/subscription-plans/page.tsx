@@ -1,15 +1,18 @@
 import React from "react";
 import { getPlans } from "@/actions/super-admin/plan-actions";
-import { SubscriptionPlansClient } from "./components/plans-client";
+import { PlanClient } from "./components/plan-client";
+
+export const metadata = {
+  title: "Subscription Plans | Super Admin Dashboard",
+  description: "Manage membership tiers and feature access levels.",
+};
 
 export default async function SubscriptionPlansPage() {
-  const { plans = [] } = await getPlans();
+  const { plans } = await getPlans();
 
-  // Convert Decimal to number for the client component
-  const formattedPlans = plans?.map(p => ({
-    ...p,
-    price: Number(p.price),
-  })) || [];
-
-  return <SubscriptionPlansClient plans={formattedPlans} />;
+  return (
+    <div className="p-4 md:p-8">
+      <PlanClient initialPlans={plans || []} />
+    </div>
+  );
 }
