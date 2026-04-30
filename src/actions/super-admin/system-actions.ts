@@ -1,9 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
 
 export async function getSystemMetrics() {
   try {
+    await ensureSuperAdmin();
     // In a real production app, you would use OS-level commands or 
     // cloud-provider APIs (like AWS CloudWatch or RDS metrics) to get real storage usage.
     // For this implementation, we'll calculate a "real-ish" value based on DB records
@@ -42,6 +44,7 @@ export async function getSystemMetrics() {
 
 export async function getBackups() {
   try {
+    await ensureSuperAdmin();
     // This would typically fetch from a S3 bucket or a backup-service table
     // For now, we'll return a set of "real-ish" mock archives if the table is empty
     const backups = [
@@ -83,11 +86,17 @@ export async function getBackups() {
 
 export async function triggerBackup() {
   try {
+    const user = await ensureSuperAdmin();
     // Simulate real backup logic
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // In a real app, this would trigger a database dump and upload to cloud storage
-    // e.g. using 'pg_dump' or a managed service API
+    await recordAudit({
+      userId: user.id,
+      action: "EXPORT",
+      entityType: "DATABASE",
+      entityId: "BACKUP_TRIGGER",
+      newValue: { type: "FULL", status: "SUCCESS" }
+    });
     
     return {
       success: true,

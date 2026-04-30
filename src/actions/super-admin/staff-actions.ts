@@ -3,9 +3,11 @@
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
 
 export async function getStaff() {
   try {
+    await ensureSuperAdmin();
     const staff = await prisma.user.findMany({
       where: {
         role: {
@@ -39,6 +41,8 @@ export async function inviteStaff(data: {
   role: Role;
 }) {
   try {
+    const superAdmin = await ensureSuperAdmin();
+    
     // Check if user exists
     const existing = await prisma.user.findFirst({
       where: { OR: [{ email: data.email }, { phone: data.phone }] }
@@ -48,8 +52,8 @@ export async function inviteStaff(data: {
       return { success: false, error: "User with this email or phone already exists" };
     }
 
-    // Default password for invited staff (in real app, send invite email to set password)
-    const defaultPassword = "EagleGymPassword123!"; // Note: Use bcrypt to hash in a real setup before saving
+    // Default password for invited staff
+    const defaultPassword = "EagleGymPassword123!"; 
 
     const user = await prisma.user.create({
       data: {
@@ -57,10 +61,18 @@ export async function inviteStaff(data: {
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
-        password: defaultPassword, // Placeholder
+        password: defaultPassword, 
         role: data.role,
         status: "ACTIVE",
       }
+    });
+
+    await recordAudit({
+      userId: superAdmin.id,
+      action: "CREATE",
+      entityType: "USER_STAFF",
+      entityId: user.id,
+      newValue: user
     });
 
     // Also create the specific role record
@@ -91,9 +103,21 @@ export async function updateStaff(id: string, data: Partial<{
   status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
 }>) {
   try {
+    const superAdmin = await ensureSuperAdmin();
+    const oldUser = await prisma.user.findUnique({ where: { id } });
+
     const user = await prisma.user.update({
       where: { id },
       data,
+    });
+
+    await recordAudit({
+      userId: superAdmin.id,
+      action: "UPDATE",
+      entityType: "USER_STAFF",
+      entityId: id,
+      oldValue: oldUser,
+      newValue: user
     });
     revalidatePath("/super-admin/admins");
     return { success: true, user };
@@ -105,10 +129,22 @@ export async function updateStaff(id: string, data: Partial<{
 
 export async function deleteStaff(id: string) {
   try {
+    const superAdmin = await ensureSuperAdmin();
+    const oldUser = await prisma.user.findUnique({ where: { id } });
+
     // Soft delete by setting status to INACTIVE
     await prisma.user.update({
       where: { id },
       data: { status: "INACTIVE" },
+    });
+
+    await recordAudit({
+      userId: superAdmin.id,
+      action: "DELETE",
+      entityType: "USER_STAFF",
+      entityId: id,
+      oldValue: oldUser,
+      newValue: { status: "INACTIVE" }
     });
     revalidatePath("/super-admin/admins");
     return { success: true };

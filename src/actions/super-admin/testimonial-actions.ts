@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
 
 export async function getAllTestimonials() {
   try {
@@ -16,9 +17,18 @@ export async function getAllTestimonials() {
 
 export async function approveTestimonial(id: string) {
   try {
-    await prisma.testimonial.update({
+    const user = await ensureSuperAdmin();
+    const testimonial = await prisma.testimonial.update({
       where: { id },
       data: { isApproved: true },
+    });
+
+    await recordAudit({
+      userId: user.id,
+      action: "UPDATE",
+      entityType: "TESTIMONIAL",
+      entityId: id,
+      newValue: { isApproved: true }
     });
     revalidatePath("/super-admin/testimonials");
     revalidatePath("/");
@@ -30,8 +40,19 @@ export async function approveTestimonial(id: string) {
 
 export async function deleteTestimonial(id: string) {
   try {
+    const user = await ensureSuperAdmin();
+    const oldTestimonial = await prisma.testimonial.findUnique({ where: { id } });
+
     await prisma.testimonial.delete({
       where: { id },
+    });
+
+    await recordAudit({
+      userId: user.id,
+      action: "DELETE",
+      entityType: "TESTIMONIAL",
+      entityId: id,
+      oldValue: oldTestimonial
     });
     revalidatePath("/super-admin/testimonials");
     revalidatePath("/");
