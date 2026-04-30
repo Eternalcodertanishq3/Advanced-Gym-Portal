@@ -67,6 +67,7 @@ export async function inviteStaff(data: {
         password: hashedPassword, 
         role: data.role,
         status: "ACTIVE",
+        passwordResetRequired: true,
       }
     });
 
