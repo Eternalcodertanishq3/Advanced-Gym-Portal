@@ -217,7 +217,7 @@ export default function SetupPage() {
             )}
           </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
