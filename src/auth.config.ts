@@ -14,11 +14,11 @@ export const authConfig = {
       const role = auth?.user?.role;
       const mustReset = (auth?.user as any)?.passwordResetRequired;
       const pathname = nextUrl.pathname;
-      const isResetPage = pathname === "/auth/reset-password";
+      const isResetPage = pathname === "/reset-password";
 
       // If user must reset password, force them to the reset page
       if (isLoggedIn && mustReset && !isResetPage) {
-        return Response.redirect(new URL("/auth/reset-password", nextUrl));
+        return Response.redirect(new URL("/reset-password", nextUrl));
       }
 
       // If already reset or not needed, don't let them stay on reset page

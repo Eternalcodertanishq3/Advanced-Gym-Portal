@@ -1303,3 +1303,18 @@ model VisitorPass {
   @@index([validUntil])
   @@map("visitor_passes")
 }
+// ═══════════════════════════════════════════════════════════════
+// BACKUP
+// ═══════════════════════════════════════════════════════════════
+
+model Backup {
+  id        String   @id @default(cuid())
+  fileName  String
+  size      String
+  type      String   @default("FULL") // FULL, INCREMENTAL
+  status    String   @default("SUCCESS") // SUCCESS, FAILED
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  @@map("backups")
+}

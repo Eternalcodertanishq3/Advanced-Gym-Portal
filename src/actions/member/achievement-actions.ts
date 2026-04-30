@@ -1,0 +1,50 @@
+"use server";
+
+import prisma from "@/lib/prisma";
+import { auth } from "@/auth";
+
+/**
+ * Fetches all achievements and which ones the member has earned.
+ */
+export async function getMemberAchievements() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const [allAchievements, userAchievements] = await Promise.all([
+      prisma.achievement.findMany({
+        orderBy: { xpValue: 'asc' }
+      }),
+      prisma.userAchievement.findMany({
+        where: { userId: session.user.id },
+        include: {
+          achievement: true
+        }
+      })
+    ]);
+
+    // Map all achievements with a "locked" or "unlocked" state
+    const mappedAchievements = allAchievements.map(achievement => {
+      const earned = userAchievements.find(ua => ua.achievementId === achievement.id);
+      return {
+        ...achievement,
+        unlocked: !!earned,
+        unlockedAt: earned?.achievedAt || null
+      };
+    });
+
+    return { 
+      success: true, 
+      data: {
+        achievements: mappedAchievements,
+        earnedCount: userAchievements.length,
+        totalCount: allAchievements.length
+      }
+    };
+  } catch (error) {
+    console.error("Error fetching achievements:", error);
+    return { success: false, error: "Failed to load achievements" };
+  }
+}
