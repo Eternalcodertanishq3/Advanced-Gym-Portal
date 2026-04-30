@@ -44,7 +44,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
             lastName: user.lastName,
             role: user.role,
             status: user.status,
-            passwordResetRequired: user.passwordResetRequired,
+            passwordResetRequired: (user as any).passwordResetRequired,
           };
         }
         return null;

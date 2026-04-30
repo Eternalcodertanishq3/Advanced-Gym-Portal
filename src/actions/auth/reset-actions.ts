@@ -19,7 +19,7 @@ export async function resetInitialPassword(newPassword: string) {
       data: {
         password: hashedPassword,
         passwordResetRequired: false,
-      },
+      } as any,
     });
 
     revalidatePath("/");

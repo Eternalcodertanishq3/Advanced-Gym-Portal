@@ -68,7 +68,7 @@ export async function inviteStaff(data: {
         role: data.role,
         status: "ACTIVE",
         passwordResetRequired: true,
-      }
+      } as any
     });
 
     await recordAudit({
