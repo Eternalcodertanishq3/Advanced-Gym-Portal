@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 export async function getStaff() {
   try {
@@ -52,8 +54,9 @@ export async function inviteStaff(data: {
       return { success: false, error: "User with this email or phone already exists" };
     }
 
-    // Default password for invited staff
-    const defaultPassword = "EagleGymPassword123!"; 
+    // Generate a secure random temporary password
+    const tempPassword = crypto.randomBytes(6).toString('hex'); // 12 chars hex
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
     const user = await prisma.user.create({
       data: {
@@ -61,7 +64,7 @@ export async function inviteStaff(data: {
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
-        password: defaultPassword, 
+        password: hashedPassword, 
         role: data.role,
         status: "ACTIVE",
       }
@@ -87,7 +90,7 @@ export async function inviteStaff(data: {
     }
 
     revalidatePath("/super-admin/admins");
-    return { success: true, user };
+    return { success: true, user, tempPassword };
   } catch (error: any) {
     console.error("Failed to invite staff:", error);
     return { success: false, error: "Failed to invite staff member" };
