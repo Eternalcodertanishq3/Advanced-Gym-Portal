@@ -86,6 +86,8 @@ export async function inviteStaff(data: {
       await prisma.receptionist.create({ data: { userId: user.id } });
     } else if (data.role === "ADMIN") {
       await prisma.admin.create({ data: { userId: user.id } });
+    } else if (data.role === "SUPER_ADMIN") {
+      await prisma.superAdmin.create({ data: { userId: user.id } });
     } else if (data.role === "WORKER") {
       await prisma.worker.create({ data: { userId: user.id } });
     }
