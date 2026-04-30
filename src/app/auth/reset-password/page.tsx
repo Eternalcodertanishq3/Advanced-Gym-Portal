@@ -49,32 +49,33 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-navy flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0F1117] flex items-center justify-center p-4">
+      {/* Subtle Background Accents */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-orange/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-orange/5 rounded-full blur-[120px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-orange/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-success/5 rounded-full blur-[120px]" />
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-card/50 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl relative z-10"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md bg-card border border-border p-8 rounded-3xl shadow-2xl relative z-10"
       >
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-brand-orange/20 flex items-center justify-center mb-4 border border-brand-orange/30">
+          <div className="w-16 h-16 rounded-2xl bg-brand-orange/10 flex items-center justify-center mb-4 border border-brand-orange/20">
             {isSuccess ? (
               <CheckCircle2 className="w-8 h-8 text-success" />
             ) : (
               <ShieldAlert className="w-8 h-8 text-brand-orange" />
             )}
           </div>
-          <h1 className="text-2xl font-display font-bold text-white mb-2">
+          <h1 className="text-2xl font-display font-bold text-foreground mb-2">
             {isSuccess ? "Password Updated" : "Secure Your Account"}
           </h1>
-          <p className="text-white/60 text-sm">
+          <p className="text-muted-foreground text-sm">
             {isSuccess 
-              ? "Your password has been changed. Redirecting to dashboard..." 
-              : "You are logging in with a temporary password. Please set a new, private password to continue."}
+              ? "Your password has been changed successfully. Redirecting you to the dashboard..." 
+              : "You're logging in with a temporary password. For your security, please set a new private password."}
           </p>
         </div>
 
@@ -82,20 +83,20 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-white/70 ml-1">New Password</label>
+                <label className="text-sm font-bold text-foreground/70 ml-1">New Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                   <input
                     required
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-12 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-brand-orange/50 transition-colors"
-                    placeholder="Enter new password"
+                    className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-12 py-4 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-all"
+                    placeholder="Create secure password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-white/30 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -103,15 +104,15 @@ export default function ResetPasswordPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-white/70 ml-1">Confirm Password</label>
+                <label className="text-sm font-bold text-foreground/70 ml-1">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                   <input
                     required
                     name="confirm"
                     type={showPassword ? "text" : "password"}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-12 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-brand-orange/50 transition-colors"
-                    placeholder="Confirm new password"
+                    className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-12 py-4 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-all"
+                    placeholder="Confirm your password"
                   />
                 </div>
               </div>
@@ -120,11 +121,16 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 bg-brand-orange text-white font-bold rounded-2xl shadow-xl shadow-brand-orange/20 hover:shadow-brand-orange/40 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-4 bg-brand-orange text-white font-bold rounded-2xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/40 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
-              {isSubmitting ? "Updating..." : "Update Password & Continue"}
+              {isSubmitting ? "Updating Security..." : "Secure Account & Login"}
             </button>
+
+            <div className="flex items-center gap-2 justify-center py-2">
+              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span className="text-[10px] uppercase tracking-widest font-bold text-success">End-to-End Encrypted</span>
+            </div>
           </form>
         )}
       </motion.div>
