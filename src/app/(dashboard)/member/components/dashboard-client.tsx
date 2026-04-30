@@ -97,14 +97,14 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
       {/* Stats Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <MemberStatCard
-          icon={Flame}
+          icon={<Flame className="w-6 h-6" />}
           label="Current Streak"
           value={`${stats?.streak || 0} days`}
           color="orange"
           subtitle="Keep it up!"
         />
         <MemberStatCard
-          icon={Footprints}
+          icon={<Footprints className="w-6 h-6" />}
           label="Total Check-ins"
           value={stats?.totalAttendance?.toString() || "0"}
           sparklineData={stats.attendanceSparkline || []}
@@ -112,14 +112,14 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
           subtitle="Since joined"
         />
         <MemberStatCard
-          icon={Zap}
+          icon={<Zap className="w-6 h-6" />}
           label="Classes"
           value={stats?.totalClasses?.toString() || "0"}
           color="info"
           subtitle="Completed"
         />
         <MemberStatCard
-          icon={TrendingUp}
+          icon={<TrendingUp className="w-6 h-6" />}
           label="Upcoming"
           value={stats?.upcomingClasses?.toString() || "0"}
           color="success"
@@ -364,14 +364,14 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
 }
 
 function MemberStatCard({
-  icon: Icon,
+  icon,
   label,
   value,
   color,
   subtitle,
   sparklineData,
 }: {
-  icon: any;
+  icon: React.ReactNode;
   label: string;
   value: string;
   color: "navy" | "success" | "info" | "orange";
@@ -395,7 +395,7 @@ function MemberStatCard({
         "w-12 h-12 rounded-xl flex items-center justify-center mb-4",
         colorMap[color]
       )}>
-        <Icon className="w-6 h-6" />
+        {icon}
       </div>
       <p className="text-2xl font-display font-bold text-foreground">{value}</p>
       <p className="text-sm font-semibold text-txt-secondary mt-1">{label}</p>

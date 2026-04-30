@@ -302,7 +302,7 @@ export function Topbar({ user }: TopbarProps) {
                       </div>
                       <div className="p-2 space-y-0.5">
                         <Link
-                          href="/member/profile"
+                          href={`/${user.role.toLowerCase().replace("_", "-")}/profile`}
                           onClick={() => setUserMenuOpen(false)}
                           className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-elevated text-txt-secondary hover:text-foreground transition-colors"
                         >
@@ -310,7 +310,7 @@ export function Topbar({ user }: TopbarProps) {
                           <span className="text-sm font-medium">My Profile</span>
                         </Link>
                         <Link
-                          href="/member/settings"
+                          href={`/${user.role.toLowerCase().replace("_", "-")}/settings`}
                           onClick={() => setUserMenuOpen(false)}
                           className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-elevated text-txt-secondary hover:text-foreground transition-colors"
                         >

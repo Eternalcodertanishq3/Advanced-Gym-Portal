@@ -41,8 +41,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <Toaster
             position="top-right"
             richColors
-            closeButton
-            duration={4000}
+            duration={2000}
           />
         </ThemeProvider>
       </SessionProvider>

@@ -173,25 +173,25 @@ export default function EquipmentPage() {
                                 <AlertCircle className="w-4 h-4 mr-2" /> Report Issue
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="bg-surface-card border-surface-sunken">
+                            <DialogContent className="sm:max-w-md bg-brand-navy border-white/10 text-white">
                               <DialogHeader>
-                                <DialogTitle>Report Equipment Issue</DialogTitle>
-                                <DialogDescription>
+                                <DialogTitle className="text-xl font-display font-bold text-white">Report Equipment Issue</DialogTitle>
+                                <DialogDescription className="text-white/50">
                                   Mark this machine as under maintenance. It will be temporarily removed from operational capacity.
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="py-4 space-y-4">
                                 <div className="space-y-2">
-                                  <label className="text-sm font-medium text-obsidian-900">Issue Description</label>
+                                  <label className="text-xs font-bold text-white/70 uppercase tracking-wider">Issue Description</label>
                                   <Input 
                                     placeholder="E.g. Frayed cable, squeaking hinge..." 
                                     value={maintenanceNotes}
                                     onChange={(e) => setMaintenanceNotes(e.target.value)}
-                                    className="bg-surface-base border-surface-sunken"
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
                                   />
                                 </div>
                                 <Button 
-                                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-11 rounded-xl shadow-lg shadow-red-600/20"
                                   onClick={() => handleSetMaintenance(item.id)}
                                   disabled={setMaintenance.isPending || !maintenanceNotes}
                                 >

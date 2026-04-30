@@ -1,12 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription 
+} from "@/components/ui/dialog";
+import { Loader2, Trash2, X } from "lucide-react";
 import { inviteStaff, updateStaff, deleteStaff } from "@/actions/super-admin/staff-actions";
 import { toast } from "sonner";
 import { Role } from "@prisma/client";
-import { Portal } from "@/components/common/portal";
 import { 
   Select, 
   SelectContent, 
@@ -14,6 +19,9 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface StaffMember {
   id: string;
@@ -86,114 +94,130 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
   const [firstName, lastName] = staff?.name.split(" ") || ["", ""];
 
   return (
-    <Portal>
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-black/60"
-              onClick={onClose}
-            />
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 pointer-events-none">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                className="pointer-events-auto w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
-              >
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-display font-bold text-foreground">
-                      {staff ? "Edit Staff Member" : "Invite Staff Member"}
-                    </h2>
-                    <div className="flex items-center gap-2">
-                      {staff && (
-                        <button 
-                          onClick={handleDelete}
-                          disabled={isDeleting}
-                          className="p-2 hover:bg-danger/10 rounded-lg text-danger/50 hover:text-danger transition-colors disabled:opacity-50"
-                        >
-                          {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                        </button>
-                      )}
-                      <button type="button" onClick={onClose} title="Close" className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/70">First Name</label>
-                    <input required name="firstName" type="text" defaultValue={firstName} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter first name" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/70">Last Name</label>
-                    <input required name="lastName" type="text" defaultValue={lastName} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter last name" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/70">Email Address</label>
-                  <input required name="email" type="email" defaultValue={staff?.email} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter email address" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/70">Phone Number</label>
-                    <input required name="phone" type="text" defaultValue={staff?.phone || ""} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter phone number" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/70">Status</label>
-                    <Select name="status" defaultValue={staff?.status || "ACTIVE"}>
-                      <SelectTrigger className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 h-11 text-foreground focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[110]">
-                        <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="INACTIVE">Inactive</SelectItem>
-                        <SelectItem value="SUSPENDED">Suspended</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/70">Role</label>
-                  <Select name="role" required defaultValue={staff?.role || "ADMIN"}>
-                    <SelectTrigger className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 h-11 text-foreground focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[110]">
-                      <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="RECEPTIONIST">Receptionist</SelectItem>
-                      <SelectItem value="TRAINER">Trainer</SelectItem>
-                      <SelectItem value="WORKER">Worker</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="pt-6">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3 bg-brand-orange text-white font-bold rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {isSubmitting ? (staff ? "Updating..." : "Inviting...") : (staff ? "Update Staff Member" : "Send Invitation")}
-                  </button>
-                </div>
-              </form>
-                  </div>
-                </motion.div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg bg-brand-navy border-white/10 text-white p-0 overflow-hidden">
+        <div className="p-6">
+          <DialogHeader className="mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-xl font-bold font-display tracking-tight text-white">
+                  {staff ? "Edit Staff Member" : "Invite Staff Member"}
+                </DialogTitle>
+                <DialogDescription className="text-white/50 text-sm mt-1">
+                  {staff ? "Update details and permissions for this staff member." : "Send an invitation to a new team member."}
+                </DialogDescription>
               </div>
-            </>
-          )}
-        </AnimatePresence>
-      </Portal>
-    );
+              {staff && (
+                <Button 
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="text-danger/50 hover:text-danger hover:bg-danger/10 transition-colors"
+                >
+                  {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                </Button>
+              )}
+            </div>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-xs font-bold text-white/70 uppercase tracking-wider">First Name</Label>
+                <Input 
+                  id="firstName"
+                  required 
+                  name="firstName" 
+                  type="text" 
+                  defaultValue={firstName} 
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
+                  placeholder="Enter first name" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="text-xs font-bold text-white/70 uppercase tracking-wider">Last Name</Label>
+                <Input 
+                  id="lastName"
+                  required 
+                  name="lastName" 
+                  type="text" 
+                  defaultValue={lastName} 
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
+                  placeholder="Enter last name" 
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-xs font-bold text-white/70 uppercase tracking-wider">Email Address</Label>
+              <Input 
+                id="email"
+                required 
+                name="email" 
+                type="email" 
+                defaultValue={staff?.email} 
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
+                placeholder="Enter email address" 
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-xs font-bold text-white/70 uppercase tracking-wider">Phone Number</Label>
+                <Input 
+                  id="phone"
+                  required 
+                  name="phone" 
+                  type="text" 
+                  defaultValue={staff?.phone || ""} 
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
+                  placeholder="Enter phone number" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-xs font-bold text-white/70 uppercase tracking-wider">Status</Label>
+                <Select name="status" defaultValue={staff?.status || "ACTIVE"}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-brand-navy border-white/10 text-white">
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="INACTIVE">Inactive</SelectItem>
+                    <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role" className="text-xs font-bold text-white/70 uppercase tracking-wider">Role</Label>
+              <Select name="role" required defaultValue={staff?.role || "ADMIN"}>
+                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent className="bg-brand-navy border-white/10 text-white">
+                  <SelectItem value="ADMIN">Admin</SelectItem>
+                  <SelectItem value="RECEPTIONIST">Receptionist</SelectItem>
+                  <SelectItem value="TRAINER">Trainer</SelectItem>
+                  <SelectItem value="WORKER">Worker</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="pt-4">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-12 bg-brand-orange hover:bg-brand-orange-dark text-white font-bold rounded-xl shadow-lg shadow-brand-orange/20 transition-all flex items-center justify-center gap-2"
+              >
+                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isSubmitting ? (staff ? "Updating..." : "Inviting...") : (staff ? "Update Staff Member" : "Send Invitation")}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

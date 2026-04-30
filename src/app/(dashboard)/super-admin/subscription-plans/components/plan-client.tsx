@@ -9,13 +9,17 @@ import { PlanModal } from "./plan-modal";
 import { togglePlanStatus, deletePlan } from "@/actions/super-admin/plan-actions";
 import { toast } from "sonner";
 import { MEMBERSHIP_FEATURES } from "@/lib/constants/features";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Props {
   initialPlans: any[];
 }
 
 export function PlanClient({ initialPlans }: Props) {
-  const [plans, setPlans] = useState(initialPlans);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
 
@@ -59,10 +63,17 @@ export function PlanClient({ initialPlans }: Props) {
 
   return (
     <div className="space-y-6">
+      <PlanModal 
+        key={selectedPlan?.id || "new-plan"}
+        open={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        plan={selectedPlan} 
+      />
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-white tracking-tight font-display">Subscription Plans</h1>
-          <p className="text-sm text-white/50">Manage your membership tiers and feature access.</p>
+          <h1 className="text-2xl font-bold text-obsidian-950 dark:text-white tracking-tight font-display">Subscription Plans</h1>
+          <p className="text-sm text-obsidian-500 dark:text-white/50">Manage your membership tiers and feature access.</p>
         </div>
         <Button 
           onClick={handleCreate}
@@ -83,8 +94,8 @@ export function PlanClient({ initialPlans }: Props) {
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ delay: index * 0.05 }}
               className={cn(
-                "glass-card p-6 rounded-2xl border transition-all relative overflow-hidden group",
-                plan.isActive ? "border-white/10" : "border-white/5 opacity-60"
+                "bg-surface-card dark:bg-brand-navy p-6 rounded-2xl border shadow-sm transition-all relative overflow-hidden group",
+                plan.isActive ? "border-surface-border dark:border-white/10" : "border-surface-border/50 dark:border-white/5 opacity-60"
               )}
             >
               {/* Branding Stripe */}
@@ -96,24 +107,24 @@ export function PlanClient({ initialPlans }: Props) {
               <div className="flex justify-between items-start mb-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white font-display">{plan.name}</h3>
+                    <h3 className="text-lg font-bold text-obsidian-950 dark:text-white font-display">{plan.name}</h3>
                     {plan.isActive ? (
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                     ) : (
-                      <XCircle className="w-3 h-3 text-red-400" />
+                      <XCircle className="w-3 h-3 text-red-500" />
                     )}
                   </div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/40">
+                  <p className="text-[10px] uppercase tracking-widest text-obsidian-400 dark:text-white/40">
                     {plan.duration} Days • {plan.gstIncluded ? "GST Inc." : "GST Extra"}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold text-white">₹{plan.price}</p>
-                  <p className="text-[10px] text-white/40">Base Price</p>
+                  <p className="text-xl font-bold text-obsidian-950 dark:text-white">₹{plan.price}</p>
+                  <p className="text-[10px] text-obsidian-400 dark:text-white/40">Base Price</p>
                 </div>
               </div>
 
-              <p className="text-sm text-white/60 line-clamp-2 min-h-[40px] mb-6">
+              <p className="text-sm text-obsidian-600 dark:text-white/60 line-clamp-2 min-h-[40px] mb-6">
                 {plan.description || "No description provided."}
               </p>
 
@@ -122,30 +133,50 @@ export function PlanClient({ initialPlans }: Props) {
                   {plan.features?.slice(0, 4).map((fId: string) => {
                     const feature = MEMBERSHIP_FEATURES.find(f => f.id === fId);
                     return (
-                      <span key={fId} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">
+                      <span key={fId} className="text-[10px] px-2 py-0.5 rounded-full bg-surface-base dark:bg-white/5 border border-surface-border dark:border-white/10 text-obsidian-600 dark:text-white/70">
                         {feature?.label || fId}
                       </span>
                     );
                   })}
                   {(plan.features?.length > 4) && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">
-                      +{plan.features.length - 4} more
-                    </span>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="text-[10px] px-2 py-0.5 rounded-full bg-surface-base dark:bg-white/5 border border-surface-border dark:border-white/10 text-obsidian-400 dark:text-white/40 hover:bg-surface-elevated dark:hover:bg-white/10 hover:text-obsidian-950 dark:hover:text-white transition-colors cursor-pointer">
+                          +{plan.features.length - 4} more
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64 bg-surface-card dark:bg-brand-navy border-surface-border dark:border-white/10 p-4 shadow-2xl">
+                        <div className="space-y-3">
+                          <h4 className="text-xs font-bold text-obsidian-950 dark:text-white uppercase tracking-wider">All Features</h4>
+                          <div className="grid grid-cols-1 gap-1.5">
+                            {plan.features.map((fId: string) => {
+                              const feature = MEMBERSHIP_FEATURES.find(f => f.id === fId);
+                              return (
+                                <div key={fId} className="flex items-center gap-2 py-1 border-b border-surface-border/50 dark:border-white/5 last:border-0">
+                                  <div className="w-1 h-1 rounded-full bg-brand-orange" />
+                                  <span className="text-xs text-obsidian-600 dark:text-white/70">{feature?.label || fId}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 py-3 border-y border-white/5">
+                <div className="grid grid-cols-3 gap-2 py-3 border-y border-surface-border dark:border-white/5">
                   <div className="text-center">
-                    <p className="text-xs font-bold text-white">{plan.maxCheckIns || "∞"}</p>
-                    <p className="text-[8px] uppercase tracking-tighter text-white/30">Checkins</p>
+                    <p className="text-xs font-bold text-obsidian-950 dark:text-white">{plan.maxCheckIns || "∞"}</p>
+                    <p className="text-[8px] uppercase tracking-tighter text-obsidian-400 dark:text-white/30">Checkins</p>
                   </div>
-                  <div className="text-center border-x border-white/5">
-                    <p className="text-xs font-bold text-white">{plan.ptSessions || "0"}</p>
-                    <p className="text-[8px] uppercase tracking-tighter text-white/30">PT Sessions</p>
+                  <div className="text-center border-x border-surface-border dark:border-white/5">
+                    <p className="text-xs font-bold text-obsidian-950 dark:text-white">{plan.ptSessions || "0"}</p>
+                    <p className="text-[8px] uppercase tracking-tighter text-obsidian-400 dark:text-white/30">PT Sessions</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs font-bold text-white">{plan.guestPasses || "0"}</p>
-                    <p className="text-[8px] uppercase tracking-tighter text-white/30">Guest Passes</p>
+                    <p className="text-xs font-bold text-obsidian-950 dark:text-white">{plan.guestPasses || "0"}</p>
+                    <p className="text-[8px] uppercase tracking-tighter text-obsidian-400 dark:text-white/30">Guest Passes</p>
                   </div>
                 </div>
 
@@ -154,7 +185,7 @@ export function PlanClient({ initialPlans }: Props) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="w-8 h-8 text-white/40 hover:text-white hover:bg-white/10"
+                      className="w-8 h-8 text-obsidian-400 hover:text-obsidian-950 dark:text-white/40 dark:hover:text-white hover:bg-surface-elevated dark:hover:bg-white/10"
                       onClick={() => handleEdit(plan)}
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -162,7 +193,7 @@ export function PlanClient({ initialPlans }: Props) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="w-8 h-8 text-white/40 hover:text-red-400 hover:bg-red-400/10"
+                      className="w-8 h-8 text-obsidian-400 hover:text-red-600 dark:text-white/40 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/10"
                       onClick={() => handleDelete(plan.id)}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -193,24 +224,18 @@ export function PlanClient({ initialPlans }: Props) {
             </motion.div>
           ))}
         </AnimatePresence>
-
-        {initialPlans.length === 0 && (
-          <div className="col-span-full py-20 text-center glass-card rounded-2xl border border-dashed border-white/10">
-            <Plus className="w-12 h-12 text-white/10 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-white font-display">No plans created yet</h3>
-            <p className="text-sm text-white/40 mb-6">Start by creating your first subscription tier.</p>
-            <Button onClick={handleCreate} className="bg-brand-orange hover:bg-brand-orange-dark text-white">
-              Create First Plan
-            </Button>
-          </div>
-        )}
       </div>
 
-      <PlanModal 
-        open={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        plan={selectedPlan} 
-      />
+      {initialPlans.length === 0 && (
+        <div className="mt-8 py-20 text-center bg-surface-card dark:bg-brand-navy rounded-2xl border border-dashed border-surface-border dark:border-white/10">
+          <Plus className="w-12 h-12 text-obsidian-200 dark:text-white/10 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-obsidian-950 dark:text-white font-display">No plans created yet</h3>
+          <p className="text-sm text-obsidian-500 dark:text-white/40 mb-6">Start by creating your first subscription tier.</p>
+          <Button onClick={handleCreate} className="bg-brand-orange hover:bg-brand-orange-dark text-white">
+            Create First Plan
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

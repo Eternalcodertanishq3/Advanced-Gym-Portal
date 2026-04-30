@@ -6,7 +6,6 @@ import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
 
 export async function getSystemConfig() {
   try {
-    await ensureSuperAdmin();
     const settings = await prisma.gymSetting.findMany();
     
     // Map settings array to a more useful object

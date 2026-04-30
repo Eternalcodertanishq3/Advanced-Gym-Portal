@@ -86,9 +86,9 @@ export function BranchesClient({ branches }: Props) {
         <button 
           onClick={() => handleEdit(row.original)}
           title="Branch Actions"
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors group"
+          className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-colors group"
         >
-          <MoreHorizontal className="w-4 h-4 text-white/50 group-hover:text-white" />
+          <MoreHorizontal className="w-4 h-4 text-obsidian-400 dark:text-white/50 group-hover:text-obsidian-950 dark:group-hover:text-white" />
         </button>
       ),
     },

@@ -113,7 +113,7 @@ export default function TrainerDashboardPage() {
       {/* Stats Row */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          icon={Users}
+          icon={<Users className="w-6 h-6" />}
           label="My Active Clients"
           value={stats?.myMembers || 0}
           trend="+2 this week"
@@ -121,21 +121,21 @@ export default function TrainerDashboardPage() {
           color="info"
         />
         <StatCard
-          icon={Clock}
+          icon={<Clock className="w-6 h-6" />}
           label="Upcoming Sessions"
           value={stats?.upcomingSessions || 0}
           subtitle="Next: 11:00 AM"
           color="orange"
         />
         <StatCard
-          icon={Target}
+          icon={<Target className="w-6 h-6" />}
           label="Completed Sessions"
           value={stats?.completedSessions || 0}
           subtitle="This month"
           color="success"
         />
         <StatCard
-          icon={Dumbbell}
+          icon={<Dumbbell className="w-6 h-6" />}
           label="Active Classes"
           value={stats?.activeClasses || 0}
           color="navy"
@@ -212,10 +212,10 @@ export default function TrainerDashboardPage() {
           <div className="surface-card p-6">
             <h3 className="text-base font-bold text-foreground mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3">
-              <QuickActionBtn icon={Users} label="My Clients" href="/trainer/clients" color="info" />
-              <QuickActionBtn icon={ClipboardList} label="Workouts" href="/trainer/workouts" color="orange" />
-              <QuickActionBtn icon={Target} label="Assessments" href="/trainer/assessments" color="success" />
-              <QuickActionBtn icon={TrendingUp} label="Progress" href="/trainer/progress" color="navy" />
+              <QuickActionBtn icon={<Users className="w-5 h-5 transition-transform group-hover:scale-110" />} label="My Clients" href="/trainer/clients" color="info" />
+              <QuickActionBtn icon={<ClipboardList className="w-5 h-5 transition-transform group-hover:scale-110" />} label="Workouts" href="/trainer/workouts" color="orange" />
+              <QuickActionBtn icon={<Target className="w-5 h-5 transition-transform group-hover:scale-110" />} label="Assessments" href="/trainer/assessments" color="success" />
+              <QuickActionBtn icon={<TrendingUp className="w-5 h-5 transition-transform group-hover:scale-110" />} label="Progress" href="/trainer/progress" color="navy" />
             </div>
           </div>
 
@@ -247,7 +247,7 @@ export default function TrainerDashboardPage() {
 // UI Components
 // ═══════════════════════════════════════════════════════════════
 
-function QuickActionBtn({ icon: Icon, label, href, color }: { icon: any, label: string, href: string, color: string }) {
+function QuickActionBtn({ icon, label, href, color }: { icon: React.ReactNode, label: string, href: string, color: string }) {
   const colorMap: any = {
     orange: "bg-brand-orange-soft text-brand-orange hover:bg-brand-orange hover:text-white",
     success: "bg-success-soft text-success hover:bg-success hover:text-white",
@@ -263,7 +263,7 @@ function QuickActionBtn({ icon: Icon, label, href, color }: { icon: any, label: 
         colorMap[color]
       )}
     >
-      <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+      {icon}
       <span className="text-xs font-bold">{label}</span>
     </Link>
   );

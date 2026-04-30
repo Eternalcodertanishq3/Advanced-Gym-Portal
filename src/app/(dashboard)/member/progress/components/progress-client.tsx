@@ -118,7 +118,7 @@ export function ProgressClient({ data }: Props) {
                 value={`${latest.weight || "--"} kg`} 
                 trend={weightDiff} 
                 unit="kg"
-                icon={Scale}
+                icon={<Scale className="w-6 h-6" />}
                 color="orange"
               />
               <StatCard 
@@ -126,7 +126,7 @@ export function ProgressClient({ data }: Props) {
                 value={`${latest.bodyFat || "--"} %`} 
                 trend={0} 
                 unit="%"
-                icon={Activity}
+                icon={<Activity className="w-6 h-6" />}
                 color="info"
               />
               <StatCard 
@@ -134,7 +134,7 @@ export function ProgressClient({ data }: Props) {
                 value={`${latest.chest || "--"} cm`} 
                 trend={0} 
                 unit="cm"
-                icon={Ruler}
+                icon={<Ruler className="w-6 h-6" />}
                 color="purple"
               />
               <StatCard 
@@ -142,7 +142,7 @@ export function ProgressClient({ data }: Props) {
                 value={`${latest.waist || "--"} cm`} 
                 trend={0} 
                 unit="cm"
-                icon={Ruler}
+                icon={<Ruler className="w-6 h-6" />}
                 color="success"
               />
             </div>
@@ -344,7 +344,7 @@ export function ProgressClient({ data }: Props) {
   );
 }
 
-function StatCard({ label, value, trend, unit, icon: Icon, color }: any) {
+function StatCard({ label, value, trend, unit, icon, color }: any) {
   const colorMap: any = {
     orange: "text-brand-orange bg-brand-orange/10 border-brand-orange/20 shadow-brand-glow",
     info: "text-info bg-info/10 border-info/20 shadow-info-glow",
@@ -356,7 +356,7 @@ function StatCard({ label, value, trend, unit, icon: Icon, color }: any) {
     <div className="surface-card p-6 rounded-3xl border border-border/50 hover:border-brand-orange/30 transition-all group">
       <div className="flex justify-between items-start mb-4">
         <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110", colorMap[color])}>
-          <Icon className="w-6 h-6" />
+          {icon}
         </div>
         {trend !== 0 && (
           <div className={cn(

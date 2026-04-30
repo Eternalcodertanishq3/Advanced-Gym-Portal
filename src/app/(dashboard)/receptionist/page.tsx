@@ -108,28 +108,28 @@ export default function ReceptionistDashboardPage() {
       {/* Quick Action Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <QuickActionCard
-          icon={QrCode}
+          icon={<QrCode className="w-6 h-6" />}
           label="Quick Check-In"
           description="Scan QR or search member"
           color="orange"
           href="/receptionist/check-in"
         />
         <QuickActionCard
-          icon={UserPlus}
+          icon={<UserPlus className="w-6 h-6" />}
           label="Walk-In Register"
           description="New member registration"
           color="success"
           href="/receptionist/walk-in"
         />
         <QuickActionCard
-          icon={CreditCard}
+          icon={<CreditCard className="w-6 h-6" />}
           label="Collect Payment"
           description="Record cash/card/UPI"
           color="info"
           href="/receptionist/payments"
         />
         <QuickActionCard
-          icon={Users}
+          icon={<Users className="w-6 h-6" />}
           label="View Members"
           description="Search & view profiles"
           color="navy"
@@ -140,7 +140,7 @@ export default function ReceptionistDashboardPage() {
       {/* Stats Row */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          icon={Users}
+          icon={<Users className="w-6 h-6" />}
           label="Checked In Today"
           value={stats?.todayCheckIns || 0}
           trend="+12"
@@ -148,19 +148,19 @@ export default function ReceptionistDashboardPage() {
           color="success"
         />
         <StatCard
-          icon={CreditCard}
+          icon={<CreditCard className="w-6 h-6" />}
           label="Today's Collection"
           value={formatCurrency(stats?.todayCollection || 0, { showSymbol: true, decimals: 0 })}
           color="orange"
         />
         <StatCard
-          icon={UserPlus}
+          icon={<UserPlus className="w-6 h-6" />}
           label="New Registrations"
           value={stats?.newWalkIns || 0}
           color="info"
         />
         <StatCard
-          icon={Bell}
+          icon={<Bell className="w-6 h-6" />}
           label="Pending Dues"
           value={stats?.pendingPayments || 0}
           color="danger"
@@ -269,31 +269,31 @@ export default function ReceptionistDashboardPage() {
 
             <div className="space-y-3">
               <SummaryRow
-                icon={Users}
+                icon={<Users className="w-5 h-5 text-txt-secondary" />}
                 label="Total Check-ins"
                 value={stats?.todayCheckIns?.toString() || "0"}
                 positive
               />
               <SummaryRow
-                icon={CreditCard}
+                icon={<CreditCard className="w-5 h-5 text-txt-secondary" />}
                 label="Revenue"
                 value={formatCurrency(stats?.todayCollection || 0, { showSymbol: true, decimals: 0 })}
                 positive
               />
               <SummaryRow
-                icon={UserPlus}
+                icon={<UserPlus className="w-5 h-5 text-txt-secondary" />}
                 label="New Members"
                 value={stats?.newWalkIns?.toString() || "0"}
                 positive
               />
               <SummaryRow
-                icon={Zap}
+                icon={<Zap className="w-5 h-5 text-txt-secondary" />}
                 label="Peak Hour"
                 value="6:00 PM"
                 neutral
               />
               <SummaryRow
-                icon={TrendingUp}
+                icon={<TrendingUp className="w-5 h-5 text-txt-secondary" />}
                 label="Occupancy"
                 value="78%"
                 positive
@@ -322,13 +322,13 @@ export default function ReceptionistDashboardPage() {
 // ═══════════════════════════════════════════════════════════════
 
 function QuickActionCard({
-  icon: Icon,
+  icon,
   label,
   description,
   color,
   href,
 }: {
-  icon: React.ElementType;
+  icon: React.ReactNode;
   label: string;
   description: string;
   color: "orange" | "success" | "info" | "navy";
@@ -357,7 +357,7 @@ function QuickActionCard({
           colorMap[color]
         )}
       >
-        <Icon className="w-6 h-6" />
+        {icon}
       </div>
       <h3 className="text-base font-bold text-foreground mb-1">{label}</h3>
       <p className="text-sm font-medium text-txt-secondary">{description}</p>
@@ -374,14 +374,14 @@ function QuickActionCard({
 // ═══════════════════════════════════════════════════════════════
 
 function SummaryRow({
-  icon: Icon,
+  icon,
   label,
   value,
   change,
   positive,
   neutral,
 }: {
-  icon: React.ElementType;
+  icon: React.ReactNode;
   label: string;
   value: string;
   change?: string;
@@ -392,7 +392,7 @@ function SummaryRow({
     <div className="flex items-center justify-between p-4 rounded-xl bg-surface-sunken">
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-lg bg-surface-elevated flex items-center justify-center">
-          <Icon className="w-5 h-5 text-txt-secondary" />
+          {icon}
         </div>
         <div>
           <p className="text-xs font-bold text-txt-tertiary tracking-wide uppercase mb-0.5">{label}</p>

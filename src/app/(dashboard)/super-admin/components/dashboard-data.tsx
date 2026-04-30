@@ -22,7 +22,7 @@ export async function StatsGrid() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
-        icon={DollarSign}
+        icon={<DollarSign className="w-6 h-6" />}
         label="Total System Revenue"
         value={currentStats.totalRevenue}
         trend={currentStats.revenueTrend}
@@ -31,7 +31,7 @@ export async function StatsGrid() {
         sparklineData={currentStats.revenueSparkline}
       />
       <StatCard
-        icon={Users}
+        icon={<Users className="w-6 h-6" />}
         label="Active Gym Members"
         value={currentStats.activeMembersCount}
         trend={currentStats.membersTrend}
@@ -40,7 +40,7 @@ export async function StatsGrid() {
         sparklineData={currentStats.membersSparkline}
       />
       <StatCard
-        icon={Shield}
+        icon={<Shield className="w-6 h-6" />}
         label="Active Staff / Admins"
         value={currentStats.activeStaffCount}
         trend="Live"
@@ -49,7 +49,7 @@ export async function StatsGrid() {
         sparklineData={[0, 0, currentStats.activeStaffCount]}
       />
       <StatCard
-        icon={Activity}
+        icon={<Activity className="w-6 h-6" />}
         label="System Health (API)"
         value="100%"
         trend="Stable"

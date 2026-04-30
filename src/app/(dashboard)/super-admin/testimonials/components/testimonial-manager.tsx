@@ -4,7 +4,8 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Trash2, Clock, Star, MessageSquare } from "lucide-react";
 import { approveTestimonial, deleteTestimonial } from "@/actions/super-admin/testimonial-actions";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
+import { ConfirmModal } from "@/components/common/confirm-modal";
 
 interface Testimonial {
   id: string;
@@ -18,6 +19,8 @@ interface Testimonial {
 
 export default function TestimonialManager({ initialTestimonials }: { initialTestimonials: Testimonial[] }) {
   const [testimonials, setTestimonials] = React.useState(initialTestimonials);
+  const [deleteModal, setDeleteModal] = React.useState({ open: false, id: "" });
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const handleApprove = async (id: string) => {
     const result = await approveTestimonial(id);
@@ -29,12 +32,17 @@ export default function TestimonialManager({ initialTestimonials }: { initialTes
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this feedback?")) return;
-    const result = await deleteTestimonial(id);
+  const handleDelete = async () => {
+    if (!deleteModal.id) return;
+    
+    setIsDeleting(true);
+    const result = await deleteTestimonial(deleteModal.id);
+    setIsDeleting(false);
+    
     if (result.success) {
-      setTestimonials(prev => prev.filter(t => t.id !== id));
-      toast.success("Feedback deleted");
+      setTestimonials(prev => prev.filter(t => t.id !== deleteModal.id));
+      toast.success("Feedback deleted successfully");
+      setDeleteModal({ open: false, id: "" });
     } else {
       toast.error(result.error || "Failed to delete");
     }
@@ -103,7 +111,7 @@ export default function TestimonialManager({ initialTestimonials }: { initialTes
                   </button>
                 )}
                 <button 
-                  onClick={() => handleDelete(t.id)}
+                  onClick={() => setDeleteModal({ open: true, id: t.id })}
                   title="Delete Feedback"
                   className="p-2.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all border border-red-500/20"
                 >
@@ -114,6 +122,16 @@ export default function TestimonialManager({ initialTestimonials }: { initialTes
           </motion.div>
         ))}
       </AnimatePresence>
+
+      <ConfirmModal 
+        isOpen={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, id: "" })}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
+        title="Delete Feedback?"
+        description="This will permanently remove this member story from your records and the landing page. This action cannot be reversed."
+        confirmText="Delete Now"
+      />
     </div>
   );
 }

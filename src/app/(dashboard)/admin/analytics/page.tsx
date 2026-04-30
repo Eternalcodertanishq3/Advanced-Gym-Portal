@@ -85,12 +85,12 @@ export default function AnalyticsPage() {
 
   const { revenueData, categoryData, attendanceData } = chartData || { revenueData: [], categoryData: [], attendanceData: [] };
 
-  const StatCard = ({ title, value, icon: Icon, trend, trendValue, description, loading }: any) => (
+  const StatCard = ({ title, value, icon, trend, trendValue, description, loading }: any) => (
     <Card className="bg-surface-card border-surface-sunken shadow-sm overflow-hidden group">
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div className="p-2.5 rounded-xl bg-surface-base border border-surface-sunken text-obsidian-900 group-hover:bg-brand-navy group-hover:text-white transition-colors">
-            <Icon className="w-5 h-5" />
+            {icon}
           </div>
           {trend && (
             <div className={cn(
@@ -154,7 +154,7 @@ export default function AnalyticsPage() {
         <StatCard 
           title="Monthly Revenue" 
           value={formatCurrency(stats?.monthlyRevenue || 0)} 
-          icon={CreditCard}
+          icon={<CreditCard className="w-5 h-5" />}
           trend="up"
           trendValue={stats?.revenueGrowth || 0}
           description="Total revenue collected this month"
@@ -163,7 +163,7 @@ export default function AnalyticsPage() {
         <StatCard 
           title="Active Members" 
           value={stats?.activeMembers || 0} 
-          icon={Users}
+          icon={<Users className="w-5 h-5" />}
           trend="up"
           trendValue={8.2}
           description="Members with active subscriptions"
@@ -172,7 +172,7 @@ export default function AnalyticsPage() {
         <StatCard 
           title="Attendance Rate" 
           value={`${stats?.attendanceRate || 0}%`} 
-          icon={Calendar}
+          icon={<Calendar className="w-5 h-5" />}
           trend="down"
           trendValue={2.4}
           description="Average daily member turnout"
@@ -181,7 +181,7 @@ export default function AnalyticsPage() {
         <StatCard 
           title="Conversion Rate" 
           value="24.8%" 
-          icon={TrendingUp}
+          icon={<TrendingUp className="w-5 h-5" />}
           trend="up"
           trendValue={15.3}
           description="Visitor to member conversion"

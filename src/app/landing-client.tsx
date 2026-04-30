@@ -289,8 +289,17 @@ function TestimonialSlider({ config, gymName, dbTestimonials }: { config: any, g
         transition={{ duration: 0.5 }}
       >
         <div className="flex gap-1 mb-6">
-          {[1,2,3,4,5].map(s => (
-            <span key={s} className="text-brand-orange text-xl">★</span>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span 
+              key={star} 
+              className={`text-xl transition-colors ${
+                star <= (testimonials[current].rating || 5) 
+                  ? "text-brand-orange" 
+                  : "text-white/10"
+              }`}
+            >
+              ★
+            </span>
           ))}
         </div>
         <p className="text-xl sm:text-2xl text-white font-medium mb-10 leading-relaxed tracking-tight italic min-h-[120px]">

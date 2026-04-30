@@ -102,35 +102,35 @@ export default function NotificationsPage() {
               New Broadcast
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md bg-surface-card border-surface-sunken">
+          <DialogContent className="sm:max-w-md bg-brand-navy border-white/10 text-white">
             <DialogHeader>
-              <DialogTitle className="text-xl font-display font-bold">Compose Broadcast</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-xl font-display font-bold text-white">Compose Broadcast</DialogTitle>
+              <DialogDescription className="text-white/50">
                 This message will be sent to all active members of the gym.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-obsidian-900">Announcement Title</label>
+                <label className="text-xs font-bold text-white/70 uppercase tracking-wider">Announcement Title</label>
                 <Input 
                   placeholder="E.g. Holiday Schedule Update" 
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="bg-surface-base border-surface-sunken"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-obsidian-900">Message Details</label>
+                <label className="text-xs font-bold text-white/70 uppercase tracking-wider">Message Details</label>
                 <Textarea 
                   placeholder="Type your message here..." 
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="bg-surface-base border-surface-sunken resize-none"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all rounded-xl resize-none"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-obsidian-900">Priority Level</label>
+                <label className="text-xs font-bold text-white/70 uppercase tracking-wider">Priority Level</label>
                 <div className="flex gap-2">
                   {['INFO', 'SUCCESS', 'URGENT'].map((t) => (
                     <Button 
@@ -138,8 +138,10 @@ export default function NotificationsPage() {
                       type="button"
                       variant="outline" 
                       className={cn(
-                        "flex-1 text-xs h-9",
-                        type === t ? "bg-brand-navy text-white border-brand-navy" : "bg-surface-base border-surface-sunken text-obsidian-600"
+                        "flex-1 text-[10px] font-black h-9 rounded-xl transition-all",
+                        type === t 
+                          ? "bg-brand-orange text-white border-brand-orange shadow-lg shadow-brand-orange/20" 
+                          : "bg-white/5 border-white/10 text-white/50 hover:text-white hover:bg-white/10"
                       )}
                       onClick={() => setType(t)}
                     >
@@ -150,9 +152,9 @@ export default function NotificationsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-4">
-              <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+              <Button variant="ghost" onClick={() => setIsOpen(false)} className="text-white/50 hover:text-white hover:bg-white/10 rounded-xl">Cancel</Button>
               <Button 
-                className="bg-brand-orange hover:bg-brand-orange/90 text-white px-6"
+                className="bg-brand-orange hover:bg-brand-orange/90 text-white px-6 h-11 rounded-xl font-bold shadow-lg shadow-brand-orange/20"
                 onClick={handleSend}
                 disabled={broadcast.isPending}
               >

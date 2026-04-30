@@ -114,10 +114,10 @@ export function DietClient({ plans }: Props) {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-                      <MacroMini label="Prot" value={`${meal.protein}g`} icon={Beef} color="danger" />
-                      <MacroMini label="Carbs" value={`${meal.carbs}g`} icon={Bean} color="info" />
-                      <MacroMini label="Fats" value={`${meal.fats}g`} icon={Droplets} color="warning" />
-                      <MacroMini label="Fiber" value={`${meal.fiber || 0}g`} icon={Apple} color="success" />
+                      <MacroMini label="Prot" value={`${meal.protein}g`} icon={<Beef className="w-4 h-4" />} color="danger" />
+                      <MacroMini label="Carbs" value={`${meal.carbs}g`} icon={<Bean className="w-4 h-4" />} color="info" />
+                      <MacroMini label="Fats" value={`${meal.fats}g`} icon={<Droplets className="w-4 h-4" />} color="warning" />
+                      <MacroMini label="Fiber" value={`${meal.fiber || 0}g`} icon={<Apple className="w-4 h-4" />} color="success" />
                     </div>
 
                     <div className="space-y-3 pt-4 border-t border-border/30">
@@ -188,7 +188,7 @@ export function DietClient({ plans }: Props) {
   );
 }
 
-function MacroMini({ label, value, icon: Icon, color }: any) {
+function MacroMini({ label, value, icon, color }: any) {
   const colorMap: any = {
     danger: "text-danger bg-danger-soft/10",
     info: "text-info bg-info-soft/10",
@@ -199,7 +199,7 @@ function MacroMini({ label, value, icon: Icon, color }: any) {
   return (
     <div className="p-3 rounded-2xl bg-surface-elevated border border-border/30 flex items-center gap-3">
       <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", colorMap[color])}>
-        <Icon className="w-4 h-4" />
+        {icon}
       </div>
       <div>
         <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest leading-none mb-1">{label}</p>

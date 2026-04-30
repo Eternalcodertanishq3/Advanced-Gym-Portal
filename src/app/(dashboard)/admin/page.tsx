@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
       {/* Stats Grid */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          icon={Users}
+          icon={<Users className="w-6 h-6" />}
           label="Total Members"
           value={stats.totalMembers}
           trend="+12%"
@@ -142,7 +142,7 @@ export default function AdminDashboardPage() {
           color="navy"
         />
         <StatCard
-          icon={CreditCard}
+          icon={<CreditCard className="w-6 h-6" />}
           label="Monthly Revenue"
           value={formatCurrency(stats.monthlyRevenue, { showSymbol: true, decimals: 0 })}
           trend={`+${stats.revenueGrowth}%`}
@@ -152,7 +152,7 @@ export default function AdminDashboardPage() {
           subtitle={`₹${formatCurrency(stats.todayRevenue, { showSymbol: false, decimals: 0 })} today`}
         />
         <StatCard
-          icon={Activity}
+          icon={<Activity className="w-6 h-6" />}
           label="Checked In Today"
           value={stats.todayAttendance}
           trendUp
@@ -161,7 +161,7 @@ export default function AdminDashboardPage() {
           subtitle="Peak: 6:00 PM - 8:00 PM"
         />
         <StatCard
-          icon={AlertTriangle}
+          icon={<AlertTriangle className="w-6 h-6" />}
           label="Pending Dues"
           value={stats.pendingPayments}
           trendUp={false}
@@ -204,25 +204,25 @@ export default function AdminDashboardPage() {
       {/* Summary Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <SummaryCard
-          icon={Calendar}
+          icon={<Calendar className="w-6 h-6" />}
           label="New This Month"
           value={stats.newMembersThisMonth}
           color="orange"
         />
         <SummaryCard
-          icon={Clock}
+          icon={<Clock className="w-6 h-6" />}
           label="Expiring Soon"
           value={stats.expiringSoon}
           color="warning"
         />
         <SummaryCard
-          icon={CheckCircle2}
+          icon={<CheckCircle2 className="w-6 h-6" />}
           label="Active Subscriptions"
           value={stats.activeMembers}
           color="success"
         />
         <SummaryCard
-          icon={XCircle}
+          icon={<XCircle className="w-6 h-6" />}
           label="Inactive Members"
           value={stats.totalMembers - stats.activeMembers}
           color="danger"
@@ -237,12 +237,12 @@ export default function AdminDashboardPage() {
 // ═══════════════════════════════════════════════════════════════
 
 function SummaryCard({
-  icon: Icon,
+  icon,
   label,
   value,
   color,
 }: {
-  icon: React.ElementType;
+  icon: React.ReactNode;
   label: string;
   value: number | string;
   color: "warning" | "success" | "info" | "danger" | "orange";
@@ -258,7 +258,7 @@ function SummaryCard({
   return (
     <div className="surface-card p-5 flex items-center gap-4 transition-transform hover:-translate-y-1 duration-300">
       <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", colorMap[color])}>
-        <Icon className="w-6 h-6" />
+        {icon}
       </div>
       <div>
         <p className="text-2xl font-display font-bold text-foreground tracking-tight">{formatNumber(value)}</p>

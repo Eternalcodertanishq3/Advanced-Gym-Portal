@@ -17,7 +17,8 @@ export async function getDashboardStats() {
       dailyRevenue,
       dailyMembers,
       prevRevenue,
-      prevMembers
+      prevMembers,
+      activeBranches
     ] = await Promise.all([
       // Total Revenue
       prisma.payment.aggregate({
@@ -65,11 +66,16 @@ export async function getDashboardStats() {
       // Previous Members for Trend
       prisma.member.count({
         where: { joinDate: { gte: prev7Days, lt: last7Days } }
+      }),
+      // Active Branches Count
+      prisma.branch.count({
+        where: { status: "ACTIVE" }
       })
     ]);
 
     const totalRevenue = Number(revenueResult._sum.total || 0);
     const previousRevenueValue = Number(prevRevenue._sum.total || 0);
+
     
     // Process Sparklines (Group by day in JS for better control)
     const revenueSparkline = Array(7).fill(0);
@@ -100,6 +106,7 @@ export async function getDashboardStats() {
         totalRevenue,
         activeMembersCount,
         activeStaffCount,
+        activeBranches,
         revenueTrend,
         membersTrend,
         revenueSparkline,

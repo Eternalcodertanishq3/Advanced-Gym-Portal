@@ -120,7 +120,7 @@ export function SubscriptionPlansClient({ plans }: Props) {
       )}
 
       <PlanModal 
-        isOpen={isModalOpen} 
+        open={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         plan={selectedPlan}
       />

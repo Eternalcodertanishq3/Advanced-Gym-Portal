@@ -45,7 +45,7 @@ export default function RevenuePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
-          icon={TrendingUp}
+          icon={<TrendingUp className="w-6 h-6" />}
           label="MRR (Monthly Recurring)"
           value={stats?.mrr || 0}
           trend="+0.0%"
@@ -54,7 +54,7 @@ export default function RevenuePage() {
           sparklineData={stats?.revenueSparkline || []}
         />
         <StatCard
-          icon={TrendingUp}
+          icon={<TrendingUp className="w-6 h-6" />}
           label="ARR (Annual Run Rate)"
           value={stats?.arr || 0}
           trend="+0.0%"
@@ -63,7 +63,7 @@ export default function RevenuePage() {
           sparklineData={stats?.revenueSparkline.map(v => v * 12) || []}
         />
         <StatCard
-          icon={TrendingUp}
+          icon={<TrendingUp className="w-6 h-6" />}
           label="Churn Rate"
           value={`${stats?.churnRate || 0}%`}
           trend="Live"

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -29,56 +29,24 @@ interface Props {
 export function PlanModal({ open, onClose, plan }: Props) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    duration: "30",
-    price: "",
-    description: "",
-    features: [] as string[],
-    color: "#F26522",
-    maxCheckIns: "0",
-    ptSessions: "0",
-    guestPasses: "0",
-    sortOrder: "0",
-    gstIncluded: true,
+    name: plan?.name || "",
+    duration: plan?.duration?.toString() || "30",
+    price: plan?.price?.toString() || "",
+    description: plan?.description || "",
+    features: plan?.features || [] as string[],
+    color: plan?.color || "#F26522",
+    maxCheckIns: plan?.maxCheckIns?.toString() || "0",
+    ptSessions: plan?.ptSessions?.toString() || "0",
+    guestPasses: plan?.guestPasses?.toString() || "0",
+    sortOrder: plan?.sortOrder?.toString() || "0",
+    gstIncluded: plan?.gstIncluded ?? true,
   });
-
-  useEffect(() => {
-    if (plan) {
-      setFormData({
-        name: plan.name || "",
-        duration: plan.duration?.toString() || "30",
-        price: plan.price?.toString() || "",
-        description: plan.description || "",
-        features: plan.features || [],
-        color: plan.color || "#F26522",
-        maxCheckIns: plan.maxCheckIns?.toString() || "0",
-        ptSessions: plan.ptSessions?.toString() || "0",
-        guestPasses: plan.guestPasses?.toString() || "0",
-        sortOrder: plan.sortOrder?.toString() || "0",
-        gstIncluded: plan.gstIncluded ?? true,
-      });
-    } else {
-      setFormData({
-        name: "",
-        duration: "30",
-        price: "",
-        description: "",
-        features: [],
-        color: "#F26522",
-        maxCheckIns: "0",
-        ptSessions: "0",
-        guestPasses: "0",
-        sortOrder: "0",
-        gstIncluded: true,
-      });
-    }
-  }, [plan, open]);
 
   const toggleFeature = (featureId: string) => {
     setFormData(prev => ({
       ...prev,
       features: prev.features.includes(featureId)
-        ? prev.features.filter(id => id !== featureId)
+        ? prev.features.filter((id: string) => id !== featureId)
         : [...prev.features, featureId]
     }));
   };
@@ -110,8 +78,8 @@ export function PlanModal({ open, onClose, plan }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-brand-navy border-white/10 text-white">
+    <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[90vh] bg-brand-navy border-white/10 text-white overflow-y-auto scrollbar-thin">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold font-display tracking-tight text-white">
             {plan ? "Edit Subscription Plan" : "Create New Subscription Plan"}
@@ -222,6 +190,7 @@ export function PlanModal({ open, onClose, plan }: Props) {
                     <Checkbox
                       checked={formData.features.includes(feature.id)}
                       onCheckedChange={() => toggleFeature(feature.id)}
+                      onClick={(e) => e.stopPropagation()} // Prevent double trigger
                       className="border-white/20 data-[state=checked]:bg-brand-orange data-[state=checked]:border-brand-orange"
                     />
                   </div>

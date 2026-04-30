@@ -10,7 +10,7 @@ import { cn, formatNumber, formatCurrency } from "@/lib/utils";
 // ═══════════════════════════════════════════════════════════════
 
 interface StatCardProps {
-  icon: LucideIcon;
+  icon: React.ReactNode;
   label: string;
   value: number | string;
   trend?: string;
@@ -135,7 +135,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
 }
 
 export function StatCard({
-  icon: Icon,
+  icon,
   label,
   value,
   trend,
@@ -195,7 +195,7 @@ export function StatCard({
             colors.bg,
             colors.text
           )}>
-            <Icon className="w-6 h-6" />
+            {icon}
           </div>
           
           {trend && (

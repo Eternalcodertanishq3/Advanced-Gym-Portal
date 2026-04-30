@@ -4,6 +4,21 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { MEMBERSHIP_FEATURES } from "@/lib/constants/features";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const formatDuration = (days: number) => {
+  if (!days) return "";
+  if (days % 30 === 0) {
+    const months = days / 30;
+    return `${months} ${months === 1 ? 'month' : 'months'}`;
+  }
+  return `${days} days`;
+};
 
 export function PricingPlans({ plans = [] }: { plans?: any[] }) {
   // If no plans exist, show a fallback or message
@@ -63,7 +78,7 @@ export function PricingPlans({ plans = [] }: { plans?: any[] }) {
                   <div className="flex items-baseline gap-1 mb-4">
                     <span className={`text-4xl md:text-5xl font-display font-black ${isPopular ? "text-white" : "text-white"}`}>₹{Number(plan.price).toLocaleString()}</span>
                     <span className={`text-sm font-bold ${isPopular ? "text-white/60" : "text-white/40"}`}>
-                      /{plan.duration} {plan.duration === 1 ? 'mo' : 'mos'}
+                      /{formatDuration(Number(plan.duration))}
                     </span>
                   </div>
                   <p className={`text-sm leading-relaxed ${isPopular ? "text-white/80" : "text-white/50"}`}>
@@ -72,20 +87,58 @@ export function PricingPlans({ plans = [] }: { plans?: any[] }) {
                 </div>
 
                 <ul className="space-y-4 mb-10 flex-grow">
-                  {plan.features.map((feature: string) => (
-                    <li key={feature} className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${isPopular ? "bg-white/20" : "bg-brand-orange/10"}`}>
-                        <Check className={`w-3 h-3 ${isPopular ? "text-white" : "text-brand-orange"}`} />
-                      </div>
-                      <span className={`text-sm font-medium ${isPopular ? "text-white" : "text-white/70"}`}>{feature}</span>
-                    </li>
-                  ))}
+                  {plan.features.slice(0, 6).map((fId: string) => {
+                    const feature = MEMBERSHIP_FEATURES.find(f => f.id === fId);
+                    return (
+                      <li key={fId} className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${isPopular ? "bg-white/20" : "bg-brand-orange/10"}`}>
+                          <Check className={`w-3 h-3 ${isPopular ? "text-white" : "text-brand-orange"}`} />
+                        </div>
+                        <span className={`text-sm font-medium ${isPopular ? "text-white" : "text-white/70"}`}>
+                          {feature?.label || fId}
+                        </span>
+                      </li>
+                    );
+                  })}
                   {plan.ptSessions > 0 && (
                     <li className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${isPopular ? "bg-white/20" : "bg-brand-orange/10"}`}>
                         <Check className={`w-3 h-3 ${isPopular ? "text-white" : "text-brand-orange"}`} />
                       </div>
                       <span className={`text-sm font-medium ${isPopular ? "text-white" : "text-white/70"}`}>{plan.ptSessions} PT Sessions included</span>
+                    </li>
+                  )}
+                  {plan.features.length > 6 && (
+                    <li className="flex items-center gap-3 pl-8">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className={`text-xs font-bold italic underline underline-offset-4 decoration-brand-orange/30 hover:decoration-brand-orange transition-all ${isPopular ? "text-white/60" : "text-white/40"}`}>
+                            + {plan.features.length - 6} more features included
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-64 bg-obsidian-900 border-white/10 p-4 shadow-2xl">
+                          <div className="space-y-3">
+                            <h4 className="text-xs font-black text-brand-orange uppercase tracking-wider">All Premium Benefits</h4>
+                            <div className="grid grid-cols-1 gap-2">
+                              {plan.features.map((fId: string) => {
+                                const feature = MEMBERSHIP_FEATURES.find(f => f.id === fId);
+                                return (
+                                  <div key={fId} className="flex items-center gap-2 py-1 border-b border-white/5 last:border-0">
+                                    <Check className="w-3 h-3 text-brand-orange" />
+                                    <span className="text-xs text-white/70">{feature?.label || fId}</span>
+                                  </div>
+                                );
+                              })}
+                              {plan.ptSessions > 0 && (
+                                <div className="flex items-center gap-2 py-1 border-t border-white/5 mt-1 pt-2">
+                                  <Check className="w-3 h-3 text-brand-orange" />
+                                  <span className="text-xs text-white font-bold">{plan.ptSessions} PT Sessions included</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </li>
                   )}
                 </ul>

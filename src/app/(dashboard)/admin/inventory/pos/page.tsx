@@ -244,10 +244,10 @@ export default function POSPage() {
                 Checkout
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-surface-card border-surface-sunken">
+            <DialogContent className="sm:max-w-md bg-brand-navy border-white/10 text-white">
               <DialogHeader>
-                <DialogTitle>Complete Sale</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-xl font-display font-bold text-white">Complete Sale</DialogTitle>
+                <DialogDescription className="text-white/50">
                   Select a payment method to complete the transaction.
                 </DialogDescription>
               </DialogHeader>
@@ -255,40 +255,60 @@ export default function POSPage() {
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   <Button 
                     variant="outline" 
-                    className={cn("h-20 flex flex-col gap-2 border-2", checkoutMethod === "CASH" ? "border-brand-navy bg-brand-navy/5" : "border-surface-sunken")}
+                    className={cn(
+                      "h-20 flex flex-col gap-2 border-2 transition-all rounded-xl", 
+                      checkoutMethod === "CASH" 
+                        ? "border-brand-orange bg-brand-orange/10 text-white" 
+                        : "border-white/10 bg-white/5 text-white/50 hover:text-white hover:bg-white/10"
+                    )}
                     onClick={() => setCheckoutMethod("CASH")}
                   >
                     <Banknote className="w-6 h-6" />
-                    Cash
+                    <span className="text-[10px] font-black uppercase tracking-widest">Cash</span>
                   </Button>
                   <Button 
                     variant="outline" 
-                    className={cn("h-20 flex flex-col gap-2 border-2", checkoutMethod === "CARD" ? "border-brand-navy bg-brand-navy/5" : "border-surface-sunken")}
+                    className={cn(
+                      "h-20 flex flex-col gap-2 border-2 transition-all rounded-xl", 
+                      checkoutMethod === "CARD" 
+                        ? "border-brand-orange bg-brand-orange/10 text-white" 
+                        : "border-white/10 bg-white/5 text-white/50 hover:text-white hover:bg-white/10"
+                    )}
                     onClick={() => setCheckoutMethod("CARD")}
                   >
                     <CreditCard className="w-6 h-6" />
-                    Card / POS
+                    <span className="text-[10px] font-black uppercase tracking-widest">Card / POS</span>
                   </Button>
                   <Button 
                     variant="outline" 
-                    className={cn("h-20 flex flex-col gap-2 border-2", checkoutMethod === "UPI" ? "border-brand-navy bg-brand-navy/5" : "border-surface-sunken")}
+                    className={cn(
+                      "h-20 flex flex-col gap-2 border-2 transition-all rounded-xl", 
+                      checkoutMethod === "UPI" 
+                        ? "border-brand-orange bg-brand-orange/10 text-white" 
+                        : "border-white/10 bg-white/5 text-white/50 hover:text-white hover:bg-white/10"
+                    )}
                     onClick={() => setCheckoutMethod("UPI")}
                   >
                     <div className="font-bold font-mono text-lg leading-none">UPI</div>
-                    Scanner
+                    <span className="text-[10px] font-black uppercase tracking-widest">Scanner</span>
                   </Button>
                 </div>
                 
                 <div className="space-y-3 mb-6">
-                  <label className="text-sm font-medium text-obsidian-900">Member (Optional)</label>
+                  <label className="text-xs font-bold text-white/70 uppercase tracking-wider">Member (Optional)</label>
                   <div className="flex gap-2">
-                    <Input placeholder="Search member by phone..." className="bg-surface-base" />
-                    <Button variant="outline" size="icon"><User className="w-4 h-4" /></Button>
+                    <Input 
+                      placeholder="Search member by phone..." 
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl" 
+                    />
+                    <Button variant="outline" size="icon" className="h-11 w-11 bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
+                      <User className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
 
                 <Button 
-                  className="w-full bg-brand-navy hover:bg-brand-navy/90 text-white h-12 text-lg"
+                  className="w-full bg-brand-orange hover:bg-brand-orange-dark text-white h-12 text-lg font-bold rounded-xl shadow-lg shadow-brand-orange/20"
                   onClick={handleCheckout}
                 >
                   Pay {formatCurrency(cart.total * 1.18)}

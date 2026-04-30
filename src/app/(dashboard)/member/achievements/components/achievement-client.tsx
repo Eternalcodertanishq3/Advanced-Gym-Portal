@@ -67,9 +67,9 @@ export function AchievementClient({ data }: Props) {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-               <SummaryStat label="Points" value="2,450" icon={Star} color="text-warning" />
-               <SummaryStat label="Rank" value="#12" icon={Flame} color="text-danger" />
-               <SummaryStat label="XP" value="12k" icon={Zap} color="text-info" />
+               <SummaryStat label="Points" value="2,450" icon={<Star className="w-5 h-5 mb-2 text-warning" />} color="text-warning" />
+               <SummaryStat label="Rank" value="#12" icon={<Flame className="w-5 h-5 mb-2 text-danger" />} color="text-danger" />
+               <SummaryStat label="XP" value="12k" icon={<Zap className="w-5 h-5 mb-2 text-info" />} color="text-info" />
             </div>
          </div>
       </div>
@@ -138,10 +138,10 @@ export function AchievementClient({ data }: Props) {
   );
 }
 
-function SummaryStat({ label, value, icon: Icon, color }: any) {
+function SummaryStat({ label, value, icon, color }: any) {
   return (
     <div className="bg-surface-sunken/50 border border-border/30 p-4 rounded-3xl flex flex-col items-center justify-center text-center">
-       <Icon className={cn("w-5 h-5 mb-2", color)} />
+       {icon}
        <p className="text-lg font-display font-bold text-foreground">{value}</p>
        <p className="text-[9px] font-bold text-txt-tertiary uppercase tracking-widest mt-0.5">{label}</p>
     </div>

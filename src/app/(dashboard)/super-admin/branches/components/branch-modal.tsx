@@ -1,12 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, Trash2 } from "lucide-react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription 
+} from "@/components/ui/dialog";
+import { Loader2, Trash2, Building2 } from "lucide-react";
 import { createBranch, updateBranch, deleteBranch } from "@/actions/super-admin/branch-actions";
 import { toast } from "sonner";
-import { Portal } from "@/components/common/portal";
-
 import { 
   Select, 
   SelectContent, 
@@ -14,6 +18,10 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 interface Branch {
   id: string;
@@ -80,99 +88,113 @@ export function BranchModal({ isOpen, onClose, branch }: Props) {
   };
 
   return (
-    <Portal>
-      <AnimatePresence>
-        {isOpen && (
-          <div className="fixed inset-0 z-[1000]">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60"
-              onClick={onClose}
-            />
-            <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                className="pointer-events-auto w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar"
-              >
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-display font-bold text-foreground">
-                      {branch ? "Edit Branch" : "Create New Branch"}
-                    </h2>
-                    <div className="flex items-center gap-2">
-                      {branch && (
-                        <button 
-                          onClick={handleDelete}
-                          disabled={isDeleting}
-                          title="Delete Branch"
-                          className="p-2 hover:bg-danger/10 rounded-lg text-danger/50 hover:text-danger transition-colors disabled:opacity-50"
-                        >
-                          {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                        </button>
-                      )}
-                      <button type="button" onClick={onClose} title="Close" className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <label htmlFor="branchName" className="text-sm font-bold text-foreground/70">Branch Name</label>
-                      <input id="branchName" required name="name" type="text" defaultValue={branch?.name} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter branch name" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="branchLocation" className="text-sm font-bold text-foreground/70">Location (Short Area)</label>
-                      <input id="branchLocation" required name="location" type="text" defaultValue={branch?.location} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter area/city" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="branchAddress" className="text-sm font-bold text-foreground/70">Full Address</label>
-                      <textarea id="branchAddress" name="address" rows={3} defaultValue={branch?.address || ""} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter complete address..." />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label htmlFor="branchPhone" className="text-sm font-bold text-foreground/70">Contact Phone</label>
-                        <input id="branchPhone" name="phone" type="text" defaultValue={branch?.phone || ""} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-colors" placeholder="Enter contact phone" />
-                      </div>
-                      <div className="space-y-2">
-                        <label htmlFor="branchStatus" className="text-sm font-bold text-foreground/70">Status</label>
-                        <Select name="status" defaultValue={branch?.status || "ACTIVE"}>
-                          <SelectTrigger id="branchStatus" className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 h-11 text-foreground focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all">
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-card border-border shadow-2xl rounded-xl z-[1100]">
-                            <SelectItem value="ACTIVE">Active</SelectItem>
-                            <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
-                            <SelectItem value="CLOSED">Closed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="pt-6">
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full py-3 bg-brand-orange text-white font-bold rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                        {isSubmitting ? (branch ? "Updating Branch..." : "Creating Branch...") : (branch ? "Update Branch" : "Save Branch Details")}
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </motion.div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg bg-brand-navy border-white/10 text-white p-0 overflow-hidden">
+        <div className="p-6">
+          <DialogHeader className="mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-xl font-bold font-display tracking-tight text-white flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-brand-orange" />
+                  {branch ? "Edit Branch" : "Create New Branch"}
+                </DialogTitle>
+                <DialogDescription className="text-white/50 text-sm mt-1">
+                  {branch ? "Manage your branch location and status." : "Add a new gym branch to your network."}
+                </DialogDescription>
+              </div>
+              {branch && (
+                <Button 
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="text-danger/50 hover:text-danger hover:bg-danger/10 transition-colors"
+                >
+                  {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                </Button>
+              )}
             </div>
-          </div>
-        )}
-      </AnimatePresence>
-    </Portal>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-xs font-bold text-white/70 uppercase tracking-wider">Branch Name</Label>
+              <Input 
+                id="name"
+                required 
+                name="name" 
+                type="text" 
+                defaultValue={branch?.name} 
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
+                placeholder="e.g. Downtown Elite" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="location" className="text-xs font-bold text-white/70 uppercase tracking-wider">Location (Area/City)</Label>
+              <Input 
+                id="location"
+                required 
+                name="location" 
+                type="text" 
+                defaultValue={branch?.location} 
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
+                placeholder="e.g. South Delhi" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address" className="text-xs font-bold text-white/70 uppercase tracking-wider">Full Address</Label>
+              <Textarea 
+                id="address" 
+                name="address" 
+                rows={3} 
+                defaultValue={branch?.address || ""} 
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all rounded-xl min-h-[100px]"
+                placeholder="Enter complete physical address..." 
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-xs font-bold text-white/70 uppercase tracking-wider">Contact Phone</Label>
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  type="text" 
+                  defaultValue={branch?.phone || ""} 
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
+                  placeholder="Contact number" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-xs font-bold text-white/70 uppercase tracking-wider">Branch Status</Label>
+                <Select name="status" defaultValue={branch?.status || "ACTIVE"}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-brand-navy border-white/10 text-white">
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
+                    <SelectItem value="CLOSED">Closed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-12 bg-brand-orange hover:bg-brand-orange-dark text-white font-bold rounded-xl shadow-lg shadow-brand-orange/20 transition-all flex items-center justify-center gap-2"
+              >
+                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isSubmitting ? (branch ? "Updating..." : "Creating...") : (branch ? "Update Branch" : "Save Branch Details")}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
