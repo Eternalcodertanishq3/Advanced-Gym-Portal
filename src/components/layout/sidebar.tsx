@@ -254,22 +254,25 @@ const navSections: Record<Role, NavSection[]> = {
   ],
 };
 
-export function Sidebar() {
+interface SidebarProps {
+  user: {
+    id: string;
+    email?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    name?: string | null;
+    role: Role;
+    status: string;
+    avatar?: string | null;
+  };
+}
+
+export function Sidebar({ user }: SidebarProps) {
   const { collapsed, mobileOpen, toggleCollapsed, toggleMobile, setMobileOpen } = useSidebarStore();
   const pathname = usePathname();
-  const { user: storeUser, setUser, logout } = useAuthStore();
-  const { data: session } = useSession();
 
-  // Sync session with store
-  useEffect(() => {
-    if (session?.user && !storeUser) {
-      setUser(session.user as any);
-    }
-  }, [session, storeUser, setUser]);
-
-  const user = session?.user || storeUser;
   const role = (user?.role ?? "MEMBER") as Role;
-  const sections = navSections[role] ?? navSections.MEMBER;
+  const sections = React.useMemo(() => navSections[role] ?? navSections.MEMBER, [role]);
 
 
   return (

@@ -16,28 +16,11 @@ const quickLinks = [
 ];
 
 interface Props {
-  stats: {
-    totalRevenue: number;
-    activeMembersCount: number;
-    activeStaffCount: number;
-  };
-  recentLogs: any[];
+  statsChild: React.ReactNode;
+  logsChild: React.ReactNode;
 }
 
-export function DashboardClient({ stats, recentLogs }: Props) {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
+export function DashboardClient({ statsChild, logsChild }: Props) {
   return (
     <div className="space-y-6 w-full">
       <div className="flex flex-col gap-1">
@@ -45,60 +28,9 @@ export function DashboardClient({ stats, recentLogs }: Props) {
         <p className="text-sm text-muted-foreground">High-level metrics across all branches and modules.</p>
       </div>
 
-      <motion.div 
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-      >
-        <motion.div variants={item}>
-          <StatCard
-            icon={DollarSign}
-            label="Total System Revenue"
-            value={stats.totalRevenue}
-            trend="+0.0%"
-            trendUp={true}
-            color="orange"
-            sparklineData={[0, 0, 0, 0, stats.totalRevenue]}
-          />
-        </motion.div>
-        
-        <motion.div variants={item}>
-          <StatCard
-            icon={Users}
-            label="Active Gym Members"
-            value={stats.activeMembersCount}
-            trend="Live"
-            trendUp={true}
-            color="info"
-            sparklineData={[0, 0, 0, stats.activeMembersCount]}
-          />
-        </motion.div>
-        
-        <motion.div variants={item}>
-          <StatCard
-            icon={Shield}
-            label="Active Staff / Admins"
-            value={stats.activeStaffCount}
-            trend="Live"
-            trendUp={true}
-            color="purple"
-            sparklineData={[0, 0, stats.activeStaffCount]}
-          />
-        </motion.div>
-        
-        <motion.div variants={item}>
-          <StatCard
-            icon={Activity}
-            label="System Health (API)"
-            value="100%"
-            trend="Stable"
-            trendUp={true}
-            color="success"
-            sparklineData={[100, 100, 100, 100]}
-          />
-        </motion.div>
-      </motion.div>
+      <div>
+        {statsChild}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
@@ -106,26 +38,7 @@ export function DashboardClient({ stats, recentLogs }: Props) {
           <div className="glass-card p-6 rounded-2xl border border-border relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,240,255,0.05),transparent_70%)]" />
             
-            {recentLogs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-48 relative z-10">
-                <Activity className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">No audit logs found yet.</p>
-              </div>
-            ) : (
-              <div className="relative z-10 space-y-3">
-                {recentLogs.map((log: any) => (
-                  <div key={log.id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/30 border border-border">
-                    <div className="w-8 h-8 rounded-full bg-electric-cyan/20 flex items-center justify-center shrink-0">
-                      <Activity className="w-4 h-4 text-electric-cyan" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{log.action}</p>
-                      <p className="text-xs text-muted-foreground">{log.user?.firstName || "System"} • {new Date(log.createdAt).toLocaleString()}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {logsChild}
             
             <Link href="/super-admin/audit-logs">
               <span className="text-xs text-electric-cyan hover:text-cyan-300 transition-colors mt-4 inline-block relative z-10">

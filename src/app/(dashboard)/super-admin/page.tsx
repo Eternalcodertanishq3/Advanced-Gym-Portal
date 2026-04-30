@@ -1,15 +1,21 @@
-import React from "react";
-import { getDashboardStats } from "@/actions/super-admin/dashboard-actions";
+import React, { Suspense } from "react";
 import { DashboardClient } from "./components/dashboard-client";
+import { StatsGrid, RecentLogsList } from "./components/dashboard-data";
+import { StatSkeleton, LogsSkeleton } from "./components/dashboard-skeletons";
 
 export default async function SuperAdminDashboard() {
-  const { stats, recentLogs } = await getDashboardStats();
-
-  const defaultStats = {
-    totalRevenue: 0,
-    activeMembersCount: 0,
-    activeStaffCount: 0,
-  };
-
-  return <DashboardClient stats={stats || defaultStats} recentLogs={recentLogs || []} />;
+  return (
+    <DashboardClient 
+      statsChild={
+        <Suspense fallback={<StatSkeleton />}>
+          <StatsGrid />
+        </Suspense>
+      }
+      logsChild={
+        <Suspense fallback={<LogsSkeleton />}>
+          <RecentLogsList />
+        </Suspense>
+      }
+    />
+  );
 }

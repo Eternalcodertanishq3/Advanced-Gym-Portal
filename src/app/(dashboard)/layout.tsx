@@ -36,7 +36,7 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar user={session.user as any} />
 
       {/* Main Content Area */}
       <DashboardContainer>
