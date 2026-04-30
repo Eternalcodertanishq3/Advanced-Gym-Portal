@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+// Force IDE re-evaluation
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcryptjs from "bcryptjs";
