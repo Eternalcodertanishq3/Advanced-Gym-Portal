@@ -42,19 +42,17 @@ export async function getDashboardStats() {
         include: { user: { select: { firstName: true, lastName: true, email: true } } },
       }),
       // Daily Revenue for Sparkline (Last 7 Days)
-      prisma.payment.groupBy({
-        by: ['createdAt'],
-        _sum: { total: true },
+      prisma.payment.findMany({
         where: { 
           status: "COMPLETED",
           createdAt: { gte: last7Days }
         },
+        select: { total: true, createdAt: true }
       }),
       // Daily Members for Sparkline (Last 7 Days)
-      prisma.member.groupBy({
-        by: ['createdAt'],
-        _count: { id: true },
-        where: { createdAt: { gte: last7Days } },
+      prisma.member.findMany({
+        where: { joinDate: { gte: last7Days } },
+        select: { joinDate: true }
       }),
       // Previous Revenue for Trend
       prisma.payment.aggregate({
@@ -66,25 +64,25 @@ export async function getDashboardStats() {
       }),
       // Previous Members for Trend
       prisma.member.count({
-        where: { createdAt: { gte: prev7Days, lt: last7Days } }
+        where: { joinDate: { gte: prev7Days, lt: last7Days } }
       })
     ]);
 
     const totalRevenue = Number(revenueResult._sum.total || 0);
     const previousRevenueValue = Number(prevRevenue._sum.total || 0);
     
-    // Process Sparklines (Group by day)
+    // Process Sparklines (Group by day in JS for better control)
     const revenueSparkline = Array(7).fill(0);
     const membersSparkline = Array(7).fill(0);
 
-    dailyRevenue.forEach(day => {
-      const dayIdx = Math.floor((new Date(day.createdAt).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000));
-      if (dayIdx >= 0 && dayIdx < 7) revenueSparkline[dayIdx] += Number(day._sum.total || 0);
+    dailyRevenue.forEach(p => {
+      const dayIdx = Math.floor((new Date(p.createdAt).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000));
+      if (dayIdx >= 0 && dayIdx < 7) revenueSparkline[dayIdx] += Number(p.total || 0);
     });
 
-    dailyMembers.forEach(day => {
-      const dayIdx = Math.floor((new Date(day.createdAt).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000));
-      if (dayIdx >= 0 && dayIdx < 7) membersSparkline[dayIdx] += day._count.id;
+    dailyMembers.forEach(m => {
+      const dayIdx = Math.floor((new Date(m.joinDate).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000));
+      if (dayIdx >= 0 && dayIdx < 7) membersSparkline[dayIdx] += 1;
     });
 
     // Calculate Trends
