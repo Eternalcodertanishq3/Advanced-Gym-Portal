@@ -98,6 +98,7 @@ export function CreateStaffModal({ isOpen, onClose }: Props) {
                             navigator.clipboard.writeText(tempPassword);
                             toast.success("Password copied!");
                           }}
+                          title="Copy password"
                           className="p-2 hover:bg-muted rounded-lg transition-colors group"
                         >
                           <Copy className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
