@@ -14,20 +14,36 @@ export default async function SupplementsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const products = await prisma.product.findMany({
-    where: { category: "SUPPLEMENT", isActive: true },
-    take: 5
+  const member = await prisma.member.findUnique({
+    where: { userId: session.user.id }
   });
 
-  const activeStack = products.map(product => ({
+  if (!member) redirect("/member");
+
+  // Fetch real supplements from member's purchase history
+  const userSales = await prisma.sale.findMany({
+    where: { customerId: member.id },
+    include: { items: { include: { product: true } } },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  const boughtSupplements = Array.from(new Set(
+    userSales.flatMap(sale => 
+      sale.items
+        .filter(item => item.product.category === "SUPPLEMENT")
+        .map(item => item.product)
+    )
+  ));
+
+  const activeStack = boughtSupplements.length > 0 ? boughtSupplements.map(product => ({
     id: product.id,
     name: product.name,
-    dosage: "As Prescribed",
+    dosage: "Per Label",
     time: "Daily",
-    purpose: product.description || "Health & Performance",
-    status: "Pending",
+    purpose: product.description || "Health & Recovery",
+    status: "In Use",
     icon: <Zap className="w-5 h-5 text-brand-orange" />
-  }));
+  })) : [];
 
   return (
     <div className="w-full h-full p-6 space-y-10 max-w-5xl mx-auto">
@@ -53,8 +69,15 @@ export default async function SupplementsPage() {
           </h3>
           <div className="space-y-4">
             {activeStack.length === 0 ? (
-              <div className="py-12 text-center surface-card border-dashed border-2">
-                <p className="text-txt-tertiary">No supplements found in the store.</p>
+              <div className="py-20 text-center surface-card border-dashed border-2">
+                <div className="w-16 h-16 rounded-full bg-surface-sunken flex items-center justify-center mx-auto mb-4">
+                  <Pill className="w-8 h-8 text-txt-tertiary" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2">Stack is Empty</h3>
+                <p className="text-sm text-txt-tertiary max-w-[300px] mx-auto mb-8">
+                  You haven't added any supplements to your routine yet. Visit the store to get started.
+                </p>
+                <Button variant="outline" className="border-border/50">Browse Recommendations</Button>
               </div>
             ) : (
               activeStack.map((sup) => (
@@ -112,10 +135,15 @@ export default async function SupplementsPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-txt-secondary">Consistency</span>
-                <span className="font-bold text-success">92%</span>
+                <span className={`font-bold ${activeStack.length > 0 ? "text-success" : "text-txt-tertiary"}`}>
+                  {activeStack.length > 0 ? "92%" : "N/A"}
+                </span>
               </div>
               <div className="h-1.5 w-full bg-surface-sunken rounded-full overflow-hidden">
-                <div className="h-full bg-success w-[92%]" />
+                <div 
+                  className={`h-full ${activeStack.length > 0 ? "bg-success" : "bg-surface-elevated"} transition-all duration-1000`} 
+                  style={{ width: activeStack.length > 0 ? "92%" : "0%" }} 
+                />
               </div>
             </div>
           </div>

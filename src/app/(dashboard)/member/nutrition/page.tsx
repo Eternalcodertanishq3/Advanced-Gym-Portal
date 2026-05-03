@@ -152,7 +152,7 @@ export default async function NutritionPage() {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-foreground">Hydration</p>
-                      <p className="text-[10px] text-txt-tertiary font-medium">2.4L / 4.0L Logged</p>
+                      <p className="text-[10px] text-txt-tertiary font-medium">Log intake to see progress</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-txt-tertiary group-hover:text-info transition-colors" />
@@ -165,7 +165,7 @@ export default async function NutritionPage() {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-foreground">Recipe Book</p>
-                      <p className="text-[10px] text-txt-tertiary font-medium">50+ Healthy Recipes</p>
+                      <p className="text-[10px] text-txt-tertiary font-medium">Coming Soon</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-txt-tertiary group-hover:text-success transition-colors" />

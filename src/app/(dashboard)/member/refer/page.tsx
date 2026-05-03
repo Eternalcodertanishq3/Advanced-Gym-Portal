@@ -1,6 +1,6 @@
-import React from "react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { Users, Gift, Copy, Share2, Star, TrendingUp, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -11,13 +11,14 @@ export const metadata = {
 
 export default async function ReferPage() {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
-  const referralCode = `EAGLE-${session.user.id.substring(0, 8).toUpperCase()}`;
+  const userId = session.user.id;
+  const referralCode = `EAGLE-${userId.substring(0, 8).toUpperCase()}`;
 
   const referralTransactions = await prisma.xPTransaction.findMany({
     where: { 
-      userId: session.user.id,
+      userId: userId,
       reason: { contains: "Referral" }
     }
   });

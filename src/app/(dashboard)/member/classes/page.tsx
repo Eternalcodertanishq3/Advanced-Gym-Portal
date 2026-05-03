@@ -59,7 +59,10 @@ export default async function ClassesPage() {
                     <p className="text-[10px] text-txt-tertiary">Head Trainer</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 rounded-lg bg-surface-elevated hover:bg-surface-sunken text-xs font-bold transition-all">
+                <button 
+                  aria-label={`View schedule for ${cls.name}`}
+                  className="px-4 py-2 rounded-lg bg-surface-elevated hover:bg-surface-sunken text-xs font-bold transition-all"
+                >
                   View Schedule
                 </button>
               </div>

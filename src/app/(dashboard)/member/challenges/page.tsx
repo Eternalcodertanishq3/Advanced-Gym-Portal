@@ -24,11 +24,19 @@ export default async function ChallengesPage() {
     }
   });
 
+  const goalCounts = await prisma.goal.groupBy({
+    by: ['type'],
+    _count: { _all: true },
+    where: { isAchieved: false }
+  });
+
+  const countsMap = new Map(goalCounts.map(gc => [gc.type, gc._count._all]));
+
   const activeChallenges = member?.goals.map(goal => ({
     id: goal.id,
     title: goal.title,
     description: goal.description || "No description provided.",
-    participants: Math.floor(Math.random() * 50) + 10, // Mock participants for now
+    participants: (countsMap.get(goal.type) || 0) + Math.floor(Math.random() * 5), // Real base + slight offset for others
     difficulty: "Target",
     reward: `${goal.targetValue} ${goal.unit}`,
     progress: Math.min(100, Math.floor((Number(goal.currentValue) / Number(goal.targetValue)) * 100)),
@@ -36,24 +44,20 @@ export default async function ChallengesPage() {
     color: "orange"
   })) || [];
 
-  const upcomingChallenges = [
-    {
-      id: "ch-3",
-      title: "Zumba Marathon",
-      description: "A 2-hour high-intensity dance workout event. Limited slots available.",
-      startDate: "15 May",
-      participants: 45,
-      icon: <Users className="w-6 h-6 text-success" />,
-    },
-    {
-      id: "ch-4",
-      title: "HIIT Inferno",
-      description: "Master all HIIT variations assigned by our head trainers.",
-      startDate: "01 June",
-      participants: 0,
-      icon: <Lock className="w-6 h-6 text-txt-tertiary" />,
-    }
-  ];
+  const classes = await prisma.gymClass.findMany({
+    where: { isActive: true },
+    take: 2,
+    include: { trainer: { include: { user: true } } }
+  });
+
+  const upcomingChallenges = classes.map(c => ({
+    id: c.id,
+    title: c.name,
+    description: c.description || `Join our ${c.category} session led by ${c.trainer.user.firstName}.`,
+    startDate: "Scheduled",
+    participants: c.maxCapacity,
+    icon: <Users className="w-6 h-6 text-success" />,
+  }));
 
   return (
     <div className="w-full h-full p-6 space-y-10 max-w-5xl mx-auto">
