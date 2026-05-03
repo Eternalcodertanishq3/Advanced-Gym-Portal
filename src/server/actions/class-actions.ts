@@ -119,3 +119,57 @@ export async function deleteClass(id: string) {
   }
 }
 
+export async function bookClass(scheduleId: string) {
+  try {
+    const { auth } = await import("@/auth");
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
+    const member = await prisma.member.findUnique({
+      where: { userId: session.user.id }
+    });
+
+    if (!member) return { success: false, error: "Member profile not found" };
+
+    // Check if already booked
+    const existing = await prisma.classBooking.findFirst({
+      where: {
+        scheduleId,
+        memberId: member.id,
+        status: "CONFIRMED"
+      }
+    });
+
+    if (existing) return { success: false, error: "You have already booked this class session." };
+
+    // Check capacity
+    const schedule = await prisma.classSchedule.findUnique({
+      where: { id: scheduleId },
+      include: {
+        class: true,
+        _count: {
+          select: { bookings: { where: { status: "CONFIRMED" } } }
+        }
+      }
+    });
+
+    if (!schedule) return { success: false, error: "Class schedule not found" };
+    if (schedule._count.bookings >= schedule.class.maxCapacity) {
+      return { success: false, error: "This class is fully booked." };
+    }
+
+    const booking = await prisma.classBooking.create({
+      data: {
+        scheduleId,
+        memberId: member.id,
+        status: "CONFIRMED"
+      }
+    });
+
+    revalidatePath("/member/classes");
+    return { success: true, data: booking };
+  } catch (error: any) {
+    console.error("Error booking class:", error);
+    return { success: false, error: error.message || "Failed to book class" };
+  }
+}

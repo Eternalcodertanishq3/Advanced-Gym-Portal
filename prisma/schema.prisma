@@ -379,11 +379,93 @@ model Member {
   notifications  Notification[]
   DietLog        DietLog[]
   ptSessions     PTSession[]
+  waterLogs      WaterLog[]
+  challengeParticipants ChallengeParticipant[]
 
   @@index([status])
   @@index([trainerId])
   @@index([joinDate])
   @@map("members")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HYDRATION
+// ═══════════════════════════════════════════════════════════════
+
+model WaterLog {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  amount Int // in ml
+  date   DateTime @default(now()) @db.Date
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([date])
+  @@map("water_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RECIPES
+// ═══════════════════════════════════════════════════════════════
+
+model Recipe {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  ingredients String[]
+  instructions String? @db.Text
+  calories    Int?
+  protein     Decimal? @db.Decimal(6, 2)
+  carbs       Decimal? @db.Decimal(6, 2)
+  fats        Decimal? @db.Decimal(6, 2)
+  image       String?
+  category    String?  // BREAKFAST, LUNCH, DINNER, SNACK
+  isPublic    Boolean  @default(true)
+  createdBy   String?  // Trainer ID
+  createdAt   DateTime @default(now())
+
+  @@map("recipes")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHALLENGES
+// ═══════════════════════════════════════════════════════════════
+
+model Challenge {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime
+  reward      String?
+  difficulty  String   @default("NORMAL") // EASY, NORMAL, HARD, ELITE
+  type        String   @default("GOAL")   // GOAL, STEPS, ATTENDANCE, STRENGTH
+  targetValue Int?
+  unit        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  participants ChallengeParticipant[]
+
+  @@map("challenges")
+}
+
+model ChallengeParticipant {
+  id          String   @id @default(cuid())
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  memberId    String
+  member      Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  progress    Int      @default(0)
+  isCompleted Boolean  @default(false)
+  joinedAt    DateTime @default(now())
+
+  @@unique([challengeId, memberId])
+  @@map("challenge_participants")
 }
 
 // ═══════════════════════════════════════════════════════════════

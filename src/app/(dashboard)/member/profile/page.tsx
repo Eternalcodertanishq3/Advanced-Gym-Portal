@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/dashboard/profile/profile-form";
 import { User, Shield, Bell, Settings as SettingsIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SecuritySettings } from "./components/security-settings";
+import { NotificationSettings } from "./components/notification-settings";
 
 export const metadata = {
   title: "My Profile | Eagle Gym",
@@ -58,27 +60,11 @@ export default async function ProfilePage() {
         </TabsContent>
 
         <TabsContent value="security">
-          <div className="surface-card p-8 border-dashed border-2 flex flex-col items-center justify-center min-h-[300px] text-center">
-            <div className="w-16 h-16 rounded-full bg-surface-sunken flex items-center justify-center mb-4">
-              <Shield className="w-8 h-8 text-brand-orange" />
-            </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">Security Settings</h3>
-            <p className="text-sm text-txt-tertiary max-w-[350px]">
-              Password management and two-factor authentication settings are coming soon.
-            </p>
-          </div>
+          <SecuritySettings />
         </TabsContent>
 
         <TabsContent value="notifications">
-          <div className="surface-card p-8 border-dashed border-2 flex flex-col items-center justify-center min-h-[300px] text-center">
-            <div className="w-16 h-16 rounded-full bg-surface-sunken flex items-center justify-center mb-4">
-              <Bell className="w-8 h-8 text-brand-orange" />
-            </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">Notification Preferences</h3>
-            <p className="text-sm text-txt-tertiary max-w-[350px]">
-              Customizing your email and push notification alerts will be available in the next update.
-            </p>
-          </div>
+          <NotificationSettings />
         </TabsContent>
       </Tabs>
     </div>

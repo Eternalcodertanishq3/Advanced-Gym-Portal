@@ -230,7 +230,8 @@ const navSections: Record<Role, NavSection[]> = {
     {
       title: "Account",
       items: [
-        { label: "Payments", href: "/member/payments", icon: CreditCard },
+        { label: "Attendance", href: "/member/attendance", icon: Clock },
+        { label: "Billing & Payments", href: "/member/billing", icon: CreditCard },
         { label: "Refer & Earn", href: "/member/refer", icon: Share2, requiredFeature: "mobile_app" },
         { label: "Profile", href: "/member/profile", icon: UserCog },
       ],
@@ -302,7 +303,7 @@ export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
         )}
@@ -312,7 +313,7 @@ export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
       <button
         onClick={toggleMobile}
         aria-label="Toggle Mobile Menu"
-        className="fixed top-4 left-4 z-30 lg:hidden w-10 h-10 rounded-xl bg-brand-navy shadow-sm flex items-center justify-center text-white"
+        className="fixed top-4 left-4 z-[120] lg:hidden w-10 h-10 rounded-xl bg-brand-navy shadow-sm flex items-center justify-center text-white"
       >
         <LayoutDashboard className="w-5 h-5" />
       </button>
@@ -326,7 +327,7 @@ export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
-          "fixed left-0 top-0 z-50 h-screen flex flex-col",
+          "fixed left-0 top-0 z-[115] h-screen flex flex-col",
           "bg-brand-navy border-r border-brand-navy-light/10 shadow-lg",
           "lg:translate-x-0 lg:opacity-100",
           !mobileOpen && "translate-x-[-100%] lg:translate-x-0"

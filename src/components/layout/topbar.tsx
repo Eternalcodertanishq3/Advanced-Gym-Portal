@@ -88,7 +88,7 @@ export function Topbar({ user }: TopbarProps) {
     <>
       <header 
         className={cn(
-          "fixed top-0 right-0 left-0 z-40 h-16 bg-surface-card border-b border-surface-border transition-[left] duration-300 ease-in-out",
+          "fixed top-0 right-0 left-0 z-[100] h-16 bg-surface-card/95 backdrop-blur-md border-b border-surface-border shadow-sm transition-[left] duration-300 ease-in-out",
           mounted && collapsed ? "lg:left-20" : "lg:left-[260px]"
         )}
       >

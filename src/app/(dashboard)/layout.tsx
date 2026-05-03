@@ -44,13 +44,12 @@ export default async function DashboardLayout({
         allowedFeatures={allowedFeatures} 
       />
 
+      {/* Topbar — Fixed at the top, outside main flow */}
+      <Topbar user={session.user} />
+
       {/* Main Content Area */}
       <DashboardContainer>
-        {/* Topbar */}
-        <Topbar user={session.user} />
-
-        {/* Page Content */}
-        <main className="pt-16 min-h-screen">
+        <main className="pt-24 min-h-screen">
           <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto">
             {children}
           </div>

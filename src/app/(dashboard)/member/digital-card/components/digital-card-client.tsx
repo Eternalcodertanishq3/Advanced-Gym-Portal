@@ -28,6 +28,11 @@ interface Props {
 export function DigitalCardClient({ member }: Props) {
   const [isFlipped, setIsFlipped] = useState(false);
   const cardRef = React.useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const downloadCard = async () => {
     if (!cardRef.current) return;
@@ -201,12 +206,12 @@ export function DigitalCardClient({ member }: Props) {
             </div>
             <p className="text-lg font-bold text-foreground">{planName}</p>
             <p className="text-xs text-txt-secondary font-medium">
-              Valid until {member.subscription?.endDate 
+              Valid until {mounted && member.subscription?.endDate 
                 ? (() => {
                     const d = new Date(member.subscription.endDate);
                     return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
                   })()
-                : "N/A"}
+                : "--/--/----"}
             </p>
          </div>
          <div className="surface-card p-5 rounded-2xl space-y-1">

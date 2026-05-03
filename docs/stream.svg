@@ -1,0 +1,19 @@
+<svg width="400" height="40" viewBox="0 0 400 40" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .line { stroke: #333; stroke-width: 1; }
+    .packet { fill: #00C786; }
+  </style>
+  <line x1="0" y1="20" x2="400" y2="20" class="line" />
+  <circle r="3" class="packet">
+    <animateMotion path="M 0 20 L 400 20" dur="2s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3" class="packet">
+    <animateMotion path="M 0 20 L 400 20" dur="2s" begin="0.5s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3" class="packet">
+    <animateMotion path="M 0 20 L 400 20" dur="2s" begin="1s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3" class="packet">
+    <animateMotion path="M 0 20 L 400 20" dur="2s" begin="1.5s" repeatCount="indefinite" />
+  </circle>
+</svg>

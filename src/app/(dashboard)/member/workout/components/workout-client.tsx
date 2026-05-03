@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { logWorkoutSession } from "@/actions/member/workout-actions";
 import { Badge } from "@/components/ui/badge";
+import { ActiveSession } from "./active-session";
 
 interface Props {
   data: {
@@ -35,6 +36,11 @@ export function WorkoutClient({ data }: Props) {
   const [isWorkoutActive, setIsWorkoutActive] = useState(false);
   const [currentExerciseIdx, setCurrentExerciseIdx] = useState(0);
   const [isLogging, setIsLogging] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleStartWorkout = (plan: any) => {
     setSelectedPlan(plan);
@@ -63,101 +69,11 @@ export function WorkoutClient({ data }: Props) {
   };
 
   if (isWorkoutActive && selectedPlan) {
-    const currentExercise = selectedPlan.exercises[currentExerciseIdx];
-    const progress = ((currentExerciseIdx + 1) / selectedPlan.exercises.length) * 100;
-
     return (
-      <div className="fixed inset-0 z-50 bg-background flex flex-col p-6 animate-in fade-in duration-500">
-        {/* Active Mode Header */}
-        <div className="flex items-center justify-between mb-8">
-          <button 
-            aria-label="Close active session"
-            onClick={() => setIsWorkoutActive(false)}
-            className="w-10 h-10 rounded-xl bg-surface-elevated flex items-center justify-center border border-border"
-          >
-            <X className="w-5 h-5 text-txt-secondary" />
-          </button>
-          <div className="text-center">
-            <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest">Active Session</p>
-            <h3 className="text-lg font-bold text-foreground">{selectedPlan.name}</h3>
-          </div>
-          <div className="w-10 h-10" /> {/* Spacer */}
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full h-2 bg-surface-sunken rounded-full overflow-hidden mb-12 border border-border/30">
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            className="h-full bg-brand-orange shadow-brand-glow"
-          />
-        </div>
-
-        {/* Main Exercise View */}
-        <div className="flex-1 flex flex-col items-center justify-center space-y-12">
-          <motion.div 
-            key={currentExercise.id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg surface-card p-10 rounded-[3rem] text-center space-y-8 shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-              <Dumbbell className="w-32 h-32" />
-            </div>
-
-            <div className="space-y-2 relative z-10">
-              <p className="text-brand-orange font-bold text-sm tracking-widest uppercase">Exercise {currentExerciseIdx + 1} of {selectedPlan.exercises.length}</p>
-              <h2 className="text-4xl font-display font-bold text-foreground leading-tight uppercase">{currentExercise.name}</h2>
-              <p className="text-txt-secondary font-medium">{currentExercise.muscleGroup || "Compound"}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6 relative z-10">
-              <div className="p-6 rounded-3xl bg-surface-sunken border border-border/50">
-                <p className="text-4xl font-display font-bold text-foreground">{currentExercise.sets}</p>
-                <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest mt-1">Sets</p>
-              </div>
-              <div className="p-6 rounded-3xl bg-surface-sunken border border-border/50">
-                <p className="text-4xl font-display font-bold text-foreground">{currentExercise.reps}</p>
-                <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest mt-1">Reps / Sec</p>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-brand-orange/5 border border-brand-orange/10 flex items-center gap-3 justify-center relative z-10">
-               <Info className="w-4 h-4 text-brand-orange" />
-               <p className="text-xs text-brand-orange/80 font-medium">Rest {currentExercise.rest}s between sets</p>
-            </div>
-          </motion.div>
-
-          {/* Navigation Controls */}
-          <div className="flex items-center gap-4 w-full max-w-lg">
-            <button 
-              disabled={currentExerciseIdx === 0}
-              onClick={() => setCurrentExerciseIdx(prev => prev - 1)}
-              className="flex-1 py-5 rounded-3xl bg-surface-elevated border border-border font-bold text-foreground disabled:opacity-30 transition-all hover:bg-surface-base active:scale-95"
-            >
-              Previous
-            </button>
-            {currentExerciseIdx === selectedPlan.exercises.length - 1 ? (
-              <button 
-                onClick={handleCompleteWorkout}
-                disabled={isLogging}
-                className="flex-[2] py-5 rounded-3xl bg-success text-white font-bold shadow-lg shadow-success/20 transition-all hover:bg-success-dark active:scale-95 flex items-center justify-center gap-3"
-              >
-                {isLogging ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trophy className="w-5 h-5" />}
-                Complete Session
-              </button>
-            ) : (
-              <button 
-                onClick={() => setCurrentExerciseIdx(prev => prev + 1)}
-                className="flex-[2] py-5 rounded-3xl bg-brand-orange text-white font-bold shadow-lg shadow-brand-orange/20 transition-all hover:bg-brand-orange-dark active:scale-95 flex items-center justify-center gap-3"
-              >
-                Next Exercise
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      <ActiveSession 
+        plan={selectedPlan} 
+        onClose={() => setIsWorkoutActive(false)} 
+      />
     );
   }
 
@@ -297,7 +213,7 @@ export function WorkoutClient({ data }: Props) {
                     <h4 className="text-base font-bold text-foreground">{log.workoutPlan.name}</h4>
                     <p className="text-xs text-txt-tertiary flex items-center gap-2 mt-1">
                       <Calendar className="w-3.5 h-3.5" />
-                      {new Date(log.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })} • {log.duration} mins
+                      {mounted ? new Date(log.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' }) : "--"} • {log.duration} mins
                     </p>
                   </div>
                 </div>

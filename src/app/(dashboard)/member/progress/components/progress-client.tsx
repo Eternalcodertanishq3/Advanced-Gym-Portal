@@ -43,6 +43,7 @@ import { formatDate } from "@/lib/utils";
 import { StatCard } from "./stat-card";
 import { MeasurementModal } from "./modals/measurement-modal";
 import { PhotoUploadModal } from "./modals/photo-upload-modal";
+import { ComparisonTool } from "./comparison-tool";
 
 interface Props {
   data: {
@@ -59,6 +60,7 @@ export function ProgressClient({ data }: Props) {
   const [activeTab, setActiveTab] = useState<"metrics" | "photos" | "goals">(initialTab || "metrics");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
   // Prepare chart data
   const chartData = data.measurements.map(m => ({
@@ -255,33 +257,53 @@ export function ProgressClient({ data }: Props) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="space-y-8"
           >
-             <div 
-               onClick={() => setShowPhotoModal(true)}
-               className="aspect-[3/4] rounded-[2.5rem] border-2 border-dashed border-border flex flex-col items-center justify-center space-y-4 hover:border-brand-orange/50 transition-all cursor-pointer group"
-             >
-                <div className="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Camera className="w-8 h-8 text-txt-tertiary group-hover:text-brand-orange transition-colors" />
-                </div>
-                <div className="text-center">
-                  <p className="font-bold text-foreground">Upload Progress</p>
-                  <p className="text-xs text-txt-tertiary">Keep visual track of gains</p>
-                </div>
-             </div>
-             {data.photos.map((photo, idx) => (
-                <div key={photo.id} className="aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-surface-sunken relative group">
-                  <img src={photo.photoUrl} alt="Progress" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-8 flex flex-col justify-end">
-                    <p className="text-xs font-bold text-brand-orange uppercase tracking-widest">{photo.photoType}</p>
-                    <p className="text-xl font-bold text-white">{photo.weight} kg</p>
-                    <p className="text-xs text-white/60 font-medium">{formatDate(photo.createdAt)}</p>
+            <div className="flex justify-between items-center bg-surface-sunken/50 p-6 rounded-[2rem] border border-border/50">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center border border-brand-orange/20">
+                     <ImageIcon className="w-6 h-6 text-brand-orange" />
                   </div>
-                  <div className="absolute top-6 right-6 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-widest">
-                    {formatDate(photo.createdAt, "MMM yyyy")}
+                  <div>
+                     <h3 className="text-lg font-bold text-foreground">Transformation Archive</h3>
+                     <p className="text-xs text-txt-tertiary font-medium">Analyze your evolution with our side-by-side comparison engine.</p>
                   </div>
-                </div>
-             ))}
+               </div>
+               <Button 
+                 onClick={() => setShowComparison(true)}
+                 className="bg-brand-orange hover:bg-brand-orange-dark font-bold rounded-2xl h-12 px-8 shadow-lg shadow-brand-orange/20 transition-all active:scale-95"
+               >
+                 Compare Progress
+               </Button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+               <div 
+                 onClick={() => setShowPhotoModal(true)}
+                 className="aspect-[3/4] rounded-[2.5rem] border-2 border-dashed border-border flex flex-col items-center justify-center space-y-4 hover:border-brand-orange/50 transition-all cursor-pointer group"
+               >
+                  <div className="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Camera className="w-8 h-8 text-txt-tertiary group-hover:text-brand-orange transition-colors" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-bold text-foreground">Upload Progress</p>
+                    <p className="text-xs text-txt-tertiary">Keep visual track of gains</p>
+                  </div>
+               </div>
+               {data.photos.map((photo, idx) => (
+                  <div key={photo.id} className="aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-surface-sunken relative group shadow-xl">
+                    <img src={photo.photoUrl} alt="Progress" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-8 flex flex-col justify-end">
+                      <p className="text-xs font-bold text-brand-orange uppercase tracking-widest">{photo.photoType}</p>
+                      <p className="text-xl font-bold text-white">{photo.weight} kg</p>
+                      <p className="text-xs text-white/60 font-medium">{formatDate(photo.createdAt)}</p>
+                    </div>
+                    <div className="absolute top-6 right-6 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-widest">
+                      {formatDate(photo.createdAt, "MMM yyyy")}
+                    </div>
+                  </div>
+               ))}
+            </div>
           </motion.div>
         ) : (
           <motion.div 
@@ -370,6 +392,13 @@ export function ProgressClient({ data }: Props) {
         onClose={() => setShowPhotoModal(false)}
         latestWeight={latest.weight}
       />
+
+      {showComparison && (
+        <ComparisonTool 
+          photos={data.photos} 
+          onClose={() => setShowComparison(false)} 
+        />
+      )}
     </div>
   );
 }
