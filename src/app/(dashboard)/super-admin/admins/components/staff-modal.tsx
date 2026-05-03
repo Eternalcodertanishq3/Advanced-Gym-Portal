@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2, Trash2, X } from "lucide-react";
 import { inviteStaff, updateStaff, deleteStaff } from "@/actions/super-admin/staff-actions";
+import { getBranches } from "@/actions/super-admin/branch-actions";
 import { toast } from "sonner";
 import { Role } from "@prisma/client";
 import { 
@@ -30,6 +31,7 @@ interface StaffMember {
   phone?: string;
   role: string;
   status: string;
+  branchId?: string;
 }
 
 interface Props {
@@ -41,6 +43,19 @@ interface Props {
 export function StaffModal({ isOpen, onClose, staff }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
+
+  React.useEffect(() => {
+    async function loadBranches() {
+      const res = await getBranches();
+      if (res.success) {
+        setBranches(res.branches || []);
+      }
+    }
+    if (isOpen) {
+      loadBranches();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,6 +72,7 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
       phone: formData.get("phone") as string,
       role: formData.get("role") as Role,
       status: formData.get("status") as any || "ACTIVE",
+      branchId: formData.get("branchId") as string,
     };
 
     let res;
@@ -67,7 +83,10 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
     }
     
     if (res.success) {
-      toast.success(staff ? "Staff updated successfully!" : "Staff invited successfully!");
+      const inviteRes = res as { tempPassword?: string };
+      toast.success(staff ? "Staff updated successfully!" : `Staff invited! Temp Password: ${inviteRes.tempPassword || "Sent to email"}`, {
+        duration: staff ? 3000 : 10000,
+      });
       onClose();
     } else {
       toast.error(res.error || (staff ? "Failed to update staff" : "Failed to invite staff"));
@@ -107,17 +126,6 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
                   {staff ? "Update details and permissions for this staff member." : "Send an invitation to a new team member."}
                 </DialogDescription>
               </div>
-              {staff && (
-                <Button 
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="text-danger/50 hover:text-danger hover:bg-danger/10 transition-colors"
-                >
-                  {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                </Button>
-              )}
             </div>
           </DialogHeader>
 
@@ -132,7 +140,7 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
                   type="text" 
                   defaultValue={firstName} 
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
-                  placeholder="Enter first name" 
+                  placeholder="Official First Name" 
                 />
               </div>
               <div className="space-y-2">
@@ -144,7 +152,7 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
                   type="text" 
                   defaultValue={lastName} 
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
-                  placeholder="Enter last name" 
+                  placeholder="Official Last Name" 
                 />
               </div>
             </div>
@@ -158,7 +166,7 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
                 type="email" 
                 defaultValue={staff?.email} 
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
-                placeholder="Enter email address" 
+                placeholder="Official Email Address" 
               />
             </div>
 
@@ -172,7 +180,7 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
                   type="text" 
                   defaultValue={staff?.phone || ""} 
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
-                  placeholder="Enter phone number" 
+                  placeholder="Secure Phone Number" 
                 />
               </div>
               <div className="space-y-2">
@@ -190,19 +198,35 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-xs font-bold text-white/70 uppercase tracking-wider">Role</Label>
-              <Select name="role" required defaultValue={staff?.role || "ADMIN"}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent className="bg-brand-navy border-white/10 text-white">
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="RECEPTIONIST">Receptionist</SelectItem>
-                  <SelectItem value="TRAINER">Trainer</SelectItem>
-                  <SelectItem value="WORKER">Worker</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="role" className="text-xs font-bold text-white/70 uppercase tracking-wider">Role</Label>
+                <Select name="role" required defaultValue={staff?.role || "ADMIN"}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-brand-navy border-white/10 text-white">
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="RECEPTIONIST">Receptionist</SelectItem>
+                    <SelectItem value="TRAINER">Trainer</SelectItem>
+                    <SelectItem value="WORKER">Worker</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="branchId" className="text-xs font-bold text-white/70 uppercase tracking-wider">Assign Branch</Label>
+                <Select name="branchId" defaultValue={staff?.branchId || "none"}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-brand-orange/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl">
+                    <SelectValue placeholder="Select Branch" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-brand-navy border-white/10 text-white">
+                    <SelectItem value="none">Global / No Branch</SelectItem>
+                    {branches.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="pt-4">

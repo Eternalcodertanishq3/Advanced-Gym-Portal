@@ -130,7 +130,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                     <Input 
                       {...field} 
                       className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
-                      placeholder="email@example.com"
+                      placeholder="Official Email Address"
                     />
                   </div>
                 </FormControl>
@@ -152,7 +152,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                       {...field} 
                       value={field.value || ""}
                       className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
-                      placeholder="+91 XXXXX XXXXX"
+                      placeholder="Secure Phone Number"
                     />
                   </div>
                 </FormControl>

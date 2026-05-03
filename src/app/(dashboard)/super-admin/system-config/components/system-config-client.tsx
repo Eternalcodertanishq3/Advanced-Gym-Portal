@@ -119,7 +119,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                         type="text" 
                         title="Gym Name"
                         defaultValue={initialConfig.gymName || ""}
-                        placeholder="Enter your gym's official name"
+                        placeholder="Official Gym Identity"
                         className="surface-input"
                       />
                     </div>
@@ -131,7 +131,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                         type="text" 
                         title="Gym Logo"
                         defaultValue={initialConfig.gymLogo || "/logo.png"}
-                        placeholder="e.g. /logo.png"
+                        placeholder="Official Logo Asset Path"
                         className="surface-input"
                       />
                     </div>
@@ -146,7 +146,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                         type="email" 
                         title="Support Email"
                         defaultValue={initialConfig.supportEmail || ""}
-                        placeholder="Enter support email"
+                        placeholder="Support Email Address"
                         className="surface-input"
                       />
                     </div>
@@ -158,7 +158,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                         type="text" 
                         title="Contact Phone"
                         defaultValue={initialConfig.contactPhone || ""}
-                        placeholder="Enter contact phone"
+                        placeholder="Contact Phone Number"
                         className="surface-input"
                       />
                     </div>
@@ -233,7 +233,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="url" 
                       title="Instagram URL"
                       defaultValue={initialConfig.instagramUrl || ""}
-                      placeholder="https://instagram.com/eaglegym"
+                      placeholder="https://instagram.com/official"
                       className="surface-input"
                     />
                   </div>
@@ -245,7 +245,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="url" 
                       title="Facebook URL"
                       defaultValue={initialConfig.facebookUrl || ""}
-                      placeholder="https://facebook.com/eaglegym"
+                      placeholder="https://facebook.com/official"
                       className="surface-input"
                     />
                   </div>
@@ -257,7 +257,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="url" 
                       title="Twitter URL"
                       defaultValue={initialConfig.twitterUrl || ""}
-                      placeholder="https://twitter.com/eaglegym"
+                      placeholder="https://twitter.com/official"
                       className="surface-input"
                     />
                   </div>
@@ -269,7 +269,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="url" 
                       title="YouTube URL"
                       defaultValue={initialConfig.youtubeUrl || ""}
-                      placeholder="https://youtube.com/@eaglegym"
+                      placeholder="https://youtube.com/@official"
                       className="surface-input"
                     />
                   </div>
@@ -289,7 +289,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="text" 
                       title="Hero Title"
                       defaultValue={initialConfig.heroTitle || "UNLEASH YOUR ELITE SELF."}
-                      placeholder="e.g. UNLEASH YOUR ELITE SELF."
+                      placeholder="Enter Hero Headline"
                       className="surface-input"
                     />
                   </div>
@@ -302,7 +302,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="text" 
                       title="Hero Subtitle"
                       defaultValue={initialConfig.heroSubtitle || "Rise Above. Transform Beyond."}
-                      placeholder="e.g. Rise Above. Transform Beyond."
+                      placeholder="Enter Hero Subheadline"
                       className="surface-input"
                     />
                   </div>
@@ -315,7 +315,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="text" 
                       title="Hero Image"
                       defaultValue={initialConfig.heroImage || "/images/hero-bg.png"}
-                      placeholder="e.g. /images/hero-bg.png"
+                      placeholder="Hero Background Asset Path"
                       className="surface-input"
                     />
                   </div>
@@ -417,7 +417,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       type="text" 
                       title="Quote Author"
                       defaultValue={initialConfig.midPageQuoteAuthor || "Elite Community"}
-                      placeholder="e.g. Elite Community"
+                      placeholder="Official Identifier"
                       className="surface-input"
                     />
                   </div>
@@ -612,6 +612,31 @@ export function SystemConfigClient({ initialConfig }: Props) {
                     </div>
                     <Switch name="smsMarketing" defaultChecked={initialConfig.smsMarketing === "true"} />
                   </div>
+
+                  <div className="pt-6 border-t border-border">
+                    <h3 className="text-sm font-black text-brand-orange uppercase tracking-widest mb-4">Automated Triggers</h3>
+                    <div className="p-4 rounded-xl bg-brand-orange/5 border border-brand-orange/10 flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold text-foreground">Send Payment Reminders</p>
+                        <p className="text-[10px] text-muted-foreground">Scan for subscriptions expiring in 3 days and send alerts.</p>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={async () => {
+                          const { triggerPaymentReminders } = await import("@/actions/super-admin/notification-actions");
+                          const res = await triggerPaymentReminders();
+                          if (res.success) {
+                            toast.success(`Successfully sent ${res.sentCount} reminders.`);
+                          } else {
+                            toast.error(res.error);
+                          }
+                        }}
+                        className="px-4 py-2 bg-brand-orange/20 hover:bg-brand-orange/30 text-brand-orange text-xs font-bold rounded-lg transition-all"
+                      >
+                        Trigger Now
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </>
             )}
@@ -635,7 +660,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       name="sessionTimeout"
                       type="number" 
                       title="Session Timeout in Minutes"
-                      placeholder="e.g. 60"
+                      placeholder="60"
                       defaultValue={initialConfig.sessionTimeout || "60"}
                       className="surface-input"
                     />

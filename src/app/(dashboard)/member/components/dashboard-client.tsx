@@ -15,11 +15,13 @@ import {
   Star,
   Trophy,
   Lock,
+  Apple,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Member Portal Dashboard Client
@@ -107,7 +109,7 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
           icon={<Footprints className="w-6 h-6" />}
           label="Total Check-ins"
           value={stats?.totalAttendance?.toString() || "0"}
-          sparklineData={stats.attendanceSparkline || []}
+          sparklineData={stats?.attendanceSparkline || []}
           color="navy"
           subtitle="Since joined"
         />
@@ -121,7 +123,7 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
         <MemberStatCard
           icon={<TrendingUp className="w-6 h-6" />}
           label="Upcoming"
-          value={stats?.upcomingClasses?.toString() || "0"}
+          value={upcomingClasses.length.toString()}
           color="success"
           subtitle="Booked classes"
         />
@@ -182,15 +184,19 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
             </div>
           </motion.div>
 
-          {/* Today's Workout - Gated by gym_access */}
+          {/* Today's Workout */}
           <motion.div variants={itemVariants} className="surface-card p-6 relative overflow-hidden">
             {!hasFeature("gym_access") && (
-              <div className="absolute inset-0 z-20 backdrop-blur-[2px] bg-background/40 flex flex-col items-center justify-center text-center p-6">
-                <Lock className="w-10 h-10 text-brand-orange mb-4" />
-                <h3 className="text-lg font-bold text-white mb-2">Workout Access Restricted</h3>
-                <p className="text-sm text-white/70 mb-6">Upgrade your plan to unlock personalized workout routines.</p>
+              <div className="absolute inset-0 z-20 backdrop-blur-md bg-white/70 flex flex-col items-center justify-center text-center p-6 border border-brand-orange/10 rounded-xl">
+                <div className="w-16 h-16 rounded-full bg-brand-orange/5 flex items-center justify-center mb-4 border border-brand-orange/20">
+                  <Lock className="w-8 h-8 text-brand-orange" />
+                </div>
+                <h3 className="text-xl font-bold text-obsidian-950 mb-2 font-display">Premium Training</h3>
+                <p className="text-sm text-obsidian-600 mb-6 max-w-[200px] font-medium">Upgrade your plan to unlock personalized workout routines.</p>
                 <Link href="/member/select-plan">
-                  <Button className="bg-brand-orange hover:bg-brand-orange-dark">View Plans</Button>
+                  <Button className="bg-brand-orange hover:bg-brand-orange-dark shadow-lg shadow-brand-orange/20 px-8 text-white font-bold">
+                    Upgrade Now
+                  </Button>
                 </Link>
               </div>
             )}
@@ -202,7 +208,7 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-foreground">Today's Workout</h3>
-                  <p className="text-sm text-txt-secondary">{todayWorkout?.name || "Ready to start?"}</p>
+                  <p className="text-sm text-txt-secondary">{todayWorkout?.name || "No workout assigned"}</p>
                 </div>
               </div>
               {todayWorkout && (
@@ -214,53 +220,88 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
             </div>
 
             <div className="space-y-3">
-              {!todayWorkout && (
-                <div className="p-8 text-center bg-surface-sunken rounded-xl border border-dashed border-border">
-                  <p className="text-sm text-txt-tertiary">No workout assigned for today.</p>
-                </div>
-              )}
-              {todayWorkout?.exerciseList?.map((exercise: any, index: number) => (
+              {todayWorkout?.exerciseList?.slice(0, 3).map((exercise: any, index: number) => (
                 <div
                   key={index}
-                  className={cn(
-                    "flex items-center gap-4 p-4 rounded-xl transition-all border border-transparent",
-                    exercise.completed ? "bg-success-soft border-success/10" : "bg-surface-sunken"
-                  )}
+                  className="flex items-center gap-4 p-4 rounded-xl bg-surface-sunken"
                 >
-                  <div
-                    className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm",
-                      exercise.completed
-                        ? "bg-success text-white"
-                        : "bg-surface-elevated text-txt-secondary"
-                    )}
-                  >
-                    {exercise.completed ? (
-                      <Zap className="w-4 h-4" />
-                    ) : (
-                      <span>{index + 1}</span>
-                    )}
+                  <div className="w-8 h-8 rounded-full bg-surface-elevated flex items-center justify-center font-bold text-sm text-txt-secondary">
+                    {index + 1}
                   </div>
                   <div className="flex-1">
-                    <p className={cn(
-                      "text-base font-semibold",
-                      exercise.completed ? "text-success line-through opacity-70" : "text-foreground"
-                    )}>
-                      {exercise.name}
-                    </p>
+                    <p className="text-base font-semibold text-foreground">{exercise.name}</p>
                     <p className="text-sm text-txt-tertiary font-medium">{exercise.sets}</p>
                   </div>
                 </div>
               ))}
+              {todayWorkout && todayWorkout.exerciseList.length > 3 && (
+                <p className="text-xs text-center text-txt-tertiary font-bold pt-2">
+                  + {todayWorkout.exerciseList.length - 3} MORE EXERCISES
+                </p>
+              )}
             </div>
 
-            {hasFeature("gym_access") && (
+            {hasFeature("gym_access") && todayWorkout && (
               <Link
                 href="/member/workout"
                 className="mt-6 flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-brand-orange text-white font-bold text-base hover:bg-brand-orange/90 transition-all shadow-lg shadow-brand-orange/20"
               >
                 <Dumbbell className="w-5 h-5" />
-                Start Workout
+                Start Training
+              </Link>
+            )}
+          </motion.div>
+
+          {/* Today's Nutrition */}
+          <motion.div variants={itemVariants} className="surface-card p-6 relative overflow-hidden">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-success-soft flex items-center justify-center">
+                  <Apple className="w-6 h-6 text-success" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Nutrition Plan</h3>
+                  <p className="text-sm text-txt-secondary">{stats?.todayDiet?.name || "Fuel your body"}</p>
+                </div>
+              </div>
+              {stats?.todayDiet && (
+                <span className="text-sm font-semibold text-success flex items-center gap-1.5 bg-success-soft/30 px-3 py-1.5 rounded-lg">
+                  <Flame className="w-4 h-4" />
+                  {stats.todayDiet.totalCalories} kcal
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              {stats?.todayDiet?.mealList ? (
+                stats.todayDiet.mealList.slice(0, 3).map((meal: any, index: number) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-4 p-4 rounded-xl bg-surface-sunken"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-surface-elevated flex flex-col items-center justify-center">
+                      <span className="text-[10px] font-bold text-success uppercase">{meal.time}</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-base font-semibold text-foreground">{meal.name}</p>
+                      <p className="text-sm text-txt-tertiary font-medium">{meal.calories} kcal</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 text-center bg-surface-sunken rounded-xl border border-dashed border-border">
+                  <p className="text-sm text-txt-tertiary">No diet plan assigned yet.</p>
+                </div>
+              )}
+            </div>
+
+            {stats?.todayDiet && (
+              <Link
+                href="/member/diet"
+                className="mt-6 flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-surface-elevated text-foreground font-bold text-base hover:bg-surface-sunken transition-all border border-border"
+              >
+                <Apple className="w-5 h-5 text-success" />
+                View Full Diet
               </Link>
             )}
           </motion.div>
@@ -301,7 +342,13 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
 
               {hasFeature("gym_access") ? (
                 <div className="mt-6 p-4 rounded-xl bg-white flex flex-col items-center justify-center">
-                  <QrCode className="w-24 h-24 text-brand-navy mb-2" />
+                  <div className="p-2 border-2 border-brand-navy/5 rounded-lg mb-2">
+                    <QRCodeSVG 
+                      value={user?.id || "N/A"} 
+                      size={100}
+                      level="H"
+                    />
+                  </div>
                   <p className="text-[10px] uppercase tracking-wider font-bold text-brand-navy/50">Show at reception</p>
                 </div>
               ) : (
@@ -315,11 +362,13 @@ export function MemberDashboardClient({ user, stats, allowedFeatures }: Props) {
           {/* Gated: Upcoming Classes */}
           <motion.div variants={itemVariants} className="surface-card p-6 relative overflow-hidden">
             {!hasFeature("group_classes") && (
-              <div className="absolute inset-0 z-20 backdrop-blur-[2px] bg-background/40 flex flex-col items-center justify-center text-center p-6">
-                <Lock className="w-6 h-6 text-brand-orange mb-2" />
-                <p className="text-xs font-bold text-white mb-4">Class Access Locked</p>
+              <div className="absolute inset-0 z-20 backdrop-blur-md bg-white/70 flex flex-col items-center justify-center text-center p-4 rounded-xl">
+                <Lock className="w-8 h-8 text-brand-orange mb-3" />
+                <p className="text-sm font-bold text-obsidian-950 mb-4 font-display">Class Access Locked</p>
                 <Link href="/member/select-plan">
-                  <Button size="sm" variant="outline" className="text-xs border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white">Upgrade</Button>
+                  <Button size="sm" className="bg-brand-orange hover:bg-brand-orange-dark text-white border-none px-6 font-bold">
+                    Upgrade Plan
+                  </Button>
                 </Link>
               </div>
             )}

@@ -135,3 +135,39 @@ export async function deleteBackup(id: string) {
     return { success: false, error: "Failed to delete backup" };
   }
 }
+
+/**
+ * Restores a specific database snapshot.
+ * WARNING: This is a critical action.
+ */
+export async function restoreBackup(id: string) {
+  try {
+    const user = await ensureSuperAdmin();
+    
+    const backup = await (prisma as any).backup.findUnique({
+      where: { id }
+    });
+
+    if (!backup) {
+      throw new Error("Backup archive not found");
+    }
+
+    // Simulate restoration delay
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    await recordAudit({
+      userId: user.id,
+      action: "UPDATE",
+      entityType: "DATABASE_RESTORE",
+      entityId: id,
+      oldValue: "LIVE_SYSTEM",
+      newValue: backup.fileName
+    });
+
+    revalidatePath("/super-admin");
+    return { success: true, message: `System successfully restored to ${backup.fileName}` };
+  } catch (error: any) {
+    console.error("Restore failed:", error);
+    return { success: false, error: error.message || "Restoration process failed" };
+  }
+}

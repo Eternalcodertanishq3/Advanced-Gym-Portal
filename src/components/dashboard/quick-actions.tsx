@@ -146,20 +146,22 @@ const itemVariants = {
   },
 };
 
-export function QuickActions() {
+export function QuickActions({ className }: { className?: string }) {
   return (
-    <div>
-      <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">
-        Quick Actions
-      </h2>
+    <div className={cn("flex flex-col h-full", className)}>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">
+          Quick Actions
+        </h2>
+      </div>
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3"
+        className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 flex-1"
       >
         {quickActions.map((action) => {
-          const colors = colorMap[action.color];
+          const colors = colorMap[action.color as keyof typeof colorMap];
           const Icon = action.icon;
 
           return (
@@ -167,27 +169,25 @@ export function QuickActions() {
               <Link
                 href={action.href}
                 className={cn(
-                  "group flex flex-col items-center gap-2 p-4 rounded-2xl",
-                  "glass-card border border-white/5",
-                  "hover:border-gold-500/20 transition-all duration-300",
+                  "group flex flex-col items-center justify-center gap-2.5 p-3.5 rounded-xl h-full",
+                  "surface-card border border-border/40",
+                  "hover:border-primary/40 hover:shadow-lg transition-all duration-300",
                   "active:scale-95"
                 )}
               >
                 <div
                   className={cn(
-                    "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center",
-                    "transition-all duration-300",
+                    "w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300",
                     colors.bg,
-                    colors.hover
+                    "group-hover:scale-105"
                   )}
                 >
                   <Icon className={cn("w-5 h-5", colors.icon)} />
                 </div>
                 <div className="text-center">
-                  <p className="text-xs font-medium text-white/70 group-hover:text-white transition-colors">
+                  <p className="text-[10px] font-bold text-foreground/90 group-hover:text-primary transition-colors leading-tight">
                     {action.label}
                   </p>
-                  <p className="text-[10px] text-white/25 mt-0.5">{action.description}</p>
                 </div>
               </Link>
             </motion.div>

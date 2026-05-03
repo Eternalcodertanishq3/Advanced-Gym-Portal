@@ -2,29 +2,42 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { getBranchContext } from "@/lib/action-utils";
 
 export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
   try {
     const skip = (page - 1) * limit;
     
-    let whereClause = {};
+    const { branchId } = await getBranchContext();
+    
+    let where: any = {};
+
+    if (branchId) {
+      where.member = {
+        user: {
+          branchId: branchId
+        }
+      };
+    }
+
     if (search) {
-      whereClause = {
-        member: {
-          user: {
-            OR: [
-              { firstName: { contains: search, mode: "insensitive" } },
-              { lastName: { contains: search, mode: "insensitive" } },
-              { email: { contains: search, mode: "insensitive" } },
-            ]
-          }
+      where.member = {
+        ...where.member,
+        user: {
+          ...where.member?.user,
+          OR: [
+            { firstName: { contains: search, mode: 'insensitive' as const } },
+            { lastName: { contains: search, mode: 'insensitive' as const } },
+            { email: { contains: search, mode: 'insensitive' as const } },
+            { phone: { contains: search, mode: 'insensitive' as const } }
+          ]
         }
       };
     }
 
     const [logs, total] = await Promise.all([
       prisma.attendance.findMany({
-        where: whereClause,
+        where: where,
         include: {
           member: {
             include: {
@@ -38,7 +51,7 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
         skip,
         take: limit,
       }),
-      prisma.attendance.count({ where: whereClause })
+      prisma.attendance.count({ where: where })
     ]);
 
     return { 
@@ -104,6 +117,34 @@ export async function checkOutMember(attendanceId: string) {
     return { success: true, data: attendance };
   } catch (error: any) {
     return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Searches for a member by phone or member ID (specifically for Kiosk mode).
+ */
+export async function searchMemberByPhone(query: string) {
+  try {
+    if (!query || query.length < 3) return { success: false, error: "Query too short" };
+
+    const member = await prisma.member.findFirst({
+      where: {
+        OR: [
+          { user: { phone: { contains: query } } },
+          { id: { contains: query } }
+        ]
+      },
+      include: {
+        user: { select: { firstName: true, lastName: true, avatar: true, phone: true } },
+        subscription: { include: { plan: true } }
+      }
+    });
+
+    if (!member) return { success: false, error: "Member not found" };
+
+    return { success: true, data: member };
+  } catch (error: any) {
+    return { success: false, error: "Search failed" };
   }
 }
 

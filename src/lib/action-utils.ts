@@ -20,6 +20,36 @@ export async function ensureSuperAdmin() {
 }
 
 /**
+ * 🏢 EAGLE GYM — Branch Context Resolver
+ * Returns the branchId if the user is an ADMIN, or null if SUPER_ADMIN.
+ */
+export async function getBranchContext() {
+  const session = await auth();
+  
+  if (!session?.user) {
+    throw new Error("Unauthorized: Authentication required.");
+  }
+
+  const user = session.user as any;
+  
+  // Super Admin sees everything
+  if (user.role === "SUPER_ADMIN") {
+    return { branchId: null, role: user.role };
+  }
+
+  // Branch Admins see only their branch
+  if (user.role === "ADMIN" || user.role === "RECEPTIONIST" || user.role === "TRAINER") {
+    if (!user.branchId) {
+      // In a real app, you might want to handle unassigned staff differently
+      console.warn(`Staff user ${user.id} has no branchId assigned.`);
+    }
+    return { branchId: user.branchId, role: user.role };
+  }
+
+  throw new Error("Unauthorized: Management role required.");
+}
+
+/**
  * 📝 EAGLE GYM — Audit Logger
  * Records sensitive administrative actions to the database.
  */

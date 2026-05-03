@@ -16,6 +16,11 @@ export async function getStaff() {
           in: [Role.SUPER_ADMIN, Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER, Role.WORKER]
         }
       },
+      include: {
+        branch: {
+          select: { name: true }
+        }
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -25,6 +30,8 @@ export async function getStaff() {
       email: user.email,
       role: user.role,
       status: user.status,
+      branchName: user.branch?.name || "Global / Unassigned",
+      branchId: user.branchId,
       lastActive: user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : "Never",
     }));
 
@@ -41,6 +48,7 @@ export async function inviteStaff(data: {
   email: string;
   phone: string;
   role: Role;
+  branchId?: string;
 }) {
   try {
     const superAdmin = await ensureSuperAdmin();
@@ -68,6 +76,7 @@ export async function inviteStaff(data: {
         role: data.role,
         status: "ACTIVE",
         passwordResetRequired: true,
+        branchId: data.branchId === "none" ? null : data.branchId,
       } as any
     });
 
@@ -107,6 +116,7 @@ export async function updateStaff(id: string, data: Partial<{
   phone: string;
   role: Role;
   status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+  branchId: string;
 }>) {
   try {
     const superAdmin = await ensureSuperAdmin();
@@ -114,7 +124,10 @@ export async function updateStaff(id: string, data: Partial<{
 
     const user = await prisma.user.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        branchId: data.branchId === "none" ? null : data.branchId
+      },
     });
 
     await recordAudit({

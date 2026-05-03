@@ -71,7 +71,10 @@ export default function InventoryPage() {
             <ShoppingCart className="w-4 h-4 mr-2" />
             POS Terminal
           </Button>
-          <Button className="bg-brand-navy hover:bg-brand-navy/90 text-white">
+          <Button 
+            className="bg-brand-orange hover:bg-brand-orange/90 text-white"
+            onClick={() => router.push("/admin/inventory/new")}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Product
           </Button>
@@ -80,20 +83,14 @@ export default function InventoryPage() {
 
       {/* Toolbar */}
       <div className="bg-surface-card rounded-2xl p-4 border border-surface-sunken shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full max-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-obsidian-400" />
           <Input
             placeholder="Search products by name or SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-navy"
+            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-orange"
           />
-        </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button variant="outline" className="bg-surface-base border-surface-sunken">
-            <Filter className="w-4 h-4 mr-2" />
-            Filter
-          </Button>
         </div>
       </div>
 
@@ -108,7 +105,7 @@ export default function InventoryPage() {
                 <TableHead className="font-semibold text-obsidian-900">Category</TableHead>
                 <TableHead className="font-semibold text-obsidian-900">Price</TableHead>
                 <TableHead className="font-semibold text-obsidian-900">Stock Status</TableHead>
-                <TableHead className="text-right font-semibold text-obsidian-900">Adjust Stock</TableHead>
+                <TableHead className="text-right font-semibold text-obsidian-900">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -132,7 +129,7 @@ export default function InventoryPage() {
                 </TableRow>
               ) : (
                 items.map((item: any) => {
-                  const status = getStockStatus(item.quantity);
+                  const status = getStockStatus(item.stock);
                   return (
                     <TableRow key={item.id} className="hover:bg-surface-base/50 transition-colors">
                       <TableCell>
@@ -155,7 +152,7 @@ export default function InventoryPage() {
                           <Badge variant="outline" className={cn("font-medium border-0 shadow-none", status.badge)}>
                             {status.label}
                           </Badge>
-                          <span className="text-sm font-semibold text-obsidian-700">{item.quantity} left</span>
+                          <span className="text-sm font-semibold text-obsidian-700">{item.stock} left</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
@@ -164,8 +161,8 @@ export default function InventoryPage() {
                             variant="outline" 
                             size="icon" 
                             className="h-8 w-8 bg-surface-base border-surface-sunken text-obsidian-700"
-                            onClick={() => handleAdjustStock(item.id, item.quantity, -1)}
-                            disabled={item.quantity === 0 || updateQuantity.isPending}
+                            onClick={() => handleAdjustStock(item.id, item.stock, -1)}
+                            disabled={item.stock === 0 || updateQuantity.isPending}
                           >
                             -
                           </Button>
@@ -173,7 +170,7 @@ export default function InventoryPage() {
                             variant="outline" 
                             size="icon" 
                             className="h-8 w-8 bg-surface-base border-surface-sunken text-obsidian-700"
-                            onClick={() => handleAdjustStock(item.id, item.quantity, 1)}
+                            onClick={() => handleAdjustStock(item.id, item.stock, 1)}
                             disabled={updateQuantity.isPending}
                           >
                             +
@@ -185,7 +182,7 @@ export default function InventoryPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="bg-surface-card border-surface-sunken">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => router.push(`/admin/inventory/${item.id}/edit`)}>
                                 <Edit className="w-4 h-4 mr-2" /> Edit Product
                               </DropdownMenuItem>
                             </DropdownMenuContent>

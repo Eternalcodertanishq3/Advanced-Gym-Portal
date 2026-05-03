@@ -35,16 +35,57 @@ export async function getMemberAchievements() {
       };
     });
 
-    return { 
-      success: true, 
-      data: {
-        achievements: mappedAchievements,
-        earnedCount: userAchievements.length,
-        totalCount: allAchievements.length
-      }
-    };
+    return { success: true, data: { achievements: mappedAchievements, earnedCount: userAchievements.length, totalCount: allAchievements.length } };
   } catch (error) {
     console.error("Error fetching achievements:", error);
     return { success: false, error: "Failed to load achievements" };
+  }
+}
+
+/**
+ * Awards XP to a member and records the transaction.
+ */
+export async function awardXP(userId: string, amount: number, reason: string) {
+  try {
+    const [xpTransaction, updatedUser] = await prisma.$transaction([
+      prisma.xPTransaction.create({
+        data: { userId, amount, reason }
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: { xp: { increment: amount } }
+      })
+    ]);
+
+    return { success: true, data: { xpTransaction, currentXP: updatedUser.xp } };
+  } catch (error) {
+    console.error("Error awarding XP:", error);
+    return { success: false, error: "Failed to award XP" };
+  }
+}
+
+/**
+ * Fetches the global leaderboard for the gym.
+ */
+export async function getLeaderboard(limit = 10) {
+  try {
+    const topMembers = await prisma.user.findMany({
+      where: { role: "MEMBER" },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        avatar: true,
+        xp: true,
+        member: { select: { joinDate: true } }
+      },
+      orderBy: { xp: 'desc' },
+      take: limit
+    });
+
+    return { success: true, data: topMembers };
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    return { success: false, error: "Failed to load leaderboard" };
   }
 }

@@ -20,6 +20,9 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { createTrainer } from "@/server/actions/trainer-actions";
+import { useState } from "react";
+
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters."),
   lastName: z.string().min(2, "Last name must be at least 2 characters."),
@@ -32,6 +35,7 @@ const formSchema = z.object({
 
 export default function AddTrainerPage() {
   const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,8 +51,20 @@ export default function AddTrainerPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    toast.success("Trainer onboarded successfully!");
-    router.push("/admin/trainers");
+    setIsPending(true);
+    try {
+      const res = await createTrainer(values);
+      if (res.success) {
+        toast.success("Trainer onboarded successfully!");
+        router.push("/admin/trainers");
+      } else {
+        toast.error(res.error || "Failed to onboard trainer");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setIsPending(false);
+    }
   }
 
   return (
@@ -75,7 +91,7 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-navy" />
+                        <Input placeholder="John" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -88,7 +104,7 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-navy" />
+                        <Input placeholder="Doe" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -101,7 +117,7 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john.doe@example.com" {...field} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-navy" />
+                        <Input type="email" placeholder="john.doe@example.com" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -114,7 +130,7 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="+91 9876543210" {...field} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-navy" />
+                        <Input placeholder="+91 9876543210" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -127,7 +143,7 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Specialization</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Bodybuilding, Yoga" {...field} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-navy" />
+                        <Input placeholder="e.g. Bodybuilding, Yoga" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -140,7 +156,7 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Experience (Years)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-navy" />
+                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -153,7 +169,7 @@ export default function AddTrainerPage() {
                     <FormItem className="col-span-1 md:col-span-2">
                       <FormLabel>Monthly Salary (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-navy" />
+                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
                       </FormControl>
                       <FormDescription>
                         Base salary before commissions.
@@ -164,11 +180,11 @@ export default function AddTrainerPage() {
                 />
               </div>
               <div className="flex justify-end gap-4 pt-4 border-t border-surface-sunken">
-                <Button variant="outline" type="button" onClick={() => router.back()} className="bg-surface-base border-surface-sunken">
+                <Button variant="outline" type="button" onClick={() => router.back()} disabled={isPending} className="bg-surface-base border-surface-sunken">
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-brand-navy text-white hover:bg-brand-navy/90">
-                  Onboard Trainer
+                <Button type="submit" disabled={isPending} className="bg-brand-orange text-white hover:bg-brand-orange/90 min-w-[140px]">
+                  {isPending ? "Onboarding..." : "Onboard Trainer"}
                 </Button>
               </div>
             </form>

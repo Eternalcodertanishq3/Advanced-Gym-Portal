@@ -59,3 +59,16 @@ export async function createWorkoutPlan(data: { name: string, description?: stri
     return { success: false, error: error.message };
   }
 }
+
+export async function getWorkoutTemplates() {
+  try {
+    const templates = await prisma.workoutPlan.findMany({
+      where: { isTemplate: true },
+      include: { exercises: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    return { success: true, data: templates };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}

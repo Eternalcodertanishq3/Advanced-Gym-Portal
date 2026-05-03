@@ -54,6 +54,7 @@ export function MarketingNav({
               width={32}
               height={32}
               className="object-contain"
+              style={{ width: 'auto', height: 'auto' }}
             />
           </div>
           <span className="text-xl font-display font-black tracking-tighter text-white uppercase">

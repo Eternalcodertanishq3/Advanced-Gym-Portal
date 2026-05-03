@@ -102,17 +102,6 @@ export function BranchModal({ isOpen, onClose, branch }: Props) {
                   {branch ? "Manage your branch location and status." : "Add a new gym branch to your network."}
                 </DialogDescription>
               </div>
-              {branch && (
-                <Button 
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="text-danger/50 hover:text-danger hover:bg-danger/10 transition-colors"
-                >
-                  {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                </Button>
-              )}
             </div>
           </DialogHeader>
 
@@ -126,7 +115,7 @@ export function BranchModal({ isOpen, onClose, branch }: Props) {
                 type="text" 
                 defaultValue={branch?.name} 
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
-                placeholder="e.g. Downtown Elite" 
+                placeholder="Official Branch Identity" 
               />
             </div>
 
@@ -139,7 +128,7 @@ export function BranchModal({ isOpen, onClose, branch }: Props) {
                 type="text" 
                 defaultValue={branch?.location} 
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
-                placeholder="e.g. South Delhi" 
+                placeholder="Primary Operational Area" 
               />
             </div>
 
@@ -164,7 +153,7 @@ export function BranchModal({ isOpen, onClose, branch }: Props) {
                   type="text" 
                   defaultValue={branch?.phone || ""} 
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-brand-orange/50 transition-all h-11 rounded-xl"
-                  placeholder="Contact number" 
+                  placeholder="Contact Phone Number" 
                 />
               </div>
               <div className="space-y-2">

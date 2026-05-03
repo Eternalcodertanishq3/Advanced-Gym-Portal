@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { getMemberProgress } from "@/actions/member/progress-actions";
 import { ProgressClient } from "./components/progress-client";
 import { redirect } from "next/navigation";
@@ -17,7 +17,9 @@ export default async function ProgressPage() {
 
   return (
     <div className="w-full h-full">
-      <ProgressClient data={res.data} />
+      <Suspense fallback={<div className="flex items-center justify-center h-full">Loading Evolution Tracker...</div>}>
+        <ProgressClient data={res.data} />
+      </Suspense>
     </div>
   );
 }

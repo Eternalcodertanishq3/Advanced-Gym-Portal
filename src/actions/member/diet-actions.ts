@@ -44,7 +44,10 @@ export async function getMemberDiets() {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: [
+        { memberId: 'desc' },
+        { createdAt: 'desc' }
+      ]
     });
 
     return { success: true, data: plans };

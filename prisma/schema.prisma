@@ -254,8 +254,11 @@ model Branch {
   updatedAt DateTime @updatedAt
 
   // Relations
-  users   User[]
-  classes GymClass[]
+  users         User[]
+  classes       GymClass[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  attendance    Attendance[]
 
   @@map("branches")
 }
@@ -279,6 +282,7 @@ model User {
   lastLoginAt   DateTime?
   lastLoginIp   String?
   passwordResetRequired Boolean   @default(false)
+  xp                    Int       @default(0)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -294,6 +298,7 @@ model User {
   sessions         Session[]
   notifications    Notification[]
   auditLogs        AuditLog[]
+  attendance       Attendance[]
   sentMessages     Message[]         @relation("SentMessages")
   receivedMessages Message[]         @relation("ReceivedMessages")
   achievements     UserAchievement[]
@@ -362,6 +367,7 @@ model Member {
   progress       Progress[]
   progressPhotos ProgressPhoto[]
   workouts       WorkoutLog[]
+  workoutPlans   WorkoutPlan[]   @relation("MemberWorkoutPlans")
   dietPlans      DietPlan[]      @relation("MemberDietPlans")
   payments       Payment[]
   classBookings  ClassBooking[]
@@ -543,6 +549,9 @@ model Subscription {
   planId String
   plan   Plan   @relation(fields: [planId], references: [id])
 
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
   startDate   DateTime
   endDate     DateTime
   amount      Decimal            @db.Decimal(10, 2)
@@ -557,6 +566,7 @@ model Subscription {
   @@index([status])
   @@index([endDate])
   @@index([memberId])
+  @@index([branchId])
   @@map("subscriptions")
 }
 
@@ -568,6 +578,9 @@ model Payment {
   id       String @id @default(cuid())
   memberId String
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
 
   amount        Decimal       @db.Decimal(10, 2)
   tax           Decimal       @default(0) @db.Decimal(10, 2)
@@ -587,6 +600,7 @@ model Payment {
   updatedAt DateTime @updatedAt
 
   @@index([memberId])
+  @@index([branchId])
   @@index([status])
   @@index([createdAt])
   @@index([receiptNo])
@@ -599,8 +613,14 @@ model Payment {
 
 model Attendance {
   id       String @id @default(cuid())
-  memberId String
-  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String?
+  member   Member? @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  userId   String?
+  user     User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
 
   date       DateTime         @default(now()) @db.Date
   checkIn    DateTime
@@ -611,8 +631,9 @@ model Attendance {
 
   createdAt DateTime @default(now())
 
-  @@unique([memberId, date])
   @@index([memberId])
+  @@index([userId])
+  @@index([branchId])
   @@index([date])
   @@index([status])
   @@map("attendance")
@@ -731,6 +752,7 @@ model WorkoutPlan {
   trainerId          String?
   trainer            Trainer?          @relation(fields: [trainerId], references: [id])
   memberId           String?
+  member             Member?           @relation(fields: [memberId], references: [id], onDelete: SetNull, name: "MemberWorkoutPlans")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

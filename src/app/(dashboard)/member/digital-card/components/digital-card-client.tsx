@@ -12,11 +12,14 @@ import {
   Rotate3d,
   CreditCard,
   Zap,
-  Info
+  Info,
+  ArrowLeft,
+  Dumbbell
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
 import html2canvas from "html2canvas";
+import Link from "next/link";
 
 interface Props {
   member: any;
@@ -44,6 +47,17 @@ export function DigitalCardClient({ member }: Props) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] py-12 px-4 space-y-12">
+      {/* Back Button */}
+      <div className="w-full max-w-[400px] flex justify-start">
+        <Link 
+          href="/member"
+          className="flex items-center gap-2 text-txt-tertiary hover:text-brand-orange transition-colors text-sm font-bold uppercase tracking-widest group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Dashboard
+        </Link>
+      </div>
+
       {/* Header Info */}
       <div className="text-center space-y-3">
         <h1 className="text-4xl font-display font-bold text-foreground tracking-tight">
@@ -67,6 +81,7 @@ export function DigitalCardClient({ member }: Props) {
             className="absolute inset-0 backface-hidden w-full h-full p-8 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-between"
             style={{ 
               background: `linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%)`,
+              transform: 'translateZ(1px)'
             }}
           >
             {/* Holographic Overlays */}
@@ -76,12 +91,12 @@ export function DigitalCardClient({ member }: Props) {
             {/* Top Row: Logo & Status */}
             <div className="flex justify-between items-start relative z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                  <img src="/logo-icon.png" alt="Logo" className="w-6 h-6" />
+                <div className="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center">
+                  <Dumbbell className="w-6 h-6 text-brand-orange" />
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase">Eagle Gym</p>
-                  <p className="text-xs font-bold text-white">Elite Member</p>
+                  <p className="text-xs font-bold text-white">{planName} Member</p>
                 </div>
               </div>
               <div className={cn(
@@ -105,7 +120,7 @@ export function DigitalCardClient({ member }: Props) {
             <div className="flex justify-between items-end relative z-10">
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Member ID</p>
-                <p className="text-xs font-mono font-bold text-white/80">{member.memberId}</p>
+                <p className="text-xs font-mono font-bold text-white/80">{member.id.slice(-8).toUpperCase()}</p>
               </div>
               <div className="text-right space-y-1">
                 <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Branch</p>
@@ -121,33 +136,27 @@ export function DigitalCardClient({ member }: Props) {
 
           {/* BACK SIDE */}
           <div 
-            className="absolute inset-0 backface-hidden w-full h-full p-8 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl flex flex-col items-center justify-center gap-4"
+            className="absolute inset-0 backface-hidden w-full h-full p-8 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
             style={{ 
               background: `linear-gradient(135deg, #1A1A1A 0%, #0A0A0A 100%)`,
-              transform: 'rotateY(180deg)'
+              transform: 'rotateY(180deg) translateZ(1px)'
             }}
           >
-             <div className="absolute inset-0 bg-brand-orange/5 mix-blend-overlay opacity-30" />
-             
-             <div className="bg-white p-4 rounded-3xl shadow-xl relative z-10 group-hover:scale-105 transition-transform duration-500">
-               <QRCodeSVG 
-                 value={member.userId} 
-                 size={120} 
-                 level="H" 
-                 includeMargin={false}
-                 imageSettings={{
-                    src: "/logo-icon.png",
-                    x: undefined,
-                    y: undefined,
-                    height: 24,
-                    width: 24,
-                    excavate: true,
-                 }}
-               />
+             <div className="flex flex-col items-center justify-center gap-4 w-full h-full">
+               <div className="absolute inset-0 bg-brand-orange/5 mix-blend-overlay opacity-30" />
+               
+               <div className="bg-white p-4 rounded-3xl shadow-xl relative z-10 group-hover:scale-105 transition-transform duration-500">
+                 <QRCodeSVG 
+                   value={member.userId} 
+                   size={120} 
+                   level="H" 
+                   includeMargin={false}
+                 />
+               </div>
+               <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] relative z-10">
+                 Scan to Verify
+               </p>
              </div>
-             <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] relative z-10">
-               Scan to Verify
-             </p>
           </div>
         </motion.div>
 
@@ -191,14 +200,21 @@ export function DigitalCardClient({ member }: Props) {
               <span className="text-[10px] font-bold uppercase tracking-widest">Plan Type</span>
             </div>
             <p className="text-lg font-bold text-foreground">{planName}</p>
-            <p className="text-xs text-txt-secondary font-medium">Valid until {member.subscription?.endDate ? new Date(member.subscription.endDate).toLocaleDateString() : "N/A"}</p>
+            <p className="text-xs text-txt-secondary font-medium">
+              Valid until {member.subscription?.endDate 
+                ? (() => {
+                    const d = new Date(member.subscription.endDate);
+                    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                  })()
+                : "N/A"}
+            </p>
          </div>
          <div className="surface-card p-5 rounded-2xl space-y-1">
             <div className="flex items-center gap-2 text-txt-tertiary mb-2">
               <MapPin className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-widest">Check-ins</span>
             </div>
-            <p className="text-lg font-bold text-foreground">12 / 30</p>
+            <p className="text-lg font-bold text-foreground">{member._count?.attendance || 0} / 30</p>
             <p className="text-xs text-txt-secondary font-medium">This month</p>
          </div>
       </div>

@@ -77,7 +77,7 @@ export default function AttendancePage() {
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
-          <Button className="bg-brand-navy hover:bg-brand-navy/90 text-white">
+          <Button className="bg-brand-orange hover:bg-brand-orange/90 text-white">
             <UserCheck className="w-4 h-4 mr-2" />
             Manual Check-In
           </Button>

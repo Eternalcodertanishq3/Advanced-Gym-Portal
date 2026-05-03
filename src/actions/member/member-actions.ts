@@ -30,6 +30,17 @@ export async function getMemberProfile() {
           include: {
             plan: true
           }
+        },
+        _count: {
+          select: {
+            attendance: {
+              where: {
+                date: {
+                  gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+                }
+              }
+            }
+          }
         }
       }
     });

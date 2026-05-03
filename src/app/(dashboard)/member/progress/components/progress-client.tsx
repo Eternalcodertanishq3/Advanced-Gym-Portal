@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   TrendingUp, 
@@ -16,7 +17,9 @@ import {
   Info,
   Trophy,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Upload,
+  Image as ImageIcon
 } from "lucide-react";
 import { 
   LineChart, 
@@ -31,7 +34,15 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { addMeasurement } from "@/actions/member/progress-actions";
+import { addMeasurement, addProgressPhoto } from "@/actions/member/progress-actions";
+import { Button } from "@/components/ui/button";
+import { Portal } from "@/components/common/portal";
+import { formatDate } from "@/lib/utils";
+
+// New Component Imports
+import { StatCard } from "./stat-card";
+import { MeasurementModal } from "./modals/measurement-modal";
+import { PhotoUploadModal } from "./modals/photo-upload-modal";
 
 interface Props {
   data: {
@@ -42,12 +53,16 @@ interface Props {
 }
 
 export function ProgressClient({ data }: Props) {
-  const [activeTab, setActiveTab] = useState<"metrics" | "photos" | "goals">("metrics");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") as "metrics" | "photos" | "goals" | null;
+  
+  const [activeTab, setActiveTab] = useState<"metrics" | "photos" | "goals">(initialTab || "metrics");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
 
   // Prepare chart data
   const chartData = data.measurements.map(m => ({
-    date: new Date(m.createdAt).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' }),
+    date: formatDate(m.createdAt, "dd MMM"),
     weight: Number(m.weight),
     bodyFat: Number(m.bodyFat)
   }));
@@ -215,7 +230,7 @@ export function ProgressClient({ data }: Props) {
                         <div>
                           <p className="text-xs font-bold text-foreground">{m.weight} kg</p>
                           <p className="text-[10px] text-txt-tertiary font-medium">
-                            {new Date(m.createdAt).toLocaleDateString()}
+                            {formatDate(m.createdAt)}
                           </p>
                         </div>
                         <div className="p-2 rounded-lg bg-surface-elevated text-txt-tertiary group-hover:text-brand-orange transition-colors">
@@ -225,7 +240,7 @@ export function ProgressClient({ data }: Props) {
                     ))}
                   </div>
                   <button 
-                    onClick={() => toast.info("Measurement logging coming soon!")}
+                    onClick={() => setShowAddModal(true)}
                     className="mt-6 w-full py-4 rounded-2xl bg-brand-orange text-white font-bold text-sm shadow-lg shadow-brand-orange/10 hover:bg-brand-orange-dark transition-all flex items-center justify-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
@@ -242,7 +257,10 @@ export function ProgressClient({ data }: Props) {
             exit={{ opacity: 0, y: -10 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-             <div className="aspect-[3/4] rounded-[2.5rem] border-2 border-dashed border-border flex flex-col items-center justify-center space-y-4 hover:border-brand-orange/50 transition-all cursor-pointer group">
+             <div 
+               onClick={() => setShowPhotoModal(true)}
+               className="aspect-[3/4] rounded-[2.5rem] border-2 border-dashed border-border flex flex-col items-center justify-center space-y-4 hover:border-brand-orange/50 transition-all cursor-pointer group"
+             >
                 <div className="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Camera className="w-8 h-8 text-txt-tertiary group-hover:text-brand-orange transition-colors" />
                 </div>
@@ -257,10 +275,10 @@ export function ProgressClient({ data }: Props) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-8 flex flex-col justify-end">
                     <p className="text-xs font-bold text-brand-orange uppercase tracking-widest">{photo.photoType}</p>
                     <p className="text-xl font-bold text-white">{photo.weight} kg</p>
-                    <p className="text-xs text-white/60 font-medium">{new Date(photo.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-white/60 font-medium">{formatDate(photo.createdAt)}</p>
                   </div>
                   <div className="absolute top-6 right-6 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-widest">
-                    {new Date(photo.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                    {formatDate(photo.createdAt, "MMM yyyy")}
                   </div>
                 </div>
              ))}
@@ -317,7 +335,7 @@ export function ProgressClient({ data }: Props) {
                     
                     <div className="flex justify-between items-center pt-4 border-t border-border/30">
                        <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest">
-                         Ends {goal.deadline ? new Date(goal.deadline).toLocaleDateString() : "No Deadline"}
+                         Ends {goal.deadline ? formatDate(goal.deadline) : "No Deadline"}
                        </p>
                        <p className="text-xs font-bold text-brand-orange flex items-center gap-1">
                          {Math.round(progress)}% Complete
@@ -340,38 +358,18 @@ export function ProgressClient({ data }: Props) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
 
-function StatCard({ label, value, trend, unit, icon, color }: any) {
-  const colorMap: any = {
-    orange: "text-brand-orange bg-brand-orange/10 border-brand-orange/20 shadow-brand-glow",
-    info: "text-info bg-info/10 border-info/20 shadow-info-glow",
-    purple: "text-purple-500 bg-purple-500/10 border-purple-500/20 shadow-purple-glow",
-    success: "text-success bg-success/10 border-success/20 shadow-success-glow",
-  };
+      <MeasurementModal 
+        isOpen={showAddModal} 
+        onClose={() => setShowAddModal(false)} 
+        latest={latest}
+      />
 
-  return (
-    <div className="surface-card p-6 rounded-3xl border border-border/50 hover:border-brand-orange/30 transition-all group">
-      <div className="flex justify-between items-start mb-4">
-        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110", colorMap[color])}>
-          {icon}
-        </div>
-        {trend !== 0 && (
-          <div className={cn(
-            "flex items-center gap-0.5 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider",
-            trend > 0 ? "text-danger bg-danger/10" : "text-success bg-success/10"
-          )}>
-            {trend > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-            {Math.abs(trend)}{unit}
-          </div>
-        )}
-      </div>
-      <div>
-        <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-[0.2em] mb-1">{label}</p>
-        <p className="text-2xl font-display font-bold text-foreground">{value}</p>
-      </div>
+      <PhotoUploadModal
+        isOpen={showPhotoModal}
+        onClose={() => setShowPhotoModal(false)}
+        latestWeight={latest.weight}
+      />
     </div>
   );
 }

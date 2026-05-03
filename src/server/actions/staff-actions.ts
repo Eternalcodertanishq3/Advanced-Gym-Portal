@@ -36,19 +36,119 @@ export async function getStaff(page = 1, limit = 10, search = "") {
     ]);
 
 
-    return { 
-      success: true, 
-      data: {
-        staff: workers,
-        pagination: {
-          total,
-          pages: Math.ceil(total / limit),
-          page,
-          limit
-        }
-      }
-    };
+    return { success: true, data: { staff: workers, pagination: { total, pages: Math.ceil(total / limit), page, limit } } };
   } catch (error: any) {
     return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Fetches attendance records for staff members.
+ */
+export async function getStaffAttendance(limit = 20) {
+  try {
+    const attendance = await prisma.attendance.findMany({
+      where: {
+        user: { role: { not: "MEMBER" } }
+      },
+      include: {
+        user: { select: { firstName: true, lastName: true, role: true, avatar: true } }
+      },
+      orderBy: { date: 'desc' },
+      take: limit
+    });
+
+    return { success: true, data: attendance };
+  } catch (error: any) {
+    return { success: false, error: "Failed to load staff attendance" };
+  }
+}
+
+export async function getStaffById(id: string) {
+  try {
+    const worker = await prisma.worker.findUnique({
+      where: { id },
+      include: { user: true }
+    });
+    if (!worker) return { success: false, error: "Staff member not found" };
+    return { success: true, data: worker };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function createStaff(data: any) {
+  try {
+    const bcrypt = require("bcryptjs");
+    const hashedPassword = await bcrypt.hash("Eagle@123", 10);
+
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          password: hashedPassword,
+          role: "WORKER",
+          status: "ACTIVE",
+          passwordResetRequired: true,
+        },
+      });
+
+      const worker = await tx.worker.create({
+        data: {
+          userId: user.id,
+          department: data.department || "GENERAL",
+          shiftStart: data.shiftStart || "06:00",
+          shiftEnd: data.shiftEnd || "22:00",
+          salary: data.salary,
+        },
+      });
+
+      return worker;
+    });
+
+    revalidatePath("/admin/staff");
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error("Error creating staff:", error);
+    if (error.code === 'P2002') {
+      return { success: false, error: "Email or phone number already exists." };
+    }
+    return { success: false, error: error.message || "Failed to onboard staff" };
+  }
+}
+
+export async function updateStaff(id: string, data: any) {
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const worker = await tx.worker.update({
+        where: { id },
+        data: {
+          department: data.department,
+          shiftStart: data.shiftStart,
+          shiftEnd: data.shiftEnd,
+          salary: data.salary,
+          isActive: data.isActive,
+          user: {
+            update: {
+              firstName: data.firstName,
+              lastName: data.lastName,
+              email: data.email,
+              phone: data.phone,
+            }
+          }
+        },
+        include: { user: true }
+      });
+      return worker;
+    });
+
+    revalidatePath("/admin/staff");
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error("Error updating staff:", error);
+    return { success: false, error: error.message || "Failed to update staff" };
   }
 }

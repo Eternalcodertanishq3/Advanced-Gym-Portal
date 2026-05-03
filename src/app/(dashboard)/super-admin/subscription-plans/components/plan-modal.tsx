@@ -97,7 +97,7 @@ export function PlanModal({ open, onClose, plan }: Props) {
                 <Label htmlFor="name">Plan Name *</Label>
                 <Input
                   id="name"
-                  placeholder="e.g. Platinum Annual"
+                  placeholder="Official Tier Identity"
                   className="bg-white/5 border-white/10 text-white"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}

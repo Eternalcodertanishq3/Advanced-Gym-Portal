@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { DollarSign, TrendingUp, Loader2 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { getSuperAdminRevenueStats } from "@/server/actions/analytics-actions";
+import { RevenueChart } from "@/components/dashboard/revenue-chart";
 
 export default function RevenuePage() {
   const [loading, setLoading] = useState(true);
@@ -12,6 +13,7 @@ export default function RevenuePage() {
     arr: number;
     churnRate: number;
     revenueSparkline: number[];
+    chartData: { name: string; revenue: number }[];
   } | null>(null);
 
   useEffect(() => {
@@ -73,11 +75,31 @@ export default function RevenuePage() {
         />
       </div>
 
-      <div className="surface-card p-6 rounded-2xl border border-border h-96 flex flex-col items-center justify-center relative overflow-hidden group">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,93,38,0.05),transparent_70%)] pointer-events-none" />
-        <TrendingUp className="w-12 h-12 text-muted-foreground/10 mb-4 group-hover:text-brand-orange/20 transition-colors duration-500" />
-        <h2 className="text-lg font-bold text-foreground font-display">Revenue Growth Chart</h2>
-        <p className="text-sm text-muted-foreground mt-2">Fiscal trends across all branches. Visualizing live database aggregations.</p>
+      <div className="surface-card p-6 rounded-2xl border border-border flex flex-col relative overflow-hidden group min-h-[450px]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(232,93,38,0.03),transparent_70%)] pointer-events-none" />
+        
+        <div className="flex items-center justify-between mb-8 relative z-10">
+          <div>
+            <h2 className="text-lg font-bold text-foreground font-display flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-brand-orange" />
+              Revenue Growth Analysis
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">Twelve-month fiscal trajectory and branch performance aggregations.</p>
+          </div>
+          <div className="px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange text-[10px] font-bold uppercase tracking-wider">
+            Live Database Sync
+          </div>
+        </div>
+
+        <div className="flex-1 w-full h-full relative z-10">
+          {stats?.chartData ? (
+            <RevenueChart data={stats.chartData} />
+          ) : (
+            <div className="flex items-center justify-center h-full text-muted-foreground italic text-sm">
+              Insufficient data for visual modeling
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

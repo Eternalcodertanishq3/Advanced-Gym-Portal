@@ -75,14 +75,20 @@ export default function BackupsPage() {
     }
   };
 
-  const handleRestore = async () => {
-    const confirmed = confirm("WARNING: This will overwrite the live database. Proceed?");
+  const handleRestore = async (id?: string) => {
+    const confirmed = confirm("WARNING: This will overwrite the live database with the selected snapshot. All current session data will be lost. Proceed?");
     if (!confirmed) return;
 
     setIsRestoring(true);
-    // Simulated restore process
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    toast.success("Database restored to selected snapshot!");
+    const { restoreBackup } = await import("@/actions/super-admin/system-actions");
+    const res = await restoreBackup(id || backups[0]?.dbId);
+    
+    if (res.success) {
+      toast.success(res.message);
+      await fetchData();
+    } else {
+      toast.error(res.error);
+    }
     setIsRestoring(false);
   };
 
@@ -170,6 +176,13 @@ export default function BackupsPage() {
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-mono text-txt-tertiary font-medium bg-surface-elevated px-2 py-1 rounded-md">{bk.size}</span>
                         <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity gap-1">
+                          <button 
+                            onClick={() => handleRestore(bk.dbId)}
+                            title="Restore snapshot"
+                            className="p-2 hover:bg-info/10 rounded-lg text-txt-secondary hover:text-info transition-colors"
+                          >
+                            <RefreshCw className={cn("w-4 h-4", isRestoring && "animate-spin")} />
+                          </button>
                           <button 
                             title="Download ZIP"
                             className="p-2 hover:bg-brand-orange/10 rounded-lg text-txt-secondary hover:text-brand-orange transition-colors"

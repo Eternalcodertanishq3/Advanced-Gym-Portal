@@ -57,7 +57,7 @@ export default function StaffPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="bg-brand-navy hover:bg-brand-navy/90 text-white">
+          <Button className="bg-brand-orange hover:bg-brand-orange/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             Add Staff Member
           </Button>
@@ -72,7 +72,7 @@ export default function StaffPage() {
             placeholder="Search by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-navy"
+            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-orange"
           />
         </div>
       </div>

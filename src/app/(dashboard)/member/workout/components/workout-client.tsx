@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { logWorkoutSession } from "@/actions/member/workout-actions";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   data: {
@@ -217,12 +218,19 @@ export function WorkoutClient({ data }: Props) {
                   <div className="w-12 h-12 rounded-2xl bg-surface-sunken flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Zap className={cn("w-6 h-6", plan.difficulty === 'ADVANCED' ? "text-danger" : "text-brand-orange")} />
                   </div>
-                  <span className={cn(
-                    "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                    plan.difficulty === 'ADVANCED' ? "bg-danger-soft text-danger" : "bg-success-soft text-success"
-                  )}>
-                    {plan.difficulty}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    {plan.memberId && (
+                      <Badge className="bg-brand-orange text-white border-none text-[8px] h-5 px-2 font-bold tracking-tighter">
+                        TRAINER ASSIGNED
+                      </Badge>
+                    )}
+                    <span className={cn(
+                      "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                      plan.difficulty === 'ADVANCED' ? "bg-danger-soft text-danger" : "bg-success-soft text-success"
+                    )}>
+                      {plan.difficulty}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex-1 space-y-2">

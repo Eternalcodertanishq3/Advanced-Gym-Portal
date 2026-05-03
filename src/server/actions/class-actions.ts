@@ -68,3 +68,54 @@ export async function createClass(data: { name: string, description?: string, tr
   }
 }
 
+export async function getClassById(id: string) {
+  try {
+    const cls = await prisma.gymClass.findUnique({
+      where: { id },
+      include: {
+        trainer: { include: { user: true } },
+        schedules: true
+      }
+    });
+    if (!cls) return { success: false, error: "Class not found" };
+    return { success: true, data: cls };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateClass(id: string, data: any) {
+  try {
+    const cls = await prisma.gymClass.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description: data.description,
+        trainerId: data.trainerId,
+        category: data.category,
+        maxCapacity: Number(data.capacity),
+        duration: Number(data.duration),
+        isActive: data.isActive,
+      }
+    });
+
+    revalidatePath("/admin/classes");
+    return { success: true, data: cls };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteClass(id: string) {
+  try {
+    await prisma.gymClass.delete({
+      where: { id }
+    });
+
+    revalidatePath("/admin/classes");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+

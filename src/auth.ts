@@ -44,6 +44,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
             lastName: user.lastName,
             role: user.role,
             status: user.status,
+            branchId: user.branchId,
             passwordResetRequired: (user as any).passwordResetRequired,
           };
         }

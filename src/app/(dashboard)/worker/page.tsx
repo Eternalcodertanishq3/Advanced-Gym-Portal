@@ -1,0 +1,35 @@
+import React from "react";
+import { getWorkerDashboardStats } from "@/server/actions/worker-actions";
+import { WorkerDashboardClient } from "./components/worker-dashboard-client";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+
+export const metadata = {
+  title: "Worker Command | Eagle Gym",
+  description: "Manage tasks, cleaning schedules, and equipment maintenance.",
+};
+
+export default async function WorkerPage() {
+  const session = await auth();
+  
+  if (!session?.user || session.user.role !== "WORKER") {
+    redirect("/login");
+  }
+
+  const res = await getWorkerDashboardStats();
+
+  if (!res.success) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+        <h2 className="text-xl font-bold text-foreground">Error loading dashboard</h2>
+        <p className="text-sm text-txt-secondary mt-2">{res.error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 md:p-10">
+      <WorkerDashboardClient user={session.user} stats={res.data} />
+    </div>
+  );
+}

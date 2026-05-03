@@ -68,7 +68,9 @@ export function DietClient({ plans }: Props) {
               className="appearance-none bg-surface-elevated border border-border rounded-2xl px-6 py-3 pr-12 text-sm font-bold text-foreground outline-none focus:border-brand-orange/50 transition-all cursor-pointer"
             >
               {plans.map((p, i) => (
-                <option key={p.id} value={i}>{p.name}</option>
+                <option key={p.id} value={i}>
+                  {p.name} {p.memberId ? "⭐ (Assigned)" : ""}
+                </option>
               ))}
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-txt-tertiary pointer-events-none" />

@@ -1,6 +1,6 @@
 "use server";
 // Force IDE re-evaluation
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
@@ -19,7 +19,7 @@ export async function resetInitialPassword(newPassword: string) {
       data: {
         password: hashedPassword,
         passwordResetRequired: false,
-      } as any,
+      },
     });
 
     revalidatePath("/");

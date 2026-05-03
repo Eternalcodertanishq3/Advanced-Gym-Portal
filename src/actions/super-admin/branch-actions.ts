@@ -16,12 +16,31 @@ export async function getBranches() {
       }
     });
 
-    // Map to include activeMembers count
-    const mappedBranches = branches.map(b => ({
-      ...b,
-      activeMembers: b.users.length,
-      manager: b.managerId ? "Assigned" : "Pending"
-    }));
+    // Fetch managers for these branches
+    const branchIds = branches.map(b => b.id);
+    const managers = await prisma.user.findMany({
+      where: {
+        branchId: { in: branchIds },
+        role: "ADMIN",
+        status: "ACTIVE"
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        branchId: true
+      }
+    });
+
+    // Map to include activeMembers count and real manager name
+    const mappedBranches = branches.map(b => {
+      const manager = managers.find(m => m.branchId === b.id);
+      return {
+        ...b,
+        activeMembers: b.users.length,
+        manager: manager ? `${manager.firstName} ${manager.lastName}` : "Pending"
+      };
+    });
 
     return { success: true, branches: mappedBranches };
   } catch (error: any) {

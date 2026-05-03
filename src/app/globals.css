@@ -350,7 +350,22 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+
+  /* ── 3D Card Utilities ── */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
 }
+
 .bg-mesh-gradient {
   background-image: radial-gradient(at 0% 0%, hsla(16,79%,53%,0.08) 0, transparent 50%),
                     radial-gradient(at 50% 0%, hsla(37,89%,53%,0.05) 0, transparent 50%),

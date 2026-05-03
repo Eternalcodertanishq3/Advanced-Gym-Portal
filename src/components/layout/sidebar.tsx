@@ -199,8 +199,8 @@ const navSections: Record<Role, NavSection[]> = {
         { label: "Workout Plan", href: "/member/workout", icon: Dumbbell, requiredFeature: "gym_access" },
         { label: "Diet Plan", href: "/member/diet", icon: Utensils, requiredFeature: "diet_plan" },
         { label: "Progress", href: "/member/progress", icon: TrendingUp, requiredFeature: "gym_access" },
-        { label: "Progress Photos", href: "/member/progress/photos", icon: Camera, requiredFeature: "mobile_app" },
-        { label: "Goals", href: "/member/progress", icon: Target, requiredFeature: "gym_access" },
+        { label: "Progress Photos", href: "/member/progress?tab=photos", icon: Camera, requiredFeature: "mobile_app" },
+        { label: "Goals", href: "/member/progress?tab=goals", icon: Target, requiredFeature: "gym_access" },
       ],
     },
     {

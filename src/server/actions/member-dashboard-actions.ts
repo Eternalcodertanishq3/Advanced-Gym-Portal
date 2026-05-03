@@ -2,10 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 
-export async function getMemberDashboardStats(memberId: string) {
+export async function getMemberDashboardStats(userId: string) {
   try {
     const member = await prisma.member.findUnique({
-      where: { id: memberId },
+      where: { userId },
       include: {
         subscription: {
           include: { plan: true }
@@ -23,7 +23,7 @@ export async function getMemberDashboardStats(memberId: string) {
 
     const [upcomingBookings, weeklyLogs] = await Promise.all([
       prisma.classBooking.findMany({
-        where: { memberId, status: "CONFIRMED" },
+        where: { memberId: member.id, status: "CONFIRMED" },
         take: 3,
         include: {
           schedule: {
@@ -34,7 +34,7 @@ export async function getMemberDashboardStats(memberId: string) {
         }
       }),
       prisma.workoutLog.findMany({
-        where: { memberId, createdAt: { gte: sevenDaysAgo } },
+        where: { memberId: member.id, createdAt: { gte: sevenDaysAgo } },
         orderBy: { createdAt: 'asc' }
       })
     ]);
@@ -59,29 +59,54 @@ export async function getMemberDashboardStats(memberId: string) {
       booked: true
     }));
 
-    // Get current workout plan
-    const currentWorkout = await prisma.workoutLog.findFirst({
-      where: { memberId },
-      orderBy: { createdAt: 'desc' },
-      include: { workoutPlan: { include: { exercises: true } } }
+    // Get current workout and diet plans assigned by trainer
+    const assignedPlans = await prisma.member.findUnique({
+      where: { id: member.id },
+      include: {
+        workoutPlans: {
+          where: { isTemplate: false }, // Only actual assigned plans
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: { exercises: { orderBy: { sortOrder: 'asc' } } }
+        },
+        dietPlans: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: { meals: { orderBy: { sortOrder: 'asc' } } }
+        }
+      }
     });
 
-    const todayWorkout = currentWorkout ? {
-      name: currentWorkout.workoutPlan.name,
-      exercises: currentWorkout.workoutPlan.exercises.length,
-      estimatedTime: `${currentWorkout.workoutPlan.estimatedDuration || 45} min`,
-      completed: 0, // In a real app, this would be tracked during the session
-      total: currentWorkout.workoutPlan.exercises.length,
-      exerciseList: currentWorkout.workoutPlan.exercises.map(e => ({
+    const activeWorkout = assignedPlans?.workoutPlans?.[0];
+    const activeDiet = assignedPlans?.dietPlans?.[0];
+
+    const todayWorkout = activeWorkout ? {
+      name: activeWorkout.name,
+      exercises: activeWorkout.exercises.length,
+      estimatedTime: `${activeWorkout.estimatedDuration || 45} min`,
+      completed: 0,
+      total: activeWorkout.exercises.length,
+      exerciseList: activeWorkout.exercises.map((e: any) => ({
         name: e.name,
         sets: `${e.sets} x ${e.reps}`,
         completed: false
       }))
     } : null;
 
+    const todayDiet = activeDiet ? {
+      name: activeDiet.name,
+      totalCalories: activeDiet.totalCalories,
+      meals: activeDiet.meals.length,
+      mealList: activeDiet.meals.map((m: any) => ({
+        name: m.name,
+        time: m.time,
+        calories: m.calories
+      }))
+    } : null;
+
     // Calculate real streak (existing logic...)
     const recentAttendance = await prisma.attendance.findMany({
-      where: { memberId },
+      where: { memberId: member.id },
       orderBy: { date: 'desc' },
       take: 30
     });
@@ -120,6 +145,7 @@ export async function getMemberDashboardStats(memberId: string) {
         weeklyProgress,
         upcomingClasses,
         todayWorkout,
+        todayDiet,
         attendanceSparkline: recentAttendance.reverse().map(a => 1) // Simple count for now, or use real data if available
       }
     };

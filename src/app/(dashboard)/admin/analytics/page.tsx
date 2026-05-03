@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
           value={stats?.activeMembers || 0} 
           icon={<Users className="w-5 h-5" />}
           trend="up"
-          trendValue={8.2}
+          trendValue={stats?.memberGrowth || 0}
           description="Members with active subscriptions"
           loading={statsLoading}
         />
@@ -173,18 +173,18 @@ export default function AnalyticsPage() {
           title="Attendance Rate" 
           value={`${stats?.attendanceRate || 0}%`} 
           icon={<Calendar className="w-5 h-5" />}
-          trend="down"
-          trendValue={2.4}
+          trend={(stats?.attendanceRate ?? 0) > 10 ? "up" : "down"}
+          trendValue={stats?.attendanceRate || 0}
           description="Average daily member turnout"
           loading={statsLoading}
         />
         <StatCard 
           title="Conversion Rate" 
-          value="24.8%" 
+          value={`${stats?.conversionRate || 0}%`} 
           icon={<TrendingUp className="w-5 h-5" />}
           trend="up"
-          trendValue={15.3}
-          description="Visitor to member conversion"
+          trendValue={stats?.conversionRate || 0}
+          description="Member conversion from base"
           loading={statsLoading}
         />
       </div>
@@ -289,12 +289,12 @@ export default function AnalyticsPage() {
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div 
-                      className="w-2.5 h-2.5 rounded-full bg-[var(--bg-color)]" 
-                      style={{ '--bg-color': item.color } as React.CSSProperties} 
+                      className="w-2.5 h-2.5 rounded-full" 
+                      style={{ backgroundColor: item.color }} 
                     />
                     <span className="text-sm font-medium text-obsidian-700">{item.name}</span>
                   </div>
-                  <span className="text-sm font-bold text-obsidian-950">{item.value}%</span>
+                  <span className="text-sm font-bold text-obsidian-950">{item.percentage}%</span>
                 </div>
               ))}
             </div>

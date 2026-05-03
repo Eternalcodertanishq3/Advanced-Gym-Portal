@@ -22,14 +22,14 @@ interface DayData {
 }
 
 const intensityColors = [
-  "bg-white/5 hover:bg-white/10",    // 0 - Low
-  "bg-gold-500/20 hover:bg-gold-500/30",  // 1
-  "bg-gold-500/40 hover:bg-gold-500/50",  // 2
-  "bg-gold-500/60 hover:bg-gold-500/70",  // 3
-  "bg-gold-500/80 hover:bg-gold-500/90",  // 4 - High
+  "bg-muted/50 hover:bg-muted",          // 0 - Low
+  "bg-primary/20 hover:bg-primary/30",    // 1
+  "bg-primary/40 hover:bg-primary/50",    // 2
+  "bg-primary/60 hover:bg-primary/70",    // 3
+  "bg-primary/80 hover:bg-primary/90",    // 4 - High
 ];
 
-const intensityLabels = ["< 150", "150-200", "200-250", "250-300", "300+"];
+const intensityLabels = ["< 5", "5-10", "10-20", "20-30", "30+"];
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -46,7 +46,7 @@ export function AttendanceHeatmap() {
     async function fetchData() {
       setIsLoading(true);
       const res = await getAttendanceHeatmapData(year, month);
-      if (res.success && res.data) {
+      if (res?.success && res.data) {
         // Fill in missing days with 0 counts
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const monthData: DayData[] = [];
@@ -94,33 +94,33 @@ export function AttendanceHeatmap() {
   const emptyCells = Array(firstDayOfMonth).fill(null);
 
   return (
-    <div className="glass-card p-6">
+    <div className="surface-card p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-green/20 to-neon-green/5 flex items-center justify-center">
-            <Calendar className="w-5 h-5 text-neon-green" />
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Calendar className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Attendance Heatmap</h3>
-            <p className="text-xs text-white/30">Daily check-in patterns</p>
+            <h3 className="text-lg font-bold text-foreground">Attendance Heatmap</h3>
+            <p className="text-xs text-muted-foreground">Daily check-in patterns</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={prevMonth}
             aria-label="Previous month"
-            className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
+            className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-sm font-medium text-white min-w-[100px] text-center">
+          <span className="text-sm font-bold text-foreground min-w-[100px] text-center">
             {formatDate(currentDate, "MMMM yyyy")}
           </span>
           <button
             onClick={nextMonth}
             aria-label="Next month"
-            className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
+            className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -129,21 +129,21 @@ export function AttendanceHeatmap() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-4 gap-3 mb-6">
-        <div className="bg-white/[0.03] rounded-xl p-3">
-          <p className="text-[10px] text-white/30 uppercase tracking-wider">Total</p>
-          <p className="text-lg font-mono font-bold text-white">{totalAttendance.toLocaleString()}</p>
+        <div className="bg-muted/50 rounded-xl p-3">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+          <p className="text-lg font-bold text-foreground">{totalAttendance.toLocaleString()}</p>
         </div>
-        <div className="bg-white/[0.03] rounded-xl p-3">
-          <p className="text-[10px] text-white/30 uppercase tracking-wider">Daily Avg</p>
-          <p className="text-lg font-mono font-bold text-gold-400">{avgDaily}</p>
+        <div className="bg-muted/50 rounded-xl p-3">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Daily Avg</p>
+          <p className="text-lg font-bold text-primary">{avgDaily}</p>
         </div>
-        <div className="bg-white/[0.03] rounded-xl p-3">
-          <p className="text-[10px] text-white/30 uppercase tracking-wider">Peak Days</p>
-          <p className="text-lg font-mono font-bold text-neon-green">{peakDays}</p>
+        <div className="bg-muted/50 rounded-xl p-3">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Peak Days</p>
+          <p className="text-lg font-bold text-success">{peakDays}</p>
         </div>
-        <div className="bg-white/[0.03] rounded-xl p-3">
-          <p className="text-[10px] text-white/30 uppercase tracking-wider">Best Day</p>
-          <p className="text-lg font-mono font-bold text-electric-cyan">
+        <div className="bg-muted/50 rounded-xl p-3">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Best Day</p>
+          <p className="text-lg font-bold text-primary">
             {bestDay.count}
           </p>
         </div>
@@ -154,7 +154,7 @@ export function AttendanceHeatmap() {
         {/* Week day headers */}
         <div className="grid grid-cols-7 gap-1">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-[10px] text-white/20 py-1">
+            <div key={day} className="text-center text-[10px] text-muted-foreground py-1 font-bold">
               {day}
             </div>
           ))}
@@ -175,7 +175,7 @@ export function AttendanceHeatmap() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.02 }}
               className={cn(
-                "aspect-square rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 relative group",
+                "aspect-square rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 relative group border border-border/10",
                 intensityColors[day.intensity]
               )}
               onMouseEnter={() => setHoveredDay(day)}
@@ -183,8 +183,8 @@ export function AttendanceHeatmap() {
             >
               <span
                 className={cn(
-                  "text-xs font-medium",
-                  day.intensity >= 3 ? "text-obsidian-950" : "text-white/60"
+                  "text-xs font-bold",
+                  day.intensity >= 3 ? "text-primary-foreground" : "text-foreground/60"
                 )}
               >
                 {index + 1}
@@ -192,14 +192,14 @@ export function AttendanceHeatmap() {
 
               {/* Tooltip */}
               {hoveredDay?.date === day.date && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 glass-card p-2 rounded-lg whitespace-nowrap border border-gold-500/20">
-                  <p className="text-xs font-medium text-white">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 surface-card p-2 rounded-lg whitespace-nowrap shadow-xl border border-primary/20">
+                  <p className="text-xs font-bold text-foreground">
                     {formatDate(day.date, "dd MMM yyyy")}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Users className="w-3 h-3 text-gold-400" />
-                    <span className="text-xs text-gold-400 font-mono">{day.count}</span>
-                    <span className="text-[10px] text-white/30">check-ins</span>
+                    <Users className="w-3 h-3 text-primary" />
+                    <span className="text-xs text-primary font-bold">{day.count}</span>
+                    <span className="text-[10px] text-muted-foreground">check-ins</span>
                   </div>
                 </div>
               )}
@@ -209,20 +209,20 @@ export function AttendanceHeatmap() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
+      <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
         <div className="flex items-center gap-3">
-          <span className="text-[10px] text-white/30">Less</span>
+          <span className="text-[10px] text-muted-foreground font-bold">Less</span>
           {intensityColors.map((color, i) => (
             <div
               key={i}
-              className={cn("w-4 h-4 rounded", color.split(" ")[0])}
+              className={cn("w-4 h-4 rounded shadow-sm", color.split(" ")[0])}
               title={intensityLabels[i]}
             />
           ))}
-          <span className="text-[10px] text-white/30">More</span>
+          <span className="text-[10px] text-muted-foreground font-bold">More</span>
         </div>
-        <div className="flex items-center gap-4 text-[10px] text-white/20">
-          <span className="flex items-center gap-1">
+        <div className="flex items-center gap-4 text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1 font-bold">
             <Clock className="w-3 h-3" />
             Updated just now
           </span>

@@ -84,7 +84,7 @@ export default function EquipmentPage() {
             <Wrench className="w-4 h-4 mr-2" />
             Maintenance Logs
           </Button>
-          <Button className="bg-brand-navy hover:bg-brand-navy/90 text-white">
+          <Button className="bg-brand-orange hover:bg-brand-orange/90 text-white">
             <Plus className="w-4 h-4 mr-2" />
             Add Machine
           </Button>
@@ -99,7 +99,7 @@ export default function EquipmentPage() {
             placeholder="Search by machine name or SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-navy"
+            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-orange"
           />
         </div>
       </div>

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
-import { Building2, Plus, MapPin, MoreHorizontal } from "lucide-react";
+import { Building2, Plus, MapPin, MoreHorizontal, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { BranchModal } from "./branch-modal";
 import { cn } from "@/lib/utils";
@@ -83,13 +83,33 @@ export function BranchesClient({ branches }: Props) {
     {
       id: "actions",
       cell: ({ row }) => (
-        <button 
-          onClick={() => handleEdit(row.original)}
-          title="Branch Actions"
-          className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-colors group"
-        >
-          <MoreHorizontal className="w-4 h-4 text-obsidian-400 dark:text-white/50 group-hover:text-obsidian-950 dark:group-hover:text-white" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => handleEdit(row.original)}
+            title="Edit Branch"
+            className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-colors group"
+          >
+            <MoreHorizontal className="w-4 h-4 text-obsidian-400 dark:text-white/50 group-hover:text-obsidian-950 dark:group-hover:text-white" />
+          </button>
+          <button 
+            onClick={async () => {
+              if (confirm("Are you sure you want to delete this branch? It will be marked as CLOSED.")) {
+                const { deleteBranch } = await import("@/actions/super-admin/branch-actions");
+                const res = await deleteBranch(row.original.id);
+                if (res.success) {
+                  const { toast } = await import("sonner");
+                  toast.success("Branch closed successfully!");
+                  // We might need to refresh the page or the data
+                  window.location.reload();
+                }
+              }
+            }}
+            title="Delete Branch"
+            className="p-2 hover:bg-danger/10 rounded-lg transition-colors group"
+          >
+            <Trash2 className="w-4 h-4 text-danger/50 group-hover:text-danger" />
+          </button>
+        </div>
       ),
     },
   ];

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Search, Calendar as CalendarIcon, Clock, Users, MapPin, MoreHorizontal, Edit, Trash2 } from "lucide-react";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import { useClasses } from "@/hooks/use-classes";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Button } from "@/components/ui/button";
@@ -16,29 +16,56 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { deleteClass } from "@/server/actions/class-actions";
+
+// ═══════════════════════════════════════════════════════════════
+// 🦅 EAGLE GYM — Class Schedule Management
+// ═══════════════════════════════════════════════════════════════
 
 export default function ClassesPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(1);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const limit = 12;
 
-  const { data, isLoading } = useClasses(page, limit, debouncedSearch);
+  const { data, isLoading, refetch } = useClasses(page, limit, debouncedSearch);
   const classesList = data?.classes || [];
   const meta = data?.pagination;
 
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "YOGA": return "bg-purple-100 text-purple-800 border-purple-200";
-      case "CROSSFIT": return "bg-brand-orange/10 text-brand-orange border-brand-orange/20";
+      case "CROSSFIT": return "bg-orange-100 text-orange-800 border-orange-200";
       case "HIIT": return "bg-red-100 text-red-800 border-red-200";
       case "SPINNING": return "bg-blue-100 text-blue-800 border-blue-200";
       default: return "bg-surface-base text-obsidian-700 border-surface-sunken";
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this class? This will also remove all associated schedules.")) return;
+    
+    setIsDeleting(id);
+    try {
+      const res = await deleteClass(id);
+      if (res.success) {
+        toast.success("Class deleted successfully");
+        refetch();
+      } else {
+        toast.error(res.error || "Failed to delete class");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -54,7 +81,10 @@ export default function ClassesPage() {
             <CalendarIcon className="w-4 h-4 mr-2" />
             Calendar View
           </Button>
-          <Button className="bg-brand-navy hover:bg-brand-navy/90 text-white">
+          <Button 
+            className="bg-brand-orange hover:bg-brand-orange/90 text-white"
+            onClick={() => router.push("/admin/classes/new")}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Create Class
           </Button>
@@ -69,7 +99,7 @@ export default function ClassesPage() {
             placeholder="Search classes by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-navy"
+            className="pl-9 bg-surface-base border-surface-sunken focus-visible:ring-brand-orange"
           />
         </div>
       </div>
@@ -112,11 +142,16 @@ export default function ClassesPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-surface-card border-surface-sunken">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => router.push(`/admin/classes/${cls.id}/edit`)}>
                         <Edit className="w-4 h-4 mr-2" /> Edit Class
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700">
-                        <Trash2 className="w-4 h-4 mr-2" /> Delete Class
+                      <DropdownMenuItem 
+                        className="text-red-600 focus:bg-red-50 focus:text-red-700"
+                        disabled={isDeleting === cls.id}
+                        onClick={() => handleDelete(cls.id)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" /> 
+                        {isDeleting === cls.id ? "Deleting..." : "Delete Class"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -130,11 +165,11 @@ export default function ClassesPage() {
                 <div className="space-y-3 mb-6 flex-1">
                   <div className="flex items-center text-sm text-obsidian-700">
                     <Clock className="w-4 h-4 mr-3 text-obsidian-400" />
-                    {cls.duration} mins • {formatDate(cls.createdAt, "h:mm a")}
+                    {cls.duration} mins
                   </div>
                   <div className="flex items-center text-sm text-obsidian-700">
                     <Users className="w-4 h-4 mr-3 text-brand-orange" />
-                    {cls.trainer?.user?.name || "TBA"}
+                    {cls.trainer?.user ? `${cls.trainer.user.firstName} ${cls.trainer.user.lastName}` : "TBA"}
                   </div>
                   <div className="flex items-center text-sm text-obsidian-700">
                     <MapPin className="w-4 h-4 mr-3 text-obsidian-400" />
@@ -151,10 +186,10 @@ export default function ClassesPage() {
                   <div className="w-full bg-surface-base rounded-full h-2 overflow-hidden">
                     <div 
                       className={cn(
-                        "h-full rounded-full transition-all w-[var(--width)]",
+                        "h-full rounded-full transition-all",
                         percentFull >= 100 ? "bg-red-500" : percentFull >= 80 ? "bg-brand-orange" : "bg-green-500"
                       )}
-                      style={{ "--width": `${percentFull}%` } as React.CSSProperties}
+                      style={{ width: `${percentFull}%` }}
                     />
                   </div>
                 </div>

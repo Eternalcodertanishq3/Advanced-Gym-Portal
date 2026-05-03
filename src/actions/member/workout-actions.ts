@@ -45,7 +45,10 @@ export async function getMemberWorkouts() {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: [
+        { memberId: 'desc' }, // Nulls come last in desc order for strings usually, but let's be careful
+        { createdAt: 'desc' }
+      ]
     });
 
     // Get recent logs to show progress

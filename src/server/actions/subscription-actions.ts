@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { getBranchContext } from "@/lib/action-utils";
 
 export async function getSubscriptions(page = 1, limit = 10, search = "") {
   try {
@@ -54,6 +55,8 @@ export async function getSubscriptions(page = 1, limit = 10, search = "") {
 
 export async function createSubscription(data: { memberId: string, planId: string, startDate: Date, endDate: Date }) {
   try {
+    const { branchId } = await getBranchContext();
+    
     const plan = await prisma.plan.findUnique({
       where: { id: data.planId }
     });
@@ -64,6 +67,7 @@ export async function createSubscription(data: { memberId: string, planId: strin
       data: {
         memberId: data.memberId,
         planId: data.planId,
+        branchId,
         startDate: data.startDate,
         endDate: data.endDate,
         amount: plan.price,
@@ -72,6 +76,7 @@ export async function createSubscription(data: { memberId: string, planId: strin
     });
 
     revalidatePath("/admin/members");
+    revalidatePath("/admin");
     return { success: true, data: sub };
   } catch (error: any) {
     return { success: false, error: error.message };

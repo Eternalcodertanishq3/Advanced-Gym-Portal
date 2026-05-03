@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
-import { ShieldCheck, UserPlus, MoreHorizontal, Mail, Phone } from "lucide-react";
+import { ShieldCheck, UserPlus, MoreHorizontal, Mail, Phone, Trash2, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { StaffModal } from "./staff-modal";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ type StaffMember = {
   phone?: string;
   role: string;
   status: string;
+  branchName: string;
   lastActive: string;
 };
 
@@ -68,6 +69,16 @@ export function AdminsClient({ staff }: Props) {
       },
     },
     {
+      accessorKey: "branchName",
+      header: "Branch",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1.5">
+          <Building2 className="w-3.5 h-3.5 text-brand-orange/40" />
+          <span className="text-xs font-bold text-foreground/80">{row.getValue("branchName")}</span>
+        </div>
+      ),
+    },
+    {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
@@ -88,13 +99,32 @@ export function AdminsClient({ staff }: Props) {
     {
       id: "actions",
       cell: ({ row }) => (
-        <button 
-          onClick={() => handleEdit(row.original)}
-          title="Staff Actions"
-          className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-colors group"
-        >
-          <MoreHorizontal className="w-4 h-4 text-obsidian-400 dark:text-white/50 group-hover:text-obsidian-950 dark:group-hover:text-white" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => handleEdit(row.original)}
+            title="Edit Staff"
+            className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-colors group"
+          >
+            <MoreHorizontal className="w-4 h-4 text-obsidian-400 dark:text-white/50 group-hover:text-obsidian-950 dark:group-hover:text-white" />
+          </button>
+          <button 
+            onClick={async () => {
+              if (confirm("Are you sure you want to remove this staff member? They will be marked as INACTIVE.")) {
+                const { deleteStaff } = await import("@/actions/super-admin/staff-actions");
+                const res = await deleteStaff(row.original.id);
+                if (res.success) {
+                  const { toast } = await import("sonner");
+                  toast.success("Staff member deactivated successfully!");
+                  window.location.reload();
+                }
+              }
+            }}
+            title="Deactivate Staff"
+            className="p-2 hover:bg-danger/10 rounded-lg transition-colors group"
+          >
+            <Trash2 className="w-4 h-4 text-danger/50 group-hover:text-danger" />
+          </button>
+        </div>
       ),
     },
   ];

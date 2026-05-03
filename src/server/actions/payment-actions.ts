@@ -2,14 +2,25 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { getBranchContext } from "@/lib/action-utils";
 
 export async function getPayments(page = 1, limit = 10, status?: string) {
   try {
     const skip = (page - 1) * limit;
     
+    const { branchId } = await getBranchContext();
+    
     let whereClause: any = {};
     if (status) {
       whereClause.status = status;
+    }
+
+    if (branchId) {
+      whereClause.member = {
+        user: {
+          branchId: branchId
+        }
+      };
     }
 
     const [payments, total] = await Promise.all([
@@ -60,6 +71,44 @@ export async function createPayment(data: { memberId: string, subscriptionId?: s
 
     revalidatePath("/admin/payments");
     return { success: true, data: payment };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getPaymentStats() {
+  try {
+    const { branchId } = await getBranchContext();
+    
+    let whereClause: any = {};
+    if (branchId) {
+      whereClause.member = {
+        user: { branchId: branchId }
+      };
+    }
+
+    const [totalRevenue, pendingDues, totalTransactions] = await Promise.all([
+      prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { ...whereClause, status: "COMPLETED" }
+      }),
+      prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { ...whereClause, status: "PENDING" }
+      }),
+      prisma.payment.count({
+        where: { ...whereClause, status: "COMPLETED" }
+      })
+    ]);
+
+    return {
+      success: true,
+      data: {
+        totalRevenue: Number(totalRevenue._sum.amount || 0),
+        pendingDues: Number(pendingDues._sum.amount || 0),
+        totalTransactions
+      }
+    };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

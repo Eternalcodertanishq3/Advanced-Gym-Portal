@@ -58,6 +58,7 @@ export const authConfig = {
         token.id = user.id;
         token.firstName = user.firstName;
         token.lastName = user.lastName;
+        token.branchId = (user as any).branchId;
         token.passwordResetRequired = (user as any).passwordResetRequired;
       }
       return token;
@@ -68,6 +69,7 @@ export const authConfig = {
         session.user.id = token.id as string;
         session.user.firstName = token.firstName as string;
         session.user.lastName = token.lastName as string;
+        (session.user as any).branchId = token.branchId as string;
         (session.user as any).passwordResetRequired = token.passwordResetRequired as boolean;
       }
       return session;

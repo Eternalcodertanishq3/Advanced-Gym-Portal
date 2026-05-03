@@ -165,7 +165,7 @@ export function StatCard({
       const progress = Math.min(elapsed / duration, 1);
       // Ease out expo
       const easeOut = 1 - Math.pow(2, -10 * progress);
-      setDisplayValue(Math.floor(easeOut * target));
+      setDisplayValue(Math.round(easeOut * target));
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -184,14 +184,14 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "surface-card p-6 h-full group relative transition-all duration-300",
+        "surface-card p-5 h-full group relative overflow-hidden transition-all duration-300",
         className
       )}
     >
       <div className="relative z-10 flex flex-col h-full">
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-4">
           <div className={cn(
-            "w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105",
+            "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110",
             colors.bg,
             colors.text
           )}>
@@ -200,7 +200,7 @@ export function StatCard({
           
           {trend && (
             <div className={cn(
-              "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold",
+              "flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-tight",
               trendUp ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
             )}>
               {trendUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
@@ -209,11 +209,11 @@ export function StatCard({
           )}
         </div>
 
-        <div className="space-y-1 mb-2">
-          <h3 className="stat-number text-3xl font-display font-bold text-foreground tracking-tight flex items-baseline gap-1">
+        <div className="space-y-0.5">
+          <h3 className="stat-number text-3xl font-display font-bold text-foreground tracking-tight">
             {formattedValue}
           </h3>
-          <p className="label-text">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {label}
           </p>
         </div>

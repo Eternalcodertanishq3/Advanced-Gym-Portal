@@ -157,6 +157,7 @@ export function LandingClient({ config, plans, testimonials: dbTestimonials }: L
                     src={config.aboutImage || "/images/hero-bg.png"} 
                     alt="Philosophy" 
                     fill 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
                     className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-obsidian-950 via-transparent to-transparent opacity-60" />

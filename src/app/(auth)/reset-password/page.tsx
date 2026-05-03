@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Lock, ShieldCheck, ArrowRight, CheckCircle2, Dumbbell, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { resetInitialPassword } from "@/actions/auth/reset-actions";
@@ -36,9 +37,8 @@ export default function ResetPasswordPage() {
     try {
       const res = await resetInitialPassword(password);
       if (res.success) {
-        toast.success("Password updated! Please log in with your new password.");
-        router.push("/login");
-        router.refresh();
+        toast.success("Password updated! Please log in with your new credentials.");
+        signOut({ callbackUrl: "/login" });
       } else {
         toast.error(res.error || "Failed to reset password");
       }

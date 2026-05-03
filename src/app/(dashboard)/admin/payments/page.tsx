@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Download, Filter, Receipt, TrendingUp, CreditCard, ArrowUpRight, ArrowDownRight, Clock } from "lucide-react";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
-import { usePayments } from "@/hooks/use-payments";
+import { usePayments, usePaymentStats } from "@/hooks/use-payments";
 import { exportToCSV } from "@/lib/export-utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ export default function PaymentsPage() {
   const [page, setPage] = useState(1);
   const limit = 15;
   const { data, isLoading } = usePayments(page, limit);
+  const { data: stats, isLoading: statsLoading } = usePaymentStats();
 
   const payments = data?.payments || [];
   const meta = data?.pagination;
@@ -71,7 +72,7 @@ export default function PaymentsPage() {
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
-          <Button className="bg-brand-navy hover:bg-brand-navy/90 text-white">
+          <Button className="bg-brand-orange hover:bg-brand-orange/90 text-white" onClick={() => toast.info("New Invoice feature coming soon!")}>
             <Receipt className="w-4 h-4 mr-2" />
             New Invoice
           </Button>
@@ -86,9 +87,11 @@ export default function PaymentsPage() {
             <div className="p-2 bg-green-50 rounded-lg"><TrendingUp className="w-4 h-4 text-green-600" /></div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-obsidian-950">₹1,24,500</div>
+            {statsLoading ? <Skeleton className="h-8 w-24" /> : (
+              <div className="text-2xl font-bold text-obsidian-950">{formatCurrency(stats?.totalRevenue || 0)}</div>
+            )}
             <p className="text-xs text-green-600 flex items-center mt-1">
-              <ArrowUpRight className="w-3 h-3 mr-1" /> +12% from last month
+              <ArrowUpRight className="w-3 h-3 mr-1" /> +0% from last month
             </p>
           </CardContent>
         </Card>
@@ -98,9 +101,11 @@ export default function PaymentsPage() {
             <div className="p-2 bg-orange-50 rounded-lg"><Clock className="w-4 h-4 text-orange-600" /></div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-obsidian-950">₹12,450</div>
+            {statsLoading ? <Skeleton className="h-8 w-24" /> : (
+              <div className="text-2xl font-bold text-obsidian-950">{formatCurrency(stats?.pendingDues || 0)}</div>
+            )}
             <p className="text-xs text-orange-600 flex items-center mt-1">
-              45 members with pending dues
+              Payments awaiting completion
             </p>
           </CardContent>
         </Card>
@@ -110,8 +115,10 @@ export default function PaymentsPage() {
             <div className="p-2 bg-brand-navy/10 rounded-lg"><CreditCard className="w-4 h-4 text-brand-navy" /></div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-obsidian-950">342</div>
-            <p className="text-xs text-obsidian-500 mt-1">Successful transactions this month</p>
+            {statsLoading ? <Skeleton className="h-8 w-24" /> : (
+              <div className="text-2xl font-bold text-obsidian-950">{stats?.totalTransactions || 0}</div>
+            )}
+            <p className="text-xs text-obsidian-500 mt-1">Total successful transactions</p>
           </CardContent>
         </Card>
       </div>

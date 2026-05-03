@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function getTrainerDashboardStats(trainerId: string) {
   try {
@@ -89,5 +90,260 @@ export async function getTrainers() {
     return { success: true, data: trainers };
   } catch (error: any) {
     return { success: false, error: error.message };
+  }
+}
+
+export async function getTrainerMembers(trainerId: string) {
+  try {
+    const members = await (prisma.member as any).findMany({
+      where: { trainerId },
+      include: {
+        user: true,
+        subscription: {
+          include: {
+            plan: true
+          }
+        },
+        workoutPlans: {
+          take: 1,
+          orderBy: { createdAt: 'desc' }
+        },
+        dietPlans: {
+          take: 1,
+          orderBy: { createdAt: 'desc' }
+        }
+      },
+      orderBy: { joinDate: 'desc' }
+    });
+
+    return { success: true, data: members };
+  } catch (error: any) {
+    console.error("Error fetching trainer members:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function assignWorkoutPlan(memberId: string, planId: string) {
+  try {
+    await prisma.workoutPlan.update({
+      where: { id: planId },
+      data: { memberId }
+    });
+
+    revalidatePath("/trainer/my-members");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function assignDietPlan(memberId: string, planId: string) {
+  try {
+    await prisma.dietPlan.update({
+      where: { id: planId },
+      data: { memberId }
+    });
+
+    revalidatePath("/trainer/my-members");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getMemberProfileForTrainer(memberId: string) {
+  try {
+    const member = await (prisma.member as any).findUnique({
+      where: { id: memberId },
+      include: {
+        user: true,
+        subscription: {
+          include: {
+            plan: true
+          }
+        },
+        workoutPlans: {
+          orderBy: { createdAt: 'desc' },
+          include: { exercises: true }
+        },
+        dietPlans: {
+          orderBy: { createdAt: 'desc' },
+          include: { meals: true }
+        },
+        progress: {
+          orderBy: { createdAt: 'desc' },
+          take: 20
+        },
+        progressPhotos: {
+          orderBy: { createdAt: 'desc' },
+          take: 10
+        },
+        goals: {
+          orderBy: { deadline: 'asc' }
+        }
+      }
+    });
+
+    if (!member) return { success: false, error: "Member not found" };
+
+    return { success: true, data: member };
+  } catch (error: any) {
+    console.error("Error fetching member profile:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Schedules a new PT session for a member.
+ */
+export async function schedulePTSession(data: {
+  memberId: string;
+  trainerId: string;
+  date: Date;
+  startTime: string; // HH:MM
+  endTime: string;   // HH:MM
+  notes?: string;
+}) {
+  try {
+    const session = await prisma.pTSession.create({
+      data: {
+        memberId: data.memberId,
+        trainerId: data.trainerId,
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        notes: data.notes,
+        status: "SCHEDULED"
+      }
+    });
+
+    revalidatePath("/trainer/sessions");
+    revalidatePath("/trainer");
+    return { success: true, data: session };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getTrainerById(id: string) {
+  try {
+    const trainer = await prisma.trainer.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        _count: {
+          select: { members: true }
+        }
+      }
+    });
+
+    if (!trainer) return { success: false, error: "Trainer not found" };
+    return { success: true, data: trainer };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to fetch trainer" };
+  }
+}
+
+/**
+ * Updates the status of a PT session (e.g., mark as COMPLETED).
+ */
+export async function updateSessionStatus(sessionId: string, status: string, feedback?: string) {
+  try {
+    const session = await prisma.pTSession.update({
+      where: { id: sessionId },
+      data: { 
+        status: status as any,
+        feedback: feedback
+      }
+    });
+
+    revalidatePath("/trainer/sessions");
+    revalidatePath("/trainer");
+    return { success: true, data: session };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Creates a new trainer user and profile.
+ */
+export async function createTrainer(data: any) {
+  try {
+    const bcrypt = require("bcryptjs");
+    const hashedPassword = await bcrypt.hash("Eagle@123", 10);
+
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Create the base User
+      const user = await tx.user.create({
+        data: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          password: hashedPassword,
+          role: "TRAINER",
+          status: "ACTIVE",
+          passwordResetRequired: true,
+        },
+      });
+
+      // 2. Create the Trainer profile
+      const trainer = await tx.trainer.create({
+        data: {
+          userId: user.id,
+          specialization: Array.isArray(data.specialization) ? data.specialization : [data.specialization],
+          experience: Number(data.experience),
+          salary: data.salary,
+          isActive: true,
+        },
+      });
+
+      return trainer;
+    });
+
+    revalidatePath("/admin/trainers");
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error("Error creating trainer:", error);
+    if (error.code === 'P2002') {
+      return { success: false, error: "Email or phone number already exists." };
+    }
+    return { success: false, error: error.message || "Failed to onboard trainer" };
+  }
+}
+
+/**
+ * Updates an existing trainer's details.
+ */
+export async function updateTrainer(id: string, data: any) {
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const trainer = await tx.trainer.update({
+        where: { id },
+        data: {
+          specialization: Array.isArray(data.specialization) ? data.specialization : [data.specialization],
+          experience: Number(data.experience),
+          salary: data.salary,
+          isActive: data.isActive,
+          user: {
+            update: {
+              firstName: data.firstName,
+              lastName: data.lastName,
+              email: data.email,
+              phone: data.phone,
+            }
+          }
+        },
+        include: { user: true }
+      });
+      return trainer;
+    });
+
+    revalidatePath("/admin/trainers");
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error("Error updating trainer:", error);
+    return { success: false, error: error.message || "Failed to update trainer" };
   }
 }
