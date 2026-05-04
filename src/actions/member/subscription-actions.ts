@@ -8,7 +8,15 @@ import { redirect } from "next/navigation";
 /**
  * Subscribe a member to a plan
  */
-export async function subscribeToPlan(planId: string) {
+export async function subscribeToPlan({ 
+  planId, 
+  paymentMethod = "CASH", 
+  branchId 
+}: { 
+  planId: string, 
+  paymentMethod?: string, 
+  branchId?: string 
+}) {
   const session = await auth();
   if (!session?.user || session.user.role !== "MEMBER") {
     return { success: false, error: "Only members can subscribe to plans." };
@@ -29,46 +37,59 @@ export async function subscribeToPlan(planId: string) {
       return { success: false, error: "Member profile not found." };
     }
 
-    const branchId = member.user.branchId;
+    // Use provided branchId or existing one
+    const activeBranchId = branchId || member.user.branchId;
+
+    if (!activeBranchId) {
+      return { success: false, error: "Please select a branch first." };
+    }
+
+    // Update user's branch if not set
+    if (!member.user.branchId && branchId) {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { branchId: branchId }
+      });
+    }
 
     // Calculate dates
     const startDate = new Date();
     const endDate = new Date();
     endDate.setDate(startDate.getDate() + plan.duration);
 
-    // Create or Update Subscription
-    // (In a real app, you'd handle payment here first)
+    // Create or Update Subscription as PENDING
+    // Access is granted only when payment is COMPLETED
     await prisma.subscription.upsert({
       where: { memberId: member.id },
       update: {
         planId: plan.id,
-        branchId,
+        branchId: activeBranchId,
         startDate,
         endDate,
         amount: plan.price,
-        status: "ACTIVE",
+        status: "PENDING",
       },
       create: {
         memberId: member.id,
         planId: plan.id,
-        branchId,
+        branchId: activeBranchId,
         startDate,
         endDate,
         amount: plan.price,
-        status: "ACTIVE",
+        status: "PENDING",
       },
     });
 
-    // Create a dummy payment record
+    // Create a PENDING payment record
     await prisma.payment.create({
       data: {
         memberId: member.id,
-        branchId,
+        branchId: activeBranchId,
         amount: plan.price,
         total: plan.price,
-        method: "CASH", // Dummy
+        method: paymentMethod as any,
         type: "SUBSCRIPTION",
-        status: "COMPLETED",
+        status: "PENDING",
         receiptNo: `REC-${Date.now()}`,
         description: `Subscription to ${plan.name}`,
       },

@@ -31,9 +31,10 @@ interface MemberFormProps {
   onSubmit: (data: any) => Promise<void>;
   loading: boolean;
   mode?: "create" | "edit";
+  branches?: any[];
 }
 
-export function MemberForm({ initialData, onSubmit, loading, mode = "create" }: MemberFormProps) {
+export function MemberForm({ initialData, onSubmit, loading, mode = "create", branches = [] }: MemberFormProps) {
   const [formData, setFormData] = useState({
     firstName: initialData?.user?.firstName || "",
     lastName: initialData?.user?.lastName || "",
@@ -43,6 +44,7 @@ export function MemberForm({ initialData, onSubmit, loading, mode = "create" }: 
     dateOfBirth: initialData?.dateOfBirth ? new Date(initialData.dateOfBirth).toISOString().split('T')[0] : "",
     address: initialData?.address || "",
     emergencyContact: initialData?.emergencyContact || "",
+    branchId: initialData?.user?.branchId || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -151,6 +153,28 @@ export function MemberForm({ initialData, onSubmit, loading, mode = "create" }: 
               />
             </div>
           </div>
+
+          {branches.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="branch" className="text-sm font-bold text-foreground">Assigned Branch</Label>
+              <Select 
+                value={formData.branchId} 
+                onValueChange={(val) => setFormData({ ...formData, branchId: val })}
+                required
+              >
+                <SelectTrigger className="bg-muted/30 border-border/50 focus:border-primary/50">
+                  <SelectValue placeholder="Select Branch" />
+                </SelectTrigger>
+                <SelectContent className="bg-surface-card border-surface-sunken">
+                  {branches.map((branch) => (
+                    <SelectItem key={branch.id} value={branch.id}>
+                      {branch.name} ({branch.location})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       </motion.div>
 

@@ -18,6 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDate } from "@/lib/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { getAuditLogs } from "@/server/actions/audit-actions";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Props {
   initialData: any;
@@ -25,13 +31,31 @@ interface Props {
 
 export function AuditLogsClient({ initialData }: Props) {
   const [logs, setLogs] = useState(initialData.logs);
+  const [pagination, setPagination] = useState(initialData.pagination);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const debouncedSearch = useDebounce(search, 500);
 
-  const filteredLogs = logs.filter((log: any) => 
-    log.entityType.toLowerCase().includes(search.toLowerCase()) ||
-    log.action.toLowerCase().includes(search.toLowerCase()) ||
-    `${log.user.firstName} ${log.user.lastName}`.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    async function loadLogs() {
+      setIsLoading(true);
+      const res = await getAuditLogs(page, 20, debouncedSearch);
+      if (res.success && res.data) {
+        setLogs(res.data.logs);
+        setPagination(res.data.pagination);
+      } else {
+        toast.error("Failed to load logs");
+      }
+      setIsLoading(false);
+    }
+    loadLogs();
+  }, [page, debouncedSearch]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -70,7 +94,7 @@ export function AuditLogsClient({ initialData }: Props) {
          <StatCard
            icon={<Activity className="w-6 h-6" />}
            label="Total Actions"
-           value={initialData.pagination.total}
+           value={pagination.total}
            color="orange"
            subtitle="Across all entities"
          />
@@ -97,33 +121,52 @@ export function AuditLogsClient({ initialData }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-sunken/50">
-              {filteredLogs.length === 0 ? (
+               {isLoading ? (
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <tr key={i} className="border-b border-surface-sunken/50">
+                      <td className="px-6 py-4"><Skeleton className="h-8 w-24 rounded-xl" /></td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-10 w-10 rounded-full" />
+                          <div className="space-y-2">
+                            <Skeleton className="h-3 w-24" />
+                            <Skeleton className="h-2 w-16" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4"><Skeleton className="h-6 w-20 rounded-lg" /></td>
+                      <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
+                      <td className="px-6 py-4 text-right"><Skeleton className="h-8 w-8 rounded-xl ml-auto" /></td>
+                    </tr>
+                  ))
+               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-32 text-center">
                     <div className="flex flex-col items-center gap-2 opacity-40">
                       <History className="w-12 h-12 mb-2" />
-                      <p className="text-sm font-bold text-foreground">No logs matching your search</p>
+                      <p className="text-sm font-bold text-foreground">No logs found</p>
                       <p className="text-xs font-medium">Try different keywords or filters</p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                filteredLogs.map((log: any, idx: number) => (
+                logs.map((log: any, idx: number) => (
                   <motion.tr 
                     key={log.id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.02 }}
+                    transition={{ delay: idx * 0.01 }}
                     className="hover:bg-surface-base/50 transition-all group"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                          <div className={cn(
                            "p-2 rounded-xl shadow-sm",
-                           log.action === 'CREATE' ? "bg-success-soft text-success" :
-                           log.action === 'DELETE' ? "bg-danger-soft text-danger" :
-                           log.action === 'LOGIN' ? "bg-brand-orange-soft text-brand-orange" :
-                           "bg-info-soft text-info"
+                           log.action === 'CREATE' ? "bg-success/10 text-success" :
+                           log.action === 'DELETE' ? "bg-red-500/10 text-red-500" :
+                           log.action === 'IMPORT' ? "bg-brand-orange/10 text-brand-orange" :
+                           log.action === 'LOGIN' ? "bg-blue-500/10 text-blue-500" :
+                           "bg-obsidian-500/10 text-obsidian-500"
                          )}>
                             <Activity className="w-4 h-4" />
                          </div>
@@ -148,9 +191,16 @@ export function AuditLogsClient({ initialData }: Props) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                       <Badge variant="outline" className="bg-surface-base text-obsidian-700 border-surface-sunken text-[10px] font-bold uppercase px-3 py-1 rounded-lg">
-                          {log.entityType}
-                       </Badge>
+                       <div className="flex flex-col gap-1">
+                        <Badge variant="outline" className="w-fit bg-surface-base text-obsidian-700 border-surface-sunken text-[10px] font-bold uppercase px-3 py-1 rounded-lg">
+                            {log.entityType}
+                        </Badge>
+                        {log.action === 'IMPORT' && log.newValue && (
+                          <span className="text-[9px] font-bold text-success uppercase tracking-tighter">
+                            {log.newValue.success} Added • {log.newValue.duplicates} Skipped
+                          </span>
+                        )}
+                       </div>
                     </td>
                     <td className="px-6 py-4">
                        <div className="flex flex-col">
@@ -175,6 +225,34 @@ export function AuditLogsClient({ initialData }: Props) {
           </table>
         </div>
       </div>
+      {/* Pagination Footer */}
+      {pagination.pages > 1 && (
+        <div className="flex items-center justify-between px-2">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+            Page {pagination.page} of {pagination.pages}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-surface-card border-surface-sunken rounded-xl font-bold"
+              disabled={page === 1 || isLoading}
+              onClick={() => handlePageChange(page - 1)}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-surface-card border-surface-sunken rounded-xl font-bold"
+              disabled={page === pagination.pages || isLoading}
+              onClick={() => handlePageChange(page + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

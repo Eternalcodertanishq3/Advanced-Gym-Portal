@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -17,11 +17,22 @@ import {
   Phone,
   ArrowUpDown,
   Filter,
+  Copy,
+  Check
 } from "lucide-react";
 import { formatCurrency, formatDate, getInitials, getAvatarColor, cn } from "@/lib/utils";
 import { useMembers } from "@/hooks/use-members";
 import { toast } from "sonner";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useSession } from "next-auth/react";
+import { getBranches } from "@/actions/super-admin/branch-actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Table,
@@ -47,12 +58,27 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export default function MembersPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("ALL");
+  const [branches, setBranches] = useState<{id: string, name: string}[]>([]);
+  const limit = 30;
 
-  const { data, isLoading, isError } = useMembers(page, limit, debouncedSearch);
+  useEffect(() => {
+    if (isSuperAdmin) {
+      getBranches().then((res) => {
+        if (res.success && res.branches) {
+          setBranches(res.branches);
+        }
+      });
+    }
+  }, [isSuperAdmin]);
+
+  const { data, isLoading, isError } = useMembers(page, limit, debouncedSearch, selectedBranchId);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -103,7 +129,7 @@ export default function MembersPage() {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline" className="bg-surface-card border-surface-sunken" onClick={() => toast.info("Importing...")}>
+          <Button variant="outline" className="bg-surface-card border-surface-sunken" onClick={() => router.push("/admin/members/import")}>
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
@@ -127,6 +153,19 @@ export default function MembersPage() {
             />
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
+            {isSuperAdmin && branches.length > 0 && (
+              <Select value={selectedBranchId} onValueChange={setSelectedBranchId}>
+                <SelectTrigger className="w-[180px] bg-surface-base border-surface-sunken">
+                  <SelectValue placeholder="All Branches" />
+                </SelectTrigger>
+                <SelectContent className="bg-surface-card border-surface-sunken">
+                  <SelectItem value="ALL">All Branches</SelectItem>
+                  {branches.map(b => (
+                    <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Button variant="outline" className="bg-surface-base border-surface-sunken">
               <Filter className="w-4 h-4 mr-2" />
               Filter
@@ -148,6 +187,8 @@ export default function MembersPage() {
                   />
                 </TableHead>
                 <TableHead className="font-semibold text-obsidian-900">Member</TableHead>
+                {isSuperAdmin && <TableHead className="font-semibold text-obsidian-900">Branch</TableHead>}
+                <TableHead className="font-semibold text-obsidian-900">Phone</TableHead>
                 <TableHead className="font-semibold text-obsidian-900">Status</TableHead>
                 <TableHead className="font-semibold text-obsidian-900">Plan</TableHead>
                 <TableHead className="font-semibold text-obsidian-900">Join Date</TableHead>
@@ -168,6 +209,8 @@ export default function MembersPage() {
                         </div>
                       </div>
                     </TableCell>
+                    {isSuperAdmin && <TableCell><Skeleton className="h-4 w-24" /></TableCell>}
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-24" /></TableCell>
@@ -176,7 +219,7 @@ export default function MembersPage() {
                 ))
               ) : members.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-obsidian-500">
+                  <TableCell colSpan={isSuperAdmin ? 8 : 7} className="h-32 text-center text-obsidian-500">
                     No members found.
                   </TableCell>
                 </TableRow>
@@ -188,7 +231,7 @@ export default function MembersPage() {
                   const planName = member.subscription?.plan?.name || "No Active Plan";
                   
                   return (
-                    <TableRow key={member.id} className="hover:bg-surface-base/50 transition-colors">
+                    <TableRow key={member.id} className="hover:bg-surface-base/50 transition-colors group">
                       <TableCell className="text-center">
                         <Checkbox 
                           checked={selectedIds.has(member.id)}
@@ -197,16 +240,29 @@ export default function MembersPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold", avatarColor)}>
+                          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-sm", avatarColor)}>
                             {initials}
                           </div>
                           <div>
                             <p className="font-medium text-obsidian-950">{name}</p>
-                            <div className="flex items-center gap-3 mt-0.5 text-xs text-obsidian-500">
+                            <div className="flex items-center gap-2 mt-0.5 text-xs text-obsidian-500">
                               <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {member.user.email}</span>
-                              <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {member.user.phone || "-"}</span>
+                              <CopyButton text={member.user.email} />
                             </div>
                           </div>
+                        </div>
+                      </TableCell>
+                      {isSuperAdmin && (
+                        <TableCell>
+                          <span className="text-sm text-obsidian-700 font-medium whitespace-nowrap">
+                            {member.user.branch?.name || "-"}
+                          </span>
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-obsidian-700">{member.user.phone || "-"}</span>
+                          <CopyButton text={member.user.phone} />
                         </div>
                       </TableCell>
                       <TableCell>
@@ -285,5 +341,29 @@ export default function MembersPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function CopyButton({ text }: { text: string | null }) {
+  const [copied, setCopied] = useState(false);
+
+  if (!text) return null;
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    toast.success("Copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button 
+      onClick={handleCopy}
+      className="p-0.5 rounded-md hover:bg-surface-sunken text-obsidian-400 hover:text-brand-orange transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center"
+      title="Copy"
+    >
+      {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+    </button>
   );
 }

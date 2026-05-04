@@ -18,7 +18,9 @@ export async function getDashboardStats() {
       dailyMembers,
       prevRevenue,
       prevMembers,
-      activeBranches
+      activeBranches,
+      activeBranchesList,
+      revenueByBranch
     ] = await Promise.all([
       // Total Revenue
       prisma.payment.aggregate({
@@ -70,8 +72,35 @@ export async function getDashboardStats() {
       // Active Branches Count
       prisma.branch.count({
         where: { status: "ACTIVE" }
+      }),
+      // Branch Performance Comparison
+      prisma.branch.findMany({
+        where: { status: "ACTIVE" },
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: { users: { where: { role: "MEMBER", status: "ACTIVE" } } }
+          }
+        }
+      }),
+      // Revenue by Branch
+      prisma.payment.groupBy({
+        by: ['branchId'],
+        where: { status: "COMPLETED" },
+        _sum: { total: true }
       })
     ]);
+
+    // Map branch names to revenue and member counts
+    const branchComparison = activeBranchesList.map(b => {
+      const revenue = revenueByBranch.find(r => r.branchId === b.id)?._sum?.total || 0;
+      return {
+        name: b.name,
+        members: b._count.users,
+        revenue: Number(revenue)
+      };
+    });
 
     const totalRevenue = Number(revenueResult._sum.total || 0);
     const previousRevenueValue = Number(prevRevenue._sum.total || 0);
@@ -110,12 +139,67 @@ export async function getDashboardStats() {
         revenueTrend,
         membersTrend,
         revenueSparkline,
-        membersSparkline
+        membersSparkline,
+        branchComparison
       },
       recentLogs,
     };
   } catch (error: any) {
     console.error("Failed to fetch dashboard stats:", error);
     return { success: false, error: "Failed to load dashboard metrics" };
+  }
+}
+
+export async function getSystemHealth() {
+  try {
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+    // 1. Check Database Heartbeat
+    const dbStart = Date.now();
+    await prisma.$queryRaw`SELECT 1`;
+    const dbLatency = Date.now() - dbStart;
+
+    // 2. Check Payments Health (Any FAILED payments in last 24h)
+    const failedPayments = await prisma.payment.count({
+      where: {
+        status: "FAILED",
+        createdAt: { gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) }
+      }
+    });
+
+    // 3. Check Backup Health (Any FAILED backups recently)
+    const failedBackups = await prisma.backup.count({
+      where: {
+        status: "FAILED",
+        createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) }
+      }
+    });
+
+    return {
+      success: true,
+      data: {
+        database: {
+          status: dbLatency < 100 ? "Optimal" : "Degraded",
+          latency: dbLatency,
+          health: Math.max(0, 100 - (dbLatency / 10))
+        },
+        payments: {
+          status: failedPayments === 0 ? "Active" : "Issues Detected",
+          stuckCount: failedPayments,
+          health: Math.max(0, 100 - (failedPayments * 10))
+        },
+        system: {
+          status: failedBackups === 0 ? "Operational" : "Backup Failed",
+          errorCount: failedBackups,
+          health: Math.max(0, 100 - (failedBackups * 20))
+        }
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "System health check failed"
+    };
   }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { getDashboardStats } from "@/actions/super-admin/dashboard-actions";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { Users, DollarSign, Shield, Activity } from "lucide-react";
+import { Users, IndianRupee, Shield, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 
 export async function StatsGrid() {
@@ -22,7 +22,7 @@ export async function StatsGrid() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
-        icon={<DollarSign className="w-6 h-6" />}
+        icon={<IndianRupee className="w-6 h-6" />}
         label="Total System Revenue"
         value={currentStats.totalRevenue}
         trend={currentStats.revenueTrend}
@@ -89,4 +89,11 @@ export async function RecentLogsList() {
       ))}
     </div>
   );
+}
+
+import { GlobalComparisonCharts } from "./global-comparison-charts";
+
+export async function BranchComparisonWrapper() {
+  const { stats } = await getDashboardStats();
+  return <GlobalComparisonCharts data={stats?.branchComparison || []} />;
 }

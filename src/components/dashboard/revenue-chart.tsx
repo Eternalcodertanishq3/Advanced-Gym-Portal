@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Loader2 } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -18,6 +19,18 @@ interface RevenueChartProps {
 }
 
 export function RevenueChart({ data }: RevenueChartProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="h-[350px] w-full flex items-center justify-center">
+      <Loader2 className="w-6 h-6 animate-spin text-brand-orange/20" />
+    </div>;
+  }
+
   if (!data || data.length === 0) {
     return (
       <div className="surface-card p-6 h-full flex flex-col items-center justify-center min-h-[350px]">
@@ -33,21 +46,21 @@ export function RevenueChart({ data }: RevenueChartProps) {
   }
 
   return (
-    <div className="surface-card p-6 h-full flex flex-col">
+    <div className="h-[400px] w-full flex flex-col pt-4">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold text-foreground">Revenue Analytics</h3>
-          <p className="text-xs text-muted-foreground">Monthly growth and income trends</p>
+          <h3 className="text-lg font-bold text-foreground">Revenue Growth Analysis</h3>
+          <p className="text-xs text-muted-foreground">Monthly income trajectory across all branches</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-[10px] text-primary font-bold uppercase tracking-wider">Revenue</span>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">
+            <div className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse" />
+            <span className="text-[10px] text-brand-orange font-bold uppercase tracking-wider">Live Revenue</span>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 min-h-[300px] w-full">
+      <div className="flex-1 w-full mt-4">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
@@ -55,8 +68,8 @@ export function RevenueChart({ data }: RevenueChartProps) {
           >
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                <stop offset="5%" stopColor="#E85D26" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#E85D26" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid 
@@ -95,7 +108,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
             <Area
               type="monotone"
               dataKey="revenue"
-              stroke="hsl(var(--primary))"
+              stroke="#E85D26"
               strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorRevenue)"

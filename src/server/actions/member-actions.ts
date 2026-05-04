@@ -6,29 +6,36 @@ import { getBranchContext } from "@/lib/action-utils";
 import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
 
-export async function getMembers(page = 1, limit = 10, search = "") {
+export async function getMembers(page = 1, limit = 10, search = "", filterBranchId?: string) {
   try {
     const skip = (page - 1) * limit;
     
-    const { branchId } = await getBranchContext();
+    const { branchId: contextBranchId, role } = await getBranchContext();
     
+    // For SUPER_ADMIN, they can filter by any branch. For others, restrict to context branch.
+    const effectiveBranchId = (role === "SUPER_ADMIN" && filterBranchId && filterBranchId !== "ALL") ? filterBranchId : contextBranchId;
+
     let where: any = {};
 
-    if (branchId) {
+    if (effectiveBranchId) {
       where.user = {
-        branchId: branchId
+        branchId: effectiveBranchId
       };
     }
 
     if (search) {
+      const searchTerms = search.trim().split(/\s+/);
+      
       where.user = {
         ...where.user,
-        OR: [
-          { firstName: { contains: search, mode: 'insensitive' as const } },
-          { lastName: { contains: search, mode: 'insensitive' as const } },
-          { email: { contains: search, mode: 'insensitive' as const } },
-          { phone: { contains: search, mode: 'insensitive' as const } }
-        ]
+        AND: searchTerms.map(term => ({
+          OR: [
+            { firstName: { contains: term, mode: 'insensitive' as const } },
+            { lastName: { contains: term, mode: 'insensitive' as const } },
+            { email: { contains: term, mode: 'insensitive' as const } },
+            { phone: { contains: term, mode: 'insensitive' as const } }
+          ]
+        }))
       };
     }
 
@@ -38,7 +45,11 @@ export async function getMembers(page = 1, limit = 10, search = "") {
         skip,
         take: limit,
         include: {
-          user: true,
+          user: {
+            include: {
+              branch: true
+            }
+          },
           subscription: {
             include: {
               plan: true
@@ -106,7 +117,8 @@ export async function getMemberById(id: string) {
 
 export async function createMember(formData: any) {
   try {
-    const { branchId } = await getBranchContext();
+    const { branchId: contextBranchId } = await getBranchContext();
+    const branchId = formData.branchId || contextBranchId;
     
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({

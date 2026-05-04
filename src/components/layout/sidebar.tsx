@@ -90,6 +90,18 @@ const navSections: Record<Role, NavSection[]> = {
       ],
     },
     {
+      title: "Global Oversight",
+      items: [
+        { label: "Global Payments", href: "/super-admin/payments", icon: CreditCard },
+        { label: "Global Members", href: "/admin/members", icon: Users },
+        { label: "Global Attendance", href: "/admin/attendance", icon: Clock },
+        { label: "Global Classes", href: "/admin/classes", icon: Calendar },
+        { label: "Global Inventory", href: "/admin/inventory", icon: Package },
+        { label: "Global Equipment", href: "/admin/equipment", icon: Wrench },
+        { label: "All Staff", href: "/admin/staff", icon: Briefcase },
+      ],
+    },
+    {
       title: "Management",
       items: [
         { label: "Admins", href: "/super-admin/admins", icon: Shield },

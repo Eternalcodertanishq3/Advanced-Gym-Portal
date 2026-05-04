@@ -110,10 +110,10 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   if (!data || data.length < 2) return null;
 
   return (
-    <svg ref={svgRef} viewBox="0 0 120 40" className="w-full h-10 opacity-70">
+    <svg ref={svgRef} viewBox="0 0 120 40" className="w-full h-12 opacity-90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
       <defs>
         <linearGradient id={`sparklineGradient-${color}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -121,9 +121,10 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
         d={pathD}
         fill="none"
         stroke={color}
-        strokeWidth="2.5"
+        strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
+        className="transition-all duration-1000"
       />
       <path
         d={`${pathD} L 120,40 L 0,40 Z`}
@@ -169,6 +170,8 @@ export function StatCard({
 
       if (progress < 1) {
         requestAnimationFrame(animate);
+      } else {
+        setDisplayValue(target);
       }
     };
 

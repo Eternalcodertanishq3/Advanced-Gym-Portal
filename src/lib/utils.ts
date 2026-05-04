@@ -161,12 +161,14 @@ export function getInitials(name: string): string {
  */
 export function getAvatarColor(name: string): string {
   const colors = [
-    "bg-gold-500/20 text-gold-400",
-    "bg-electric-cyan/20 text-electric-cyan",
-    "bg-neon-green/20 text-neon-green",
-    "bg-crimson/20 text-crimson",
-    "bg-purple-500/20 text-purple-400",
-    "bg-blue-500/20 text-blue-400",
+    "bg-brand-orange/10 text-brand-orange",
+    "bg-blue-500/10 text-blue-500",
+    "bg-emerald-500/10 text-emerald-500",
+    "bg-purple-500/10 text-purple-500",
+    "bg-rose-500/10 text-rose-500",
+    "bg-amber-500/10 text-amber-500",
+    "bg-indigo-500/10 text-indigo-500",
+    "bg-cyan-500/10 text-cyan-500",
   ];
   
   let hash = 0;

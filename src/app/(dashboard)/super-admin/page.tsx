@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { DashboardClient } from "./components/dashboard-client";
-import { StatsGrid, RecentLogsList } from "./components/dashboard-data";
+import { StatsGrid, RecentLogsList, BranchComparisonWrapper } from "./components/dashboard-data";
 import { StatSkeleton, LogsSkeleton } from "./components/dashboard-skeletons";
 
 export default async function SuperAdminDashboard() {
@@ -9,6 +9,11 @@ export default async function SuperAdminDashboard() {
       statsChild={
         <Suspense fallback={<StatSkeleton />}>
           <StatsGrid />
+        </Suspense>
+      }
+      chartsChild={
+        <Suspense fallback={<LogsSkeleton />}>
+          <BranchComparisonWrapper />
         </Suspense>
       }
       logsChild={

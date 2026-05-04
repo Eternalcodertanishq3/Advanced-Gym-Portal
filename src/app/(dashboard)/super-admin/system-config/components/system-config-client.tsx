@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Save, ServerCrash, Loader2, Bell, ShieldCheck, Languages, Users, Zap, MessageSquare } from "lucide-react";
+import { Save, ServerCrash, Loader2, Bell, ShieldCheck, Languages, Users, Zap, MessageSquare, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { updateSystemConfig } from "@/actions/super-admin/config-actions";
@@ -23,6 +23,14 @@ interface Props {
 export function SystemConfigClient({ initialConfig }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("General Settings");
+  const [paymentMethodsJson, setPaymentMethodsJson] = useState(
+    initialConfig.paymentMethods || 
+    JSON.stringify([
+      { id: "UPI", label: "UPI / QR Code", icon: "Smartphone", description: "Google Pay, PhonePe, Paytm" },
+      { id: "CARD", label: "Credit / Debit Card", icon: "CreditCard", description: "Visa, Mastercard, RuPay" },
+      { id: "CASH", label: "Cash Payment", icon: "Banknote", description: "Pay at the gym reception" },
+    ])
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -79,6 +87,7 @@ export function SystemConfigClient({ initialConfig }: Props) {
         <div className="space-y-2">
           {[
             { id: "General Settings", icon: Save },
+            { id: "Payment Methods", icon: CreditCard },
             { id: "Social Links", icon: Users },
             { id: "Marketing Content", icon: Zap },
             { id: "Testimonial Fallbacks", icon: MessageSquare },
@@ -216,6 +225,87 @@ export function SystemConfigClient({ initialConfig }: Props) {
                       defaultValue={initialConfig.closingTime || ""}
                       className="surface-input [color-scheme:light]"
                     />
+                  </div>
+                </div>
+              </>
+            )}
+            {activeTab === "Payment Methods" && (
+              <>
+                <div className="flex items-center justify-between border-b border-border pb-2">
+                  <h2 className="text-lg font-display text-foreground">Payment Methods</h2>
+                  <button
+                    type="button"
+                    title="Add new payment method"
+                    onClick={() => {
+                      const methods = JSON.parse(paymentMethodsJson);
+                      const newMethod = { id: `METHOD_${Date.now()}`, label: "New Method", description: "Method description", icon: "CreditCard" };
+                      setPaymentMethodsJson(JSON.stringify([...methods, newMethod]));
+                    }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-orange/10 text-brand-orange text-xs font-bold hover:bg-brand-orange/20 transition-all"
+                  >
+                    <Zap className="w-3 h-3" />
+                    Add Method
+                  </button>
+                </div>
+                
+                <div className="space-y-4 pt-2">
+                  <p className="text-[11px] text-muted-foreground bg-primary/5 border border-primary/10 p-4 rounded-xl leading-relaxed">
+                    Configure the payment options available to members during checkout. These will appear on the plan selection page.
+                  </p>
+
+                  <input type="hidden" name="paymentMethods" value={paymentMethodsJson} />
+                  
+                  <div className="grid grid-cols-1 gap-3">
+                    {JSON.parse(paymentMethodsJson).map((method: any, idx: number) => (
+                      <div key={method.id} className="p-4 rounded-2xl bg-muted/30 border border-border flex items-start gap-4 group">
+                        <div className="w-10 h-10 rounded-xl bg-brand-orange/10 text-brand-orange flex items-center justify-center shrink-0">
+                          <CreditCard className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Label</label>
+                            <input
+                              type="text"
+                              title="Method Label"
+                              placeholder="e.g., UPI QR"
+                              value={method.label}
+                              onChange={(e) => {
+                                const methods = JSON.parse(paymentMethodsJson);
+                                methods[idx].label = e.target.value;
+                                setPaymentMethodsJson(JSON.stringify(methods));
+                              }}
+                              className="surface-input py-1 h-9 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Description</label>
+                            <input
+                              type="text"
+                              title="Method Description"
+                              placeholder="Short explanation for members"
+                              value={method.description}
+                              onChange={(e) => {
+                                const methods = JSON.parse(paymentMethodsJson);
+                                methods[idx].description = e.target.value;
+                                setPaymentMethodsJson(JSON.stringify(methods));
+                              }}
+                              className="surface-input py-1 h-9 text-sm"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          title="Remove this payment method"
+                          onClick={() => {
+                            const methods = JSON.parse(paymentMethodsJson);
+                            setPaymentMethodsJson(JSON.stringify(methods.filter((_: any, i: number) => i !== idx)));
+                          }}
+                          className="w-10 h-10 rounded-xl bg-danger/5 text-danger opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center hover:bg-danger/10"
+                        >
+                          <Zap className="w-4 h-4 rotate-45" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </>

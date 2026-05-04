@@ -1,9 +1,11 @@
 import React from "react";
 import prisma from "@/lib/prisma";
+export const dynamic = "force-dynamic";
 import { SelectPlanClient } from "./components/select-plan-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { hasActiveSubscription } from "@/lib/membership";
+import { getSystemConfig } from "@/actions/super-admin/config-actions";
 
 export const metadata = {
   title: "Choose Your Plan | Eagle Gym",
@@ -20,14 +22,37 @@ export default async function SelectPlanPage() {
     redirect("/member");
   }
 
-  const plans = await prisma.plan.findMany({
+  const configRes = await getSystemConfig();
+  const paymentMethods = (configRes.success && configRes.config?.paymentMethods)
+    ? JSON.parse(configRes.config.paymentMethods) 
+    : null;
+
+  const rawPlans = await prisma.plan.findMany({
     where: { isActive: true },
     orderBy: { price: "asc" },
   });
 
+  // Convert Decimal to numbers for serialization to client component
+  const plans = rawPlans.map(plan => ({
+    ...plan,
+    price: Number(plan.price),
+  }));
+
+  const branches = await prisma.branch.findMany({
+    where: { status: "ACTIVE" },
+    select: { id: true, name: true, location: true }
+  });
+
+  const userBranchId = (session.user as any).branchId;
+
   return (
     <div className="bg-brand-navy-dark min-h-screen">
-      <SelectPlanClient plans={plans} />
+      <SelectPlanClient 
+        plans={plans} 
+        customPaymentMethods={paymentMethods}
+        branches={branches}
+        userBranchId={userBranchId}
+      />
     </div>
   );
 }

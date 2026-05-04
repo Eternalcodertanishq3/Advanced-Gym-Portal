@@ -45,7 +45,7 @@ export default function RevenuePage() {
         <p className="text-sm text-muted-foreground">Real-time revenue monitoring, churn analysis, and fiscal forecasting.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           icon={<TrendingUp className="w-6 h-6" />}
           label="MRR (Monthly Recurring)"
@@ -62,7 +62,7 @@ export default function RevenuePage() {
           trend="+0.0%"
           trendUp={true}
           color="info"
-          sparklineData={stats?.revenueSparkline.map(v => v * 12) || []}
+          sparklineData={stats?.revenueSparkline?.map(v => v * 12) || []}
         />
         <StatCard
           icon={<TrendingUp className="w-6 h-6" />}
@@ -75,23 +75,10 @@ export default function RevenuePage() {
         />
       </div>
 
-      <div className="surface-card p-6 rounded-2xl border border-border flex flex-col relative overflow-hidden group min-h-[450px]">
+      <div className="surface-card p-6 rounded-2xl border border-border relative overflow-hidden group min-h-[500px] flex flex-col">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(232,93,38,0.03),transparent_70%)] pointer-events-none" />
         
-        <div className="flex items-center justify-between mb-8 relative z-10">
-          <div>
-            <h2 className="text-lg font-bold text-foreground font-display flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-brand-orange" />
-              Revenue Growth Analysis
-            </h2>
-            <p className="text-xs text-muted-foreground mt-1">Twelve-month fiscal trajectory and branch performance aggregations.</p>
-          </div>
-          <div className="px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange text-[10px] font-bold uppercase tracking-wider">
-            Live Database Sync
-          </div>
-        </div>
-
-        <div className="flex-1 w-full h-full relative z-10">
+        <div className="flex-1 w-full relative z-10">
           {stats?.chartData ? (
             <RevenueChart data={stats.chartData} />
           ) : (

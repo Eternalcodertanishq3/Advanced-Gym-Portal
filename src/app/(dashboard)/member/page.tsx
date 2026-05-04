@@ -13,6 +13,11 @@ export default async function MemberDashboardPage() {
   const res = await getMemberDashboardStats(session.user.id);
   const stats = res.success ? res.data : null;
 
+  // If no subscription found, redirect to plan selection
+  if (!stats || stats.subscriptionStatus !== "ACTIVE") {
+    redirect("/member/select-plan");
+  }
+
   return (
     <MemberDashboardClient 
       user={session.user as any}
