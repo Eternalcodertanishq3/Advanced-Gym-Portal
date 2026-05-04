@@ -54,6 +54,13 @@ graph TD
 - **Backups & Recovery**: managing global data integrity and failover.
 - **Permission Matrix**: governing the master role-access hierarchy.
 
+### 🎮 STRATEGIC COMMAND `(super-admin)`
+- **Executive Analytics**: Side-by-side branch comparison of revenue and membership distribution.
+- **System Integrity**: Real-time health monitoring of database clusters, payment gateways, and core services.
+- **Quick Action Hub**: Centralized jumping-off point for critical administrative tasks.
+- **Localized View**: Advanced branch-level filtering for member and payment directories.
+
+
 ---
 
 ## 📊 SYSTEM COMPOSITION

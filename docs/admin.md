@@ -45,6 +45,8 @@ graph TD
 - **Role Governance**: managing permissions and access for all staff.
 - **Efficiency Reports**: auditing trainer performance and member satisfaction.
 - **Scheduling**: coordinating floor coverage across all shifts.
+- **Member Directory**: Integrated filtering for specific gym locations (available to Super Admins).
+
 
 ### 📦 ASSET INTEGRITY `(admin/inventory)`
 - **Machine Health**: maintenance scheduling for all gym equipment.
