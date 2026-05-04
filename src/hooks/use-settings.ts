@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getGymSettings, updateGymSetting } from '@/server/actions/settings-actions';
+import { getGymSettings, updateGymSetting } from '@/actions/shared/settings-actions';
 
 export function useSettings() {
   const queryClient = useQueryClient();
@@ -26,3 +26,4 @@ export function useSettings() {
 
   return { ...query, updateSetting };
 }
+

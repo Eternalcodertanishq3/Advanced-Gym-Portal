@@ -20,7 +20,7 @@ import {
   Mail
 } from "lucide-react";
 import { cn, formatDate, getInitials, getAvatarColor } from "@/lib/utils";
-import { getMemberProfileForTrainer } from "@/server/actions/trainer-actions";
+import { getMemberProfileForTrainer } from "@/actions/admin/trainer-actions";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

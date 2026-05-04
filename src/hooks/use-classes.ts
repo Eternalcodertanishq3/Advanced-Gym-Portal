@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getClasses } from '@/server/actions/class-actions';
+import { getClasses } from '@/actions/admin/class-actions';
 
 export function useClasses(page = 1, limit = 10, search = "") {
   const queryClient = useQueryClient();
@@ -15,3 +15,4 @@ export function useClasses(page = 1, limit = 10, search = "") {
 
   return { ...query };
 }
+

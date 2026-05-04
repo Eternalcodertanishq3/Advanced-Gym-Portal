@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTrainerById, updateTrainer } from "@/server/actions/trainer-actions";
+import { getTrainerById, updateTrainer } from "@/actions/admin/trainer-actions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 

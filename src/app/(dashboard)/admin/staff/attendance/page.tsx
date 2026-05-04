@@ -1,5 +1,5 @@
 import React from "react";
-import { getStaffAttendance } from "@/server/actions/staff-actions";
+import { getStaffAttendance } from "@/actions/admin/staff-management-actions";
 import { StaffAttendanceClient } from "./components/staff-attendance-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -33,3 +33,4 @@ export default async function StaffAttendancePage() {
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import React from "react";
-import { getWorkerTasks } from "@/server/actions/worker-actions";
+import { getWorkerTasks } from "@/actions/admin/worker-actions";
 import { TasksClient } from "./components/tasks-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -33,3 +33,4 @@ export default async function TasksPage() {
     </div>
   );
 }
+

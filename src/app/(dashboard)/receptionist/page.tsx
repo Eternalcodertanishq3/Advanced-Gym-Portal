@@ -17,9 +17,9 @@ import {
   Zap,
 } from "lucide-react";
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard } from "@/app/(dashboard)/admin/components/stat-card";
 import { toast } from "sonner";
-import { getReceptionistDashboardStats } from "@/server/actions/receptionist-actions";
+import { getReceptionistDashboardStats } from "@/actions/admin/receptionist-actions";
 import { SkeletonStatGrid } from "@/components/loaders/eagle-loader";
 
 // ═══════════════════════════════════════════════════════════════

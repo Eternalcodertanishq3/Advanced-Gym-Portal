@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createProduct } from "@/server/actions/inventory-actions";
+import { createProduct } from "@/actions/admin/inventory-actions";
 import { toast } from "sonner";
 
 // ═══════════════════════════════════════════════════════════════
@@ -218,3 +218,4 @@ export default function NewProductPage() {
     </div>
   );
 }
+

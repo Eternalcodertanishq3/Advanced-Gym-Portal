@@ -13,8 +13,8 @@ import {
   Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getWorkoutTemplates } from "@/server/actions/workout-actions";
-import { assignWorkoutPlan } from "@/server/actions/trainer-actions";
+import { getWorkoutTemplates } from "@/actions/member/workout-management-actions";
+import { assignWorkoutPlan } from "@/actions/admin/trainer-actions";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -191,3 +191,4 @@ export default function AssignWorkoutPage() {
     </Suspense>
   );
 }
+

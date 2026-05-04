@@ -1,5 +1,5 @@
 import React from "react";
-import { getAuditLogs } from "@/server/actions/audit-actions";
+import { getAuditLogs } from "@/actions/super-admin/audit-log-actions";
 import { AuditLogsClient } from "./components/audit-logs-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -33,3 +33,4 @@ export default async function AuditLogsPage() {
     </div>
   );
 }
+

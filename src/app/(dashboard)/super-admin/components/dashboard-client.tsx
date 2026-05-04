@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard } from "@/app/(dashboard)/admin/components/stat-card";
 import { Activity, Users, IndianRupee, Shield, Building2, ServerCrash } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";

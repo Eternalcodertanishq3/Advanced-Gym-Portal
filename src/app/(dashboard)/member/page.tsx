@@ -1,7 +1,7 @@
 import React from "react";
 import { auth } from "@/auth";
 import { getMemberFeatures } from "@/lib/membership";
-import { getMemberDashboardStats } from "@/server/actions/member-dashboard-actions";
+import { getMemberDashboardStats } from "@/actions/member/dashboard-data-actions";
 import { MemberDashboardClient } from "./components/dashboard-client";
 import { redirect } from "next/navigation";
 

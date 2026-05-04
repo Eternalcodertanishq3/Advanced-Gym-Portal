@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MemberForm } from "@/components/members/member-form";
-import { createMember } from "@/server/actions/member-actions";
+import { MemberForm } from "@/app/(dashboard)/admin/members/components/member-form";
+import { createMember } from "@/actions/admin/member-management-actions";
 import { getBranches } from "@/actions/super-admin/branch-actions";
 import { toast } from "sonner";
 
@@ -71,3 +71,4 @@ export function AddMemberClient({ userRole }: { userRole: string }) {
     </div>
   );
 }
+

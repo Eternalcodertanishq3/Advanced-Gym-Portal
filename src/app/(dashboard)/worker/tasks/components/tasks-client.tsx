@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
-import { updateTaskStatus } from "@/server/actions/worker-actions";
+import { updateTaskStatus } from "@/actions/admin/worker-actions";
 
 interface Props {
   tasks: any[];
@@ -173,3 +173,4 @@ export function TasksClient({ tasks: initialTasks }: Props) {
     </div>
   );
 }
+

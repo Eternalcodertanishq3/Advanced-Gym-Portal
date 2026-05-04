@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllDocuments, deleteDocument } from '@/server/actions/document-actions';
+import { getAllDocuments, deleteDocument } from '@/actions/shared/document-actions';
 
 export function useDocuments() {
   const queryClient = useQueryClient();
@@ -26,3 +26,4 @@ export function useDocuments() {
 
   return { ...query, removeDocument };
 }
+

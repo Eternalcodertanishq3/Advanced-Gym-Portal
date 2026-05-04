@@ -1,5 +1,5 @@
 import React from "react";
-import { getClasses } from "@/server/actions/class-actions";
+import { getClasses } from "@/actions/admin/class-actions";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ClassesClient } from "./components/classes-client";
@@ -39,3 +39,4 @@ export default async function ClassesPage() {
     </div>
   );
 }
+

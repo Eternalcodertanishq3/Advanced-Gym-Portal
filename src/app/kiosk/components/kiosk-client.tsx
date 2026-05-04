@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { searchMemberByPhone, checkInMember } from "@/server/actions/attendance-actions";
+import { searchMemberByPhone, checkInMember } from "@/actions/admin/attendance-actions";
 
 export function KioskClient() {
   const [phone, setPhone] = useState("");
@@ -253,3 +253,4 @@ export function KioskClient() {
     </div>
   );
 }
+

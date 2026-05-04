@@ -1,4 +1,4 @@
-import { getMemberById } from "@/server/actions/member-actions";
+import { getMemberById } from "@/actions/admin/member-management-actions";
 import { notFound } from "next/navigation";
 import { formatCurrency, formatDate, getInitials, getAvatarColor, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";

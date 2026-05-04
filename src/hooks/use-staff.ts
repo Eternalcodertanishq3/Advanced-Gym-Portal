@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getStaff } from '@/server/actions/staff-actions';
+import { getStaff } from '@/actions/admin/staff-management-actions';
 
 export function useStaff(page = 1, limit = 10, search = "") {
   const queryClient = useQueryClient();
@@ -15,3 +15,4 @@ export function useStaff(page = 1, limit = 10, search = "") {
 
   return { ...query };
 }
+

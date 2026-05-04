@@ -1,5 +1,5 @@
 import React from "react";
-import { getEquipment } from "@/server/actions/equipment-actions";
+import { getEquipment } from "@/actions/admin/equipment-actions";
 import { EquipmentClient } from "./components/equipment-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -34,3 +34,4 @@ export default async function EquipmentPage() {
     </div>
   );
 }
+

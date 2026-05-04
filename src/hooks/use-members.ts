@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMembers } from '@/server/actions/member-actions';
+import { getMembers } from '@/actions/admin/member-management-actions';
 
 export function useMembers(page = 1, limit = 10, search = "", branchId?: string) {
   const queryClient = useQueryClient();
@@ -15,3 +15,4 @@ export function useMembers(page = 1, limit = 10, search = "", branchId?: string)
 
   return { ...query };
 }
+

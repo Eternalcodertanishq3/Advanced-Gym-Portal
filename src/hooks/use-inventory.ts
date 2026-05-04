@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getInventoryItems, updateInventoryQuantity } from '@/server/actions/inventory-actions';
+import { getInventoryItems, updateInventoryQuantity } from '@/actions/admin/inventory-actions';
 
 export function useInventory(page = 1, limit = 10, search = "") {
   const queryClient = useQueryClient();
@@ -26,3 +26,4 @@ export function useInventory(page = 1, limit = 10, search = "") {
 
   return { ...query, updateQuantity };
 }
+

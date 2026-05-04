@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllSentNotifications, sendBroadcast } from '@/server/actions/notification-actions';
+import { getAllSentNotifications, sendBroadcast } from '@/actions/shared/notification-actions';
 
 export function useNotifications() {
   const queryClient = useQueryClient();
@@ -26,3 +26,4 @@ export function useNotifications() {
 
   return { ...query, broadcast };
 }
+

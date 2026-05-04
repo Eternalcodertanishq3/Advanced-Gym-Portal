@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createReceptionist } from "@/server/actions/receptionist-actions";
+import { createReceptionist } from "@/actions/admin/receptionist-actions";
 import { useState } from "react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -194,3 +194,4 @@ export default function NewReceptionistPage() {
     </div>
   );
 }
+

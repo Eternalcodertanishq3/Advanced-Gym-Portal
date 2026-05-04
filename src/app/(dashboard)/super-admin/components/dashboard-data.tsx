@@ -1,6 +1,6 @@
 import React from "react";
 import { getDashboardStats } from "@/actions/super-admin/dashboard-actions";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard } from "@/app/(dashboard)/admin/components/stat-card";
 import { Users, IndianRupee, Shield, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 

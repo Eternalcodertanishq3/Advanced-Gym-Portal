@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getReceptionists } from '@/server/actions/receptionist-actions';
+import { getReceptionists } from '@/actions/admin/receptionist-actions';
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Receptionists Data Hook
@@ -19,3 +19,4 @@ export function useReceptionists(page = 1, limit = 10, search = "") {
 
   return { ...query };
 }
+

@@ -13,19 +13,19 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { QuickActions } from "@/components/dashboard/quick-actions";
-import { ActivityFeed } from "@/components/dashboard/activity-feed";
-import { RevenueChart } from "@/components/dashboard/revenue-chart";
-import { AttendanceHeatmap } from "@/components/dashboard/attendance-heatmap";
-import { UpcomingSchedule } from "@/components/dashboard/upcoming-schedule";
+import { StatCard } from "@/app/(dashboard)/admin/components/stat-card";
+import { QuickActions } from "@/app/(dashboard)/admin/components/quick-actions";
+import { ActivityFeed } from "@/app/(dashboard)/admin/components/activity-feed";
+import { RevenueChart } from "@/app/(dashboard)/admin/components/revenue-chart";
+import { AttendanceHeatmap } from "@/app/(dashboard)/admin/components/attendance-heatmap";
+import { UpcomingSchedule } from "@/app/(dashboard)/admin/components/upcoming-schedule";
 import { SkeletonStatGrid, SkeletonChart } from "@/components/loaders/eagle-loader";
 import { 
   getDashboardStats, 
   getAnalyticsChartsData, 
   getDashboardActivity, 
   getDashboardSchedules 
-} from "@/server/actions/analytics-actions";
+} from "@/actions/admin/analytics-actions";
 import { toast } from "sonner";
 
 // ═══════════════════════════════════════════════════════════════

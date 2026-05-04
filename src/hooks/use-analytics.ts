@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDashboardStats } from '@/server/actions/analytics-actions';
+import { getDashboardStats } from '@/actions/admin/analytics-actions';
 
 export function useAnalytics() {
   const query = useQuery({
@@ -13,3 +13,4 @@ export function useAnalytics() {
 
   return { ...query };
 }
+

@@ -1,5 +1,5 @@
 import React from "react";
-import { getInventoryItems } from "@/server/actions/inventory-actions";
+import { getInventoryItems } from "@/actions/admin/inventory-actions";
 import { POSClient } from "./components/pos-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -34,3 +34,4 @@ export default async function POSPage() {
     </div>
   );
 }
+

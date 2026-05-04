@@ -2,7 +2,7 @@ import React from "react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { ProfileForm } from "@/components/dashboard/profile/profile-form";
+import { ProfileForm } from "@/app/(dashboard)/admin/components/profile/profile-form";
 import { User, Shield, Bell, Settings as SettingsIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SecuritySettings } from "./components/security-settings";

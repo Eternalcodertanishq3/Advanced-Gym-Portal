@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getTrainers } from '@/server/actions/trainer-actions';
+import { getTrainers } from '@/actions/admin/trainer-actions';
 
 export function useTrainers() {
   const query = useQuery({
@@ -13,3 +13,4 @@ export function useTrainers() {
 
   return { ...query };
 }
+

@@ -15,8 +15,8 @@ import {
   Target
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { getTrainerDashboardStats } from "@/server/actions/trainer-actions";
+import { StatCard } from "@/app/(dashboard)/admin/components/stat-card";
+import { getTrainerDashboardStats } from "@/actions/admin/trainer-actions";
 import { SkeletonStatGrid } from "@/components/loaders/eagle-loader";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -285,3 +285,4 @@ function ActionItem({ title, client, due, urgent }: { title: string, client: str
     </div>
   );
 }
+

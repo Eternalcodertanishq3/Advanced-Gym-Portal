@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getStaffById, updateStaff } from "@/server/actions/staff-actions";
+import { getStaffById, updateStaff } from "@/actions/admin/staff-management-actions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 

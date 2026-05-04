@@ -13,8 +13,8 @@ import {
   Flame
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getDietTemplates } from "@/server/actions/diet-actions";
-import { assignDietPlan } from "@/server/actions/trainer-actions";
+import { getDietTemplates } from "@/actions/admin/diet-actions";
+import { assignDietPlan } from "@/actions/admin/trainer-actions";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -191,3 +191,4 @@ export default function AssignDietPage() {
     </Suspense>
   );
 }
+

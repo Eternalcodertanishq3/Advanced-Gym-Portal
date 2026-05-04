@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getProductById, updateProduct } from "@/server/actions/inventory-actions";
+import { getProductById, updateProduct } from "@/actions/admin/inventory-actions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 

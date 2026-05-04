@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MemberForm } from "@/components/members/member-form";
-import { getMemberById, updateMember } from "@/server/actions/member-actions";
+import { MemberForm } from "@/app/(dashboard)/admin/members/components/member-form";
+import { getMemberById, updateMember } from "@/actions/admin/member-management-actions";
 import { toast } from "sonner";
 
 // ═══════════════════════════════════════════════════════════════

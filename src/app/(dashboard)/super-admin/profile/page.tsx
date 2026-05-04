@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { ProfileForm } from "@/components/dashboard/profile/profile-form";
+import { ProfileForm } from "@/app/(dashboard)/admin/components/profile/profile-form";
 import { 
   Shield, 
   Activity, 

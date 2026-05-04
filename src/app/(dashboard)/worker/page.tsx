@@ -1,5 +1,5 @@
 import React from "react";
-import { getWorkerDashboardStats } from "@/server/actions/worker-actions";
+import { getWorkerDashboardStats } from "@/actions/admin/worker-actions";
 import { WorkerDashboardClient } from "./components/worker-dashboard-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -33,3 +33,4 @@ export default async function WorkerPage() {
     </div>
   );
 }
+

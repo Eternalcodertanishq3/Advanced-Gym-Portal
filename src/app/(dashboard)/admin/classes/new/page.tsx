@@ -27,8 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createClass } from "@/server/actions/class-actions";
-import { getTrainers } from "@/server/actions/trainer-actions";
+import { createClass } from "@/actions/admin/class-actions";
+import { getTrainers } from "@/actions/admin/trainer-actions";
 import { toast } from "sonner";
 
 // ═══════════════════════════════════════════════════════════════
@@ -240,3 +240,4 @@ export default function NewClassPage() {
     </div>
   );
 }
+

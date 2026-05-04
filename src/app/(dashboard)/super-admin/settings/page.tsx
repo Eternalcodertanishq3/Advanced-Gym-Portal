@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { PasswordForm } from "@/components/dashboard/settings/password-form";
+import { PasswordForm } from "@/app/(dashboard)/admin/components/settings/password-form";
 import { 
   Settings, 
   ShieldCheck, 

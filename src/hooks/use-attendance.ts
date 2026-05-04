@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAttendanceLogs } from '@/server/actions/attendance-actions';
+import { getAttendanceLogs } from '@/actions/admin/attendance-actions';
 
 export function useAttendance(page = 1, limit = 10, search = "") {
   const queryClient = useQueryClient();
@@ -15,3 +15,4 @@ export function useAttendance(page = 1, limit = 10, search = "") {
 
   return { ...query };
 }
+

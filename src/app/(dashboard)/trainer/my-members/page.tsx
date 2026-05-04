@@ -18,7 +18,7 @@ import {
   UserPlus
 } from "lucide-react";
 import { cn, formatDate, getInitials, getAvatarColor } from "@/lib/utils";
-import { getTrainerMembers } from "@/server/actions/trainer-actions";
+import { getTrainerMembers } from "@/actions/admin/trainer-actions";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -234,3 +234,4 @@ function MemberCard({ member }: { member: any }) {
     </motion.div>
   );
 }
+

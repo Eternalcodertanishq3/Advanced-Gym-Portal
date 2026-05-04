@@ -17,8 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDate } from "@/lib/utils";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { getAuditLogs } from "@/server/actions/audit-actions";
+import { StatCard } from "@/app/(dashboard)/admin/components/stat-card";
+import { getAuditLogs } from "@/actions/super-admin/audit-log-actions";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -256,3 +256,4 @@ export function AuditLogsClient({ initialData }: Props) {
     </div>
   );
 }
+

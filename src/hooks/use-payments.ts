@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getPayments, getPaymentStats } from '@/server/actions/payment-actions';
+import { getPayments, getPaymentStats } from '@/actions/admin/payment-actions';
 
 export function usePayments(page = 1, limit = 10, status?: string) {
   const query = useQuery({
@@ -26,3 +26,4 @@ export function usePaymentStats() {
 
   return { ...query };
 }
+

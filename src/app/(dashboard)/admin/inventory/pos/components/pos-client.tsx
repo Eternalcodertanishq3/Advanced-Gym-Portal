@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { processSale } from "@/server/actions/inventory-actions";
+import { processSale } from "@/actions/admin/inventory-actions";
 
 interface Props {
   products: any[];
@@ -299,3 +299,4 @@ export function POSClient({ products }: Props) {
     </div>
   );
 }
+

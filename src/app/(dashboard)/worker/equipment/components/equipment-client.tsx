@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
-import { reportMaintenanceIssue } from "@/server/actions/worker-actions";
+import { reportMaintenanceIssue } from "@/actions/admin/worker-actions";
 
 interface Props {
   equipment: any[];
@@ -153,3 +153,4 @@ export function EquipmentClient({ equipment: initialEquipment }: Props) {
     </div>
   );
 }
+

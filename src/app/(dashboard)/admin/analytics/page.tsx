@@ -37,7 +37,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { getAnalyticsChartsData } from "@/server/actions/analytics-actions";
+import { getAnalyticsChartsData } from "@/actions/admin/analytics-actions";
 
 const tooltipContentStyle = { 
   backgroundColor: '#FFFFFF', 
@@ -358,3 +358,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+

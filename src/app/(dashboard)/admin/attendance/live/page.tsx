@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn, formatNumber } from "@/lib/utils";
-import { LiveOccupancy } from "@/components/dashboard/live-occupancy";
-import { getLiveAttendanceData } from "@/server/actions/live-attendance-actions";
+import { LiveOccupancy } from "@/app/(dashboard)/admin/components/live-occupancy";
+import { getLiveAttendanceData } from "@/actions/admin/live-attendance-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -288,3 +288,4 @@ export default function AdminLiveAttendancePage() {
     </motion.div>
   );
 }
+

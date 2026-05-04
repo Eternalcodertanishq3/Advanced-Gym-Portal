@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createStaff } from "@/server/actions/staff-actions";
+import { createStaff } from "@/actions/admin/staff-management-actions";
 import { useState } from "react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -242,3 +242,4 @@ export default function NewStaffPage() {
     </div>
   );
 }
+

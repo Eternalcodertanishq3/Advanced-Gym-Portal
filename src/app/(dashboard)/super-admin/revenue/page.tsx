@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { DollarSign, TrendingUp, Loader2 } from "lucide-react";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { getSuperAdminRevenueStats } from "@/server/actions/analytics-actions";
-import { RevenueChart } from "@/components/dashboard/revenue-chart";
+import { StatCard } from "@/app/(dashboard)/admin/components/stat-card";
+import { getSuperAdminRevenueStats } from "@/actions/admin/analytics-actions";
+import { RevenueChart } from "@/app/(dashboard)/admin/components/revenue-chart";
 
 export default function RevenuePage() {
   const [loading, setLoading] = useState(true);
@@ -91,3 +91,4 @@ export default function RevenuePage() {
     </div>
   );
 }
+

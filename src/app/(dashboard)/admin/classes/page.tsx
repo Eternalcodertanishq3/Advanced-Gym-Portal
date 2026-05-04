@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { deleteClass } from "@/server/actions/class-actions";
+import { deleteClass } from "@/actions/admin/class-actions";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Class Schedule Management
@@ -230,3 +230,4 @@ export default function ClassesPage() {
     </div>
   );
 }
+

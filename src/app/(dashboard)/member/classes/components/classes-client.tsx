@@ -14,7 +14,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { createPortal } from "react-dom";
-import { bookClass } from "@/server/actions/class-actions";
+import { bookClass } from "@/actions/admin/class-actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -229,3 +229,4 @@ export function ClassesClient({ classes }: Props) {
     </div>
   );
 }
+

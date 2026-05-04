@@ -1,5 +1,5 @@
 import React from "react";
-import { getMaintenanceLogs } from "@/server/actions/worker-actions";
+import { getMaintenanceLogs } from "@/actions/admin/worker-actions";
 import { MaintenanceLogsClient } from "./components/maintenance-logs-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -33,3 +33,4 @@ export default async function MaintenancePage() {
     </div>
   );
 }
+

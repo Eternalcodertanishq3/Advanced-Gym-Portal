@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getEquipment, markEquipmentUnderMaintenance } from '@/server/actions/equipment-actions';
+import { getEquipment, markEquipmentUnderMaintenance } from '@/actions/admin/equipment-actions';
 
 export function useEquipment(page = 1, limit = 10, search = "") {
   const queryClient = useQueryClient();
@@ -26,3 +26,4 @@ export function useEquipment(page = 1, limit = 10, search = "") {
 
   return { ...query, setMaintenance };
 }
+

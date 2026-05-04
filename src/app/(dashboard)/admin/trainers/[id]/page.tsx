@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getTrainerById } from "@/server/actions/trainer-actions";
+import { getTrainerById } from "@/actions/admin/trainer-actions";
 import { formatCurrency, formatDate, getInitials, getAvatarColor, cn } from "@/lib/utils";
 import { toast } from "sonner";
 

@@ -20,7 +20,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { createTrainer } from "@/server/actions/trainer-actions";
+import { createTrainer } from "@/actions/admin/trainer-actions";
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -194,3 +194,4 @@ export default function AddTrainerPage() {
     </div>
   );
 }
+
