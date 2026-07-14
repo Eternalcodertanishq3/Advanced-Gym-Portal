@@ -3,8 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getBranchContext } from "@/lib/action-utils";
+import { auth } from "@/auth";
 
 export async function getSubscriptions(page = 1, limit = 10, search = "") {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const skip = (page - 1) * limit;
     

@@ -11,6 +11,8 @@ import type { Role } from "@/lib/constants";
 
 import { getMemberFeatures } from "@/lib/membership";
 
+import { getTenantDetails } from "@/lib/tenant";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -23,6 +25,7 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const tenant = getTenantDetails();
   const allowedFeatures = await getMemberFeatures();
   const userRole = session.user.role as Role;
 
@@ -37,11 +40,15 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 relative overflow-hidden">
+      {/* Ambient background mesh gradient to support liquid glass refraction */}
+      <div className="absolute inset-0 bg-mesh-gradient opacity-60 dark:opacity-30 pointer-events-none" />
+
       {/* Sidebar */}
       <Sidebar 
         user={session.user as any} 
         allowedFeatures={allowedFeatures} 
+        tenantName={tenant.name}
       />
 
       {/* Topbar — Fixed at the top, outside main flow */}

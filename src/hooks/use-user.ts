@@ -2,8 +2,6 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./use-auth";
-// These actions should be created if they don't exist
-// import { getProfile, updateProfile } from "@/server/actions/user-actions";
 
 export function useUser() {
   const { user: authUser } = useAuth();

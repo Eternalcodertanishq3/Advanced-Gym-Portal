@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { SECURITY } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 
@@ -22,7 +23,7 @@ export async function updatePassword(data: { current: string, new: string }) {
     const isValid = await bcrypt.compare(data.current, user.password);
     if (!isValid) return { success: false, error: "Incorrect current password" };
 
-    const hashedPassword = await bcrypt.hash(data.new, 10);
+    const hashedPassword = await bcrypt.hash(data.new, SECURITY.BCRYPT_ROUNDS);
     await prisma.user.update({
       where: { id: session.user.id },
       data: { password: hashedPassword }

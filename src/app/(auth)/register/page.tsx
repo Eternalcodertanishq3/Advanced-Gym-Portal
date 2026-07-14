@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { registerUser } from "@/actions/auth/register-actions";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Dashboard Consistent Registration Page
@@ -62,13 +63,22 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const res = await registerUser({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
       
-      toast.success("Account created successfully! Please log in.");
-      router.push("/login");
-    } catch {
-      toast.error("Registration failed. Please try again.");
+      if (res.success) {
+        toast.success("Account created successfully! Please log in.");
+        router.push("/login");
+      } else {
+        toast.error(res.error || "Registration failed. Please try again.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }

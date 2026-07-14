@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { SECURITY } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -77,7 +78,7 @@ export async function changePassword(formData: FormData) {
     const passwordMatch = await bcrypt.compare(currentPassword, user.password);
     if (!passwordMatch) return { error: "Incorrect current password" };
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(newPassword, SECURITY.BCRYPT_ROUNDS);
 
     await prisma.user.update({
       where: { id: session.user.id },

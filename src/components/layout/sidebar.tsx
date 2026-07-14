@@ -156,6 +156,30 @@ const navSections: Record<Role, NavSection[]> = {
     },
   ],
 
+  MANAGER: [
+    {
+      title: "Overview",
+      items: [
+        { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+        { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+      ],
+    },
+    {
+      title: "People",
+      items: [
+        { label: "Members", href: "/admin/members", icon: Users },
+      ],
+    },
+    {
+      title: "Operations",
+      items: [
+        { label: "Payments", href: "/admin/payments", icon: CreditCard },
+        { label: "Attendance", href: "/admin/attendance", icon: Clock },
+        { label: "Classes", href: "/admin/classes", icon: Calendar },
+      ],
+    },
+  ],
+
   RECEPTIONIST: [
     {
       title: "Quick Actions",
@@ -280,9 +304,10 @@ interface SidebarProps {
     avatar?: string | null;
   };
   allowedFeatures?: string[];
+  tenantName?: string;
 }
 
-export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
+export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS" }: SidebarProps) {
   const { collapsed, mobileOpen, toggleCollapsed, toggleMobile, setMobileOpen } = useSidebarStore();
   const { logout } = useAuthStore();
   const pathname = usePathname();
@@ -340,7 +365,7 @@ export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
           "fixed left-0 top-0 z-[115] h-screen flex flex-col",
-          "bg-brand-navy border-r border-brand-navy-light/10 shadow-lg",
+          "bg-brand-navy/80 backdrop-blur-2xl border-r border-white/10 shadow-[4px_0_24px_rgba(0,0,0,0.2)]",
           "lg:translate-x-0 lg:opacity-100",
           !mobileOpen && "translate-x-[-100%] lg:translate-x-0"
         )}
@@ -348,7 +373,9 @@ export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
         {/* Logo Area */}
         <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10 group">
           <div className="w-10 h-10 rounded-xl bg-brand-orange flex items-center justify-center shrink-0 shadow-lg shadow-brand-orange/20 transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-3">
-            <span className="text-white font-display font-bold text-xl tracking-tight">E</span>
+            <span className="text-white font-display font-bold text-xl tracking-tight">
+              {tenantName.charAt(0).toUpperCase()}
+            </span>
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -359,7 +386,7 @@ export function Sidebar({ user, allowedFeatures = [] }: SidebarProps) {
                 className="overflow-hidden"
               >
                 <h1 className="text-lg font-display font-bold text-white tracking-tight leading-none">
-                  Eagle Gym
+                  {tenantName}
                 </h1>
                 <p className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
                   {getRoleLabel(role)}

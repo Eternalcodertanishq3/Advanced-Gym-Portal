@@ -287,7 +287,7 @@ export default function BackupsPage() {
               CRITICAL: Restoring a backup will force-reboot the instance and overwrite all live data with the selected snapshot.
             </p>
             <button 
-              onClick={handleRestore}
+              onClick={() => handleRestore()}
               disabled={isRestoring || isBackingUp}
               className={cn(
                 "w-full py-3 rounded-xl text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2",

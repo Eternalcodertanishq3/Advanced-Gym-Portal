@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 
 export function HeroSection({ 
-  gymName = "EAGLE GYM",
+  gymName = "GymFlow SaaS",
   heroSubtitle = "Rise Above. Transform Beyond.",
   heroTitle = "UNLEASH YOUR ELITE SELF.",
   heroDescription = "Experience the pinnacle of fitness in our premium, state-of-the-art facility. Built for those who refuse to settle for ordinary.",

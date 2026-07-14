@@ -24,7 +24,7 @@ const sizeMap = {
 
 export function EagleLoader({
   size = "md",
-  text = "EAGLE GYM",
+  text = "GymFlow SaaS",
   subText,
   className,
   fullScreen = false,
@@ -170,7 +170,7 @@ export function EagleLoader({
 // ═══════════════════════════════════════════════════════════════
 
 export function PageLoader() {
-  return <EagleLoader size="lg" fullScreen text="EAGLE GYM" subText="Loading your dashboard..." />;
+  return <EagleLoader size="lg" fullScreen text="GymFlow SaaS" subText="Loading your dashboard..." />;
 }
 
 // ═══════════════════════════════════════════════════════════════

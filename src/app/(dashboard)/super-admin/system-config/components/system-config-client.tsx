@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, ServerCrash, Loader2, Bell, ShieldCheck, Languages, Users, Zap, MessageSquare, CreditCard } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +31,12 @@ export function SystemConfigClient({ initialConfig }: Props) {
       { id: "CASH", label: "Cash Payment", icon: "Banknote", description: "Pay at the gym reception" },
     ])
   );
+
+  useEffect(() => {
+    if (initialConfig.currency) {
+      localStorage.setItem("gymflow-currency", initialConfig.currency);
+    }
+  }, [initialConfig.currency]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,6 +70,9 @@ export function SystemConfigClient({ initialConfig }: Props) {
     const res = await updateSystemConfig(data);
     
     if (res.success) {
+      if (data.currency) {
+        localStorage.setItem("gymflow-currency", data.currency);
+      }
       toast.success("System configurations saved!");
     } else {
       toast.error(res.error || "Failed to save settings");

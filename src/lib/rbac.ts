@@ -153,6 +153,7 @@ export function getRoleDashboard(role: Role): string {
   const dashboardMap: Record<Role, string> = {
     SUPER_ADMIN: "/super-admin",
     ADMIN: "/admin",
+    MANAGER: "/admin",
     RECEPTIONIST: "/receptionist",
     TRAINER: "/trainer",
     MEMBER: "/member",
@@ -168,6 +169,7 @@ export function getRoleLabel(role: Role): string {
   const labels: Record<Role, string> = {
     SUPER_ADMIN: "Super Admin",
     ADMIN: "Admin",
+    MANAGER: "Manager",
     RECEPTIONIST: "Receptionist",
     TRAINER: "Trainer",
     MEMBER: "Member",
@@ -183,6 +185,7 @@ export function getRoleBadgeClass(role: Role): string {
   const classes: Record<Role, string> = {
     SUPER_ADMIN: "bg-purple-500/20 text-purple-400 border-purple-500/30",
     ADMIN: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    MANAGER: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
     RECEPTIONIST: "bg-electric-cyan/20 text-electric-cyan border-electric-cyan/30",
     TRAINER: "bg-neon-green/20 text-neon-green border-neon-green/30",
     MEMBER: "bg-gold-500/20 text-gold-400 border-gold-500/30",

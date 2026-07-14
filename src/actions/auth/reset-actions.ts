@@ -1,6 +1,7 @@
 "use server";
 // Force IDE re-evaluation
 import { prisma } from "@/lib/prisma";
+import { SECURITY } from "@/lib/constants";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
@@ -12,7 +13,7 @@ export async function resetInitialPassword(newPassword: string) {
       return { success: false, error: "Not authenticated" };
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(newPassword, SECURITY.BCRYPT_ROUNDS);
 
     await prisma.user.update({
       where: { id: session.user.id },

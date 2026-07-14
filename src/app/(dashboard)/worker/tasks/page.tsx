@@ -29,7 +29,7 @@ export default async function TasksPage() {
 
   return (
     <div className="w-full h-full">
-      <TasksClient tasks={res.data} />
+      <TasksClient tasks={res.data ?? []} />
     </div>
   );
 }

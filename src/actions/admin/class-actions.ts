@@ -2,8 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export async function getClasses(page = 1, limit = 10, search = "") {
+  const session = await auth();
+  if (!session?.user) return { success: false, error: "Unauthorized" };
   try {
     const skip = (page - 1) * limit;
     
@@ -49,6 +52,10 @@ export async function getClasses(page = 1, limit = 10, search = "") {
 }
 
 export async function createClass(data: { name: string, description?: string, trainerId: string, category: any, capacity: number, duration: number }) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const gymClass = await prisma.gymClass.create({
       data: {
@@ -69,6 +76,8 @@ export async function createClass(data: { name: string, description?: string, tr
 }
 
 export async function getClassById(id: string) {
+  const session = await auth();
+  if (!session?.user) return { success: false, error: "Unauthorized" };
   try {
     const cls = await prisma.gymClass.findUnique({
       where: { id },
@@ -85,6 +94,10 @@ export async function getClassById(id: string) {
 }
 
 export async function updateClass(id: string, data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const cls = await prisma.gymClass.update({
       where: { id },
@@ -107,6 +120,10 @@ export async function updateClass(id: string, data: any) {
 }
 
 export async function deleteClass(id: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     await prisma.gymClass.delete({
       where: { id }

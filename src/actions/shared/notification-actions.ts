@@ -1,9 +1,15 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function getNotifications(userId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.id !== userId && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const notifications = await prisma.notification.findMany({
       where: { userId },
@@ -17,6 +23,10 @@ export async function getNotifications(userId: string) {
 }
 
 export async function getAllSentNotifications() {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const notifications = await prisma.notification.findMany({
       orderBy: { createdAt: 'desc' },
@@ -30,6 +40,10 @@ export async function getAllSentNotifications() {
 }
 
 export async function sendBroadcast(title: string, message: string, type: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const users = await prisma.user.findMany({ select: { id: true } });
     
@@ -52,6 +66,10 @@ export async function sendBroadcast(title: string, message: string, type: string
 
 
 export async function markAsRead(notificationId: string) {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     await prisma.notification.update({
       where: { id: notificationId },

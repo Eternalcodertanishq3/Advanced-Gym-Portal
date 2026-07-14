@@ -37,8 +37,8 @@ export default function ReceptionistsPage() {
   const limit = 10;
 
   const { data, isLoading } = useReceptionists(page, limit, debouncedSearch);
-  const receptionists = data?.data || [];
-  const meta = data?.meta;
+  const receptionists = (data as any)?.data || data || [];
+  const meta = (data as any)?.meta;
 
   return (
     <div className="space-y-6">

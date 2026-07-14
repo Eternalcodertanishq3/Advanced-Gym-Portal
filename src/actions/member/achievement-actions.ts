@@ -46,6 +46,10 @@ export async function getMemberAchievements() {
  * Awards XP to a member and records the transaction.
  */
 export async function awardXP(userId: string, amount: number, reason: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN" && session.user.id !== userId)) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const [xpTransaction, updatedUser] = await prisma.$transaction([
       prisma.xPTransaction.create({
@@ -68,6 +72,8 @@ export async function awardXP(userId: string, amount: number, reason: string) {
  * Fetches the global leaderboard for the gym.
  */
 export async function getLeaderboard(limit = 10) {
+  const session = await auth();
+  if (!session?.user) return { success: false, error: "Unauthorized" };
   try {
     const topMembers = await prisma.user.findMany({
       where: { role: "MEMBER" },

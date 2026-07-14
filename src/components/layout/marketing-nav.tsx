@@ -14,7 +14,7 @@ const navLinks = [
 ];
 
 export function MarketingNav({ 
-  gymName = "EAGLE GYM",
+  gymName = "GymFlow SaaS",
   gymLogo = "/logo-white.png"
 }: { 
   gymName?: string;

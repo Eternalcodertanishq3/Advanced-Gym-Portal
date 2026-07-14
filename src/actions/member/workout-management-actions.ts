@@ -1,9 +1,15 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function getWorkoutPlans(page = 1, limit = 10, search = "") {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const skip = (page - 1) * limit;
     
@@ -43,6 +49,10 @@ export async function getWorkoutPlans(page = 1, limit = 10, search = "") {
 }
 
 export async function createWorkoutPlan(data: { name: string, description?: string, trainerId: string, memberId?: string }) {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const plan = await prisma.workoutPlan.create({
       data: {
@@ -61,6 +71,10 @@ export async function createWorkoutPlan(data: { name: string, description?: stri
 }
 
 export async function getWorkoutTemplates() {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const templates = await prisma.workoutPlan.findMany({
       where: { isTemplate: true },

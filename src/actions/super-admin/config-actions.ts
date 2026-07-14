@@ -1,10 +1,15 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import prisma, { resolveTenantId } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
+import { auth } from "@/auth";
 
 export async function getSystemConfig() {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized: Authentication required.");
+  }
   try {
     const settings = await prisma.gymSetting.findMany();
     
@@ -33,11 +38,12 @@ export async function updateSystemConfig(data: Record<string, any>) {
     const oldValue: Record<string, any> = {};
     oldSettings.forEach(s => oldValue[s.key] = s.value);
 
+    const tenantId = resolveTenantId() || null;
     const operations = Object.entries(data).map(([key, value]) => 
       prisma.gymSetting.upsert({
-        where: { key },
+        where: { key_tenantId: { key, tenantId: tenantId || "" } },
         update: { value, updatedBy },
-        create: { key, value, updatedBy }
+        create: { key, value, tenantId, updatedBy }
       })
     );
 

@@ -1,8 +1,11 @@
 "use server";
 
+import { ensureSuperAdmin } from "@/lib/action-utils";
+
 import prisma from "@/lib/prisma";
 
 export async function getAuditLogs() {
+  await ensureSuperAdmin();
   try {
     const logs = await prisma.auditLog.findMany({
       orderBy: { createdAt: "desc" },

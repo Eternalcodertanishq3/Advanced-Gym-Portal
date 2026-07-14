@@ -25,6 +25,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { SECURITY } from "@/lib/constants";
 
 interface MemberFormProps {
   initialData?: any;
@@ -259,7 +260,7 @@ export function MemberForm({ initialData, onSubmit, loading, mode = "create", br
             <h4 className="font-bold text-primary mb-1">What happens next?</h4>
             <p className="text-sm text-primary/80 leading-relaxed">
               After creation, the member will receive a welcome email with their login credentials. 
-              A default password **Eagle@123** will be assigned, which they can change on first login.
+              A secure randomly generated temporary password will be assigned, which they can change on first login.
             </p>
           </div>
         </div>

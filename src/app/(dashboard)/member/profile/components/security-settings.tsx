@@ -17,10 +17,12 @@ export function SecuritySettings() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.new !== formData.confirm) {
-      return toast.error("New passwords do not match");
+      toast.error("New passwords do not match");
+      return;
     }
     if (formData.new.length < 8) {
-      return toast.error("Password must be at least 8 characters");
+      toast.error("Password must be at least 8 characters");
+      return;
     }
 
     setLoading(true);

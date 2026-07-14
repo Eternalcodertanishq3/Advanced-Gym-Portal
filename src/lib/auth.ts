@@ -26,6 +26,7 @@ export function getRedirectPath(role: Role): string {
   const paths: Record<Role, string> = {
     SUPER_ADMIN: "/super-admin",
     ADMIN: "/admin",
+    MANAGER: "/admin",
     RECEPTIONIST: "/receptionist",
     TRAINER: "/trainer",
     MEMBER: "/member",

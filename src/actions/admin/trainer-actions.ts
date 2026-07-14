@@ -1,9 +1,16 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { SECURITY } from "@/lib/constants";
 
 export async function getTrainerDashboardStats(trainerId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -80,6 +87,10 @@ export async function getTrainerDashboardStats(trainerId: string) {
 }
 
 export async function getTrainers() {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const trainers = await prisma.trainer.findMany({
       include: {
@@ -94,6 +105,10 @@ export async function getTrainers() {
 }
 
 export async function getTrainerMembers(trainerId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const members = await (prisma.member as any).findMany({
       where: { trainerId },
@@ -124,6 +139,10 @@ export async function getTrainerMembers(trainerId: string) {
 }
 
 export async function assignWorkoutPlan(memberId: string, planId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     await prisma.workoutPlan.update({
       where: { id: planId },
@@ -138,6 +157,10 @@ export async function assignWorkoutPlan(memberId: string, planId: string) {
 }
 
 export async function assignDietPlan(memberId: string, planId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     await prisma.dietPlan.update({
       where: { id: planId },
@@ -152,6 +175,10 @@ export async function assignDietPlan(memberId: string, planId: string) {
 }
 
 export async function getMemberProfileForTrainer(memberId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const member = await (prisma.member as any).findUnique({
       where: { id: memberId },
@@ -204,6 +231,10 @@ export async function schedulePTSession(data: {
   endTime: string;   // HH:MM
   notes?: string;
 }) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const session = await prisma.pTSession.create({
       data: {
@@ -226,6 +257,10 @@ export async function schedulePTSession(data: {
 }
 
 export async function getTrainerById(id: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const trainer = await prisma.trainer.findUnique({
       where: { id },
@@ -248,6 +283,10 @@ export async function getTrainerById(id: string) {
  * Updates the status of a PT session (e.g., mark as COMPLETED).
  */
 export async function updateSessionStatus(sessionId: string, status: string, feedback?: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const session = await prisma.pTSession.update({
       where: { id: sessionId },
@@ -269,9 +308,13 @@ export async function updateSessionStatus(sessionId: string, status: string, fee
  * Creates a new trainer user and profile.
  */
 export async function createTrainer(data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const bcrypt = require("bcryptjs");
-    const hashedPassword = await bcrypt.hash("Eagle@123", 10);
+    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Create the base User
@@ -317,6 +360,10 @@ export async function createTrainer(data: any) {
  * Updates an existing trainer's details.
  */
 export async function updateTrainer(id: string, data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const result = await prisma.$transaction(async (tx) => {
       const trainer = await tx.trainer.update({

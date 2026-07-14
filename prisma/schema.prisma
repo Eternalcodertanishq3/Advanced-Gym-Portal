@@ -12,12 +12,78 @@ datasource db {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// SAAS TENANCY & PLANS
+// ═══════════════════════════════════════════════════════════════
+
+model Tenant {
+  id         String    @id @default(cuid())
+  name       String
+  domain     String?   @unique
+  subdomain  String    @unique
+  logo       String?
+  currency   String    @default("INR")
+  locale     String    @default("en-IN")
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  
+  saasPlanId String?
+  saasPlan   SaaSPlan? @relation(fields: [saasPlanId], references: [id])
+  saasStatus String    @default("ACTIVE") // ACTIVE, SUSPENDED, TRIAL, EXPIRED
+  saasExpiry DateTime?
+
+  // Relations
+  branches      Branch[]
+  users         User[]
+  plans         Plan[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  attendance    Attendance[]
+  gymClasses    GymClass[]
+  ptSessions    PTSession[]
+  workoutPlans  WorkoutPlan[]
+  dietPlans     DietPlan[]
+  equipment     Equipment[]
+  products      Product[]
+  sales         Sale[]
+  tasks         Task[]
+  conversations Conversation[]
+  notifications Notification[]
+  documents     Document[]
+  visitorPasses VisitorPass[]
+  gymSettings   GymSetting[]
+  backups       Backup[]
+  testimonials  Testimonial[]
+
+  @@map("tenants")
+}
+
+model SaaSPlan {
+  id          String   @id @default(cuid())
+  name        String
+  price       Decimal  @db.Decimal(10, 2)
+  interval    String   // MONTHLY, YEARLY
+  maxBranches Int      @default(1)
+  maxMembers  Int      @default(100)
+  features    String[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenants     Tenant[]
+
+  @@map("saas_plans")
+}
+
+// ═══════════════════════════════════════════════════════════════
+
 // ENUMS
 // ═══════════════════════════════════════════════════════════════
 
 enum Role {
   SUPER_ADMIN
   ADMIN
+  MANAGER
   RECEPTIONIST
   TRAINER
   MEMBER
@@ -253,6 +319,9 @@ model Branch {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   users         User[]
   classes       GymClass[]
@@ -260,6 +329,7 @@ model Branch {
   payments      Payment[]
   attendance    Attendance[]
 
+  @@index([tenantId])
   @@map("branches")
 }
 
@@ -285,8 +355,11 @@ model User {
   xp                    Int       @default(0)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  deletedAt             DateTime?
 
   // Relations
+  tenantId         String?
+  tenant           Tenant?           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   branchId         String?
   branch           Branch?           @relation(fields: [branchId], references: [id])
   member           Member?
@@ -308,6 +381,7 @@ model User {
   @@index([phone])
   @@index([role])
   @@index([status])
+  @@index([tenantId])
   @@map("users")
 }
 
@@ -360,6 +434,7 @@ model Member {
   source   String? // How they heard about gym
   notes    String?      @db.Text
   status   MemberStatus @default(ACTIVE)
+  deletedAt DateTime?
 
   // Relations
   subscription   Subscription?
@@ -611,11 +686,15 @@ model Plan {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   subscriptions Subscription[]
 
   @@index([isActive])
   @@index([sortOrder])
+  @@index([tenantId])
   @@map("plans")
 }
 
@@ -644,11 +723,16 @@ model Subscription {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([endDate])
   @@index([memberId])
   @@index([branchId])
+  @@index([tenantId])
   @@map("subscriptions")
 }
 
@@ -680,12 +764,17 @@ model Payment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([memberId])
   @@index([branchId])
   @@index([status])
   @@index([createdAt])
   @@index([receiptNo])
+  @@index([tenantId])
   @@map("payments")
 }
 
@@ -712,12 +801,17 @@ model Attendance {
   deviceInfo String?
 
   createdAt DateTime @default(now())
+  deletedAt DateTime?
+
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([memberId])
   @@index([userId])
   @@index([branchId])
   @@index([date])
   @@index([status])
+  @@index([tenantId])
   @@map("attendance")
 }
 
@@ -743,11 +837,15 @@ model GymClass {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   schedules ClassSchedule[]
 
   @@index([category])
   @@index([isActive])
+  @@index([tenantId])
   @@map("gym_classes")
 }
 
@@ -813,9 +911,13 @@ model PTSession {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   @@index([trainerId])
   @@index([memberId])
   @@index([date])
+  @@index([tenantId])
   @@map("pt_sessions")
 }
 
@@ -839,12 +941,16 @@ model WorkoutPlan {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   exercises Exercise[]
   logs      WorkoutLog[]
 
   @@index([isTemplate])
   @@index([trainerId])
+  @@index([tenantId])
   @@map("workout_plans")
 }
 
@@ -908,12 +1014,16 @@ model DietPlan {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   meals Meal[]
   logs  DietLog[]
 
   @@index([isTemplate])
   @@index([trainerId])
+  @@index([tenantId])
   @@map("diet_plans")
 }
 
@@ -1049,12 +1159,16 @@ model Equipment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   logs MaintenanceLog[]
 
   @@index([category])
   @@index([status])
   @@index([location])
+  @@index([tenantId])
   @@map("equipment")
 }
 
@@ -1100,12 +1214,16 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   saleItems SaleItem[]
 
   @@index([category])
   @@index([isActive])
   @@index([barcode])
+  @@index([tenantId])
   @@map("products")
 }
 
@@ -1125,8 +1243,12 @@ model Sale {
 
   createdAt DateTime @default(now())
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   @@index([createdAt])
   @@index([status])
+  @@index([tenantId])
   @@map("sales")
 }
 
@@ -1170,9 +1292,13 @@ model Task {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   @@index([workerId])
   @@index([status])
   @@index([dueDate])
+  @@index([tenantId])
   @@map("tasks")
 }
 
@@ -1187,10 +1313,14 @@ model Conversation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   messages Message[]
 
   @@index([participantIds])
+  @@index([tenantId])
   @@map("conversations")
 }
 
@@ -1211,6 +1341,7 @@ model Message {
   readAt      DateTime?
 
   createdAt DateTime @default(now())
+  deletedAt DateTime?
   Member    Member?  @relation(fields: [memberId], references: [id])
   memberId  String?
   Trainer   Trainer? @relation(fields: [trainerId], references: [id])
@@ -1244,6 +1375,9 @@ model Notification {
 
   createdAt DateTime @default(now())
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   member   Member? @relation(fields: [memberId], references: [id], onDelete: SetNull)
   memberId String?
@@ -1252,6 +1386,7 @@ model Notification {
   @@index([isRead])
   @@index([type])
   @@index([createdAt])
+  @@index([tenantId])
   @@map("notifications")
 }
 
@@ -1271,9 +1406,14 @@ model Document {
   mimeType String?
 
   createdAt DateTime @default(now())
+  deletedAt DateTime?
+
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([memberId])
   @@index([type])
+  @@index([tenantId])
   @@map("documents")
 }
 
@@ -1359,14 +1499,19 @@ model AuditLog {
 
 model GymSetting {
   id          String   @id @default(cuid())
-  key         String   @unique
+  key         String
   value       Json
   category    String   @default("GENERAL")
   description String?
   updatedBy   String
   updatedAt   DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([key, tenantId])
   @@index([category])
+  @@index([tenantId])
   @@map("gym_settings")
 }
 
@@ -1380,6 +1525,10 @@ model Testimonial {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
   @@map("testimonials")
 }
 
@@ -1403,8 +1552,12 @@ model VisitorPass {
   createdAt DateTime @default(now())
   createdBy String
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   @@index([passCode])
   @@index([validUntil])
+  @@index([tenantId])
   @@map("visitor_passes")
 }
 // ═══════════════════════════════════════════════════════════════
@@ -1420,5 +1573,9 @@ model Backup {
   createdBy String?
   createdAt DateTime @default(now())
 
+  tenantId  String?
+  tenant    Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
   @@map("backups")
 }

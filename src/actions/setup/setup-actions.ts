@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { SECURITY } from "@/lib/constants";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
@@ -28,7 +29,7 @@ export async function createInitialSuperAdmin(data: any) {
       throw new Error("System already has a Super Admin.");
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(data.password, SECURITY.BCRYPT_ROUNDS);
 
     const user = await prisma.user.create({
       data: {

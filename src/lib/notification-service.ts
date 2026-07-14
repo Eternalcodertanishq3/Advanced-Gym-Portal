@@ -6,6 +6,7 @@ interface EmailParams {
   to: string;
   subject: string;
   html: string;
+  fromName?: string;
 }
 
 interface SMSParams {
@@ -14,22 +15,27 @@ interface SMSParams {
 }
 
 /**
- * 🦅 EAGLE GYM — Notification Hub
+ * 🦅 GymFlow SaaS — Notification Hub
  * Centralized service for Email and SMS delivery.
  */
 export const NotificationService = {
   /**
    * Send an Email via Resend
    */
-  async sendEmail({ to, subject, html }: EmailParams) {
+  async sendEmail({ to, subject, html, fromName }: EmailParams) {
     if (!process.env.RESEND_API_KEY) {
       console.warn("RESEND_API_KEY not found. Email suppressed.");
       return { success: false, error: "API Key missing" };
     }
 
     try {
+      const displayName = fromName || "GymFlow SaaS";
+      // Using a test resend email domain or configuration value
+      const fromEmail = process.env.RESEND_FROM_EMAIL || "notifications@gymflow.saas";
+      const fromAddress = `${displayName} <${fromEmail}>`;
+
       const { data, error } = await resend.emails.send({
-        from: "Eagle Gym <notifications@eaglegym.com>",
+        from: fromAddress,
         to: [to],
         subject,
         html,
@@ -53,11 +59,6 @@ export const NotificationService = {
   async sendSMS({ to, message }: SMSParams) {
     // Placeholder for Twilio/AWS SNS implementation
     console.log(`[SMS MOCK] To: ${to}, Message: ${message}`);
-    
-    // Logic for real implementation would go here:
-    // const client = require('twilio')(sid, auth);
-    // await client.messages.create({ body: message, from: '+12345', to });
-
     return { success: true, provider: "Mock/Twilio Placeholder" };
   }
 };

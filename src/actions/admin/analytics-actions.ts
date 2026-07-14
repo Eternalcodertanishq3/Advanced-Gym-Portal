@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getBranchContext } from "@/lib/action-utils";
+import { getBranchContext, ensureSuperAdmin } from "@/lib/action-utils";
 
 export async function getDashboardStats() {
   try {
@@ -349,6 +349,7 @@ export async function getDashboardSchedules() {
 }
 
 export async function getSuperAdminRevenueStats() {
+  await ensureSuperAdmin();
   try {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);

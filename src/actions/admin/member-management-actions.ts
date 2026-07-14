@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getBranchContext } from "@/lib/action-utils";
 import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
+import { SECURITY } from "@/lib/constants";
 
 export async function getMembers(page = 1, limit = 10, search = "", filterBranchId?: string) {
   try {
@@ -78,6 +79,10 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
 }
 
 export async function getMemberById(id: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "TRAINER" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const member = await prisma.member.findUnique({
       where: { id },
@@ -135,7 +140,7 @@ export async function createMember(formData: any) {
     }
 
     // Hash default password
-    const hashedPassword = await bcrypt.hash("Eagle@123", 10);
+    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
 
     // Create User and Member in a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -192,6 +197,10 @@ export async function createMember(formData: any) {
 }
 
 export async function updateMember(id: string, formData: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const result = await prisma.$transaction(async (tx) => {
       const member = await tx.member.update({

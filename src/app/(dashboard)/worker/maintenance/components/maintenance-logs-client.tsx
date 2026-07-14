@@ -7,7 +7,7 @@ import {
   Clock, 
   AlertCircle,
   History,
-  Tool
+  Hammer
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDate } from "@/lib/utils";

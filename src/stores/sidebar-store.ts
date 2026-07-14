@@ -1,19 +1,30 @@
-import { create } from 'zustand';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+// ═══════════════════════════════════════════════════════════════
+// 🦅 EAGLE GYM — Sidebar Store
+// ═══════════════════════════════════════════════════════════════
 
 interface SidebarState {
-  isOpen: boolean;
-  isCollapsed: boolean;
-  toggleSidebar: () => void;
-  setIsOpen: (open: boolean) => void;
-  toggleCollapse: () => void;
-  setCollapsed: (collapsed: boolean) => void;
+  collapsed: boolean;
+  mobileOpen: boolean;
+  toggleCollapsed: () => void;
+  toggleMobile: () => void;
+  setMobileOpen: (open: boolean) => void;
 }
 
-export const useSidebarStore = create<SidebarState>((set) => ({
-  isOpen: false,
-  isCollapsed: false,
-  toggleSidebar: () => set((state) => ({ isOpen: !state.isOpen })),
-  setIsOpen: (open) => set({ isOpen: open }),
-  toggleCollapse: () => set((state) => ({ isCollapsed: !state.isCollapsed })),
-  setCollapsed: (collapsed) => set({ isCollapsed: collapsed }),
-}));
+export const useSidebarStore = create<SidebarState>()(
+  persist(
+    (set) => ({
+      collapsed: false,
+      mobileOpen: false,
+      toggleCollapsed: () => set((state) => ({ collapsed: !state.collapsed })),
+      toggleMobile: () => set((state) => ({ mobileOpen: !state.mobileOpen })),
+      setMobileOpen: (mobileOpen) => set({ mobileOpen }),
+    }),
+    {
+      name: "eagle-gym-sidebar",
+      partialize: (state) => ({ collapsed: state.collapsed }),
+    }
+  )
+);

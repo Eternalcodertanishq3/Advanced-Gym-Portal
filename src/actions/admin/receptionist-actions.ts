@@ -1,9 +1,16 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { SECURITY } from "@/lib/constants";
 
 export async function getReceptionistDashboardStats() {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -67,6 +74,10 @@ export async function generateVisitorPass(data: {
   purpose: string;
   validUntil: Date;
 }) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const pass = await prisma.visitorPass.create({
       data: {
@@ -87,6 +98,10 @@ export async function generateVisitorPass(data: {
 }
 
 export async function getReceptionists(page = 1, limit = 10, search = "") {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const skip = (page - 1) * limit;
     let where: any = {};
@@ -131,6 +146,10 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
 }
 
 export async function getReceptionistById(id: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const rec = await prisma.receptionist.findUnique({
       where: { id },
@@ -144,9 +163,13 @@ export async function getReceptionistById(id: string) {
 }
 
 export async function createReceptionist(data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const bcrypt = require("bcryptjs");
-    const hashedPassword = await bcrypt.hash("Eagle@123", 10);
+    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
 
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -186,6 +209,10 @@ export async function createReceptionist(data: any) {
 }
 
 export async function updateReceptionist(id: string, data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const result = await prisma.$transaction(async (tx) => {
       const rec = await tx.receptionist.update({

@@ -2,6 +2,7 @@
 // Force IDE re-evaluation
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
+import { SECURITY } from "@/lib/constants";
 import { Role } from "@prisma/client";
 import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
 import bcrypt from "bcryptjs";
@@ -64,7 +65,7 @@ export async function inviteStaff(data: {
 
     // Generate a secure random temporary password
     const tempPassword = crypto.randomBytes(6).toString('hex'); // 12 chars hex
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+    const hashedPassword = await bcrypt.hash(tempPassword, SECURITY.BCRYPT_ROUNDS);
 
     const user = await prisma.user.create({
       data: {

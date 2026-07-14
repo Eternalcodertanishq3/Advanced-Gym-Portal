@@ -1,9 +1,15 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function getInventoryItems(page = 1, limit = 10, search = "") {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const skip = (page - 1) * limit;
     let whereClause = {};
@@ -31,6 +37,10 @@ export async function getInventoryItems(page = 1, limit = 10, search = "") {
 }
 
 export async function updateInventoryQuantity(id: string, newQuantity: number) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const item = await prisma.product.update({
       where: { id },
@@ -57,6 +67,10 @@ export async function processSale(data: {
   discount: number;
   total: number;
 }) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const sale = await prisma.$transaction(async (tx) => {
       // 1. Create the Sale
@@ -119,6 +133,10 @@ export async function processSale(data: {
 }
 
 export async function getProductById(id: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const product = await prisma.product.findUnique({
       where: { id }
@@ -131,6 +149,10 @@ export async function getProductById(id: string) {
 }
 
 export async function createProduct(data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const product = await prisma.product.create({
       data: {
@@ -152,6 +174,10 @@ export async function createProduct(data: any) {
 }
 
 export async function updateProduct(id: string, data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const product = await prisma.product.update({
       where: { id },
@@ -174,6 +200,10 @@ export async function updateProduct(id: string, data: any) {
 }
 
 export async function deleteProduct(id: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     await prisma.product.delete({
       where: { id }

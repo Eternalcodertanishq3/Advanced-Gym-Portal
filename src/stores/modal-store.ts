@@ -1,17 +1,21 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-type ModalType = 'ADD_MEMBER' | 'QUICK_CHECKIN' | 'PAYMENT' | 'NONE';
+// ═══════════════════════════════════════════════════════════════
+// 🦅 EAGLE GYM — Modal Store
+// ═══════════════════════════════════════════════════════════════
 
 interface ModalState {
-  activeModal: ModalType;
-  modalProps: any;
-  openModal: (type: ModalType, props?: any) => void;
+  isOpen: boolean;
+  modalType: string | null;
+  modalData: unknown;
+  openModal: (type: string, data?: unknown) => void;
   closeModal: () => void;
 }
 
-export const useModalStore = create<ModalState>((set) => ({
-  activeModal: 'NONE',
-  modalProps: null,
-  openModal: (type, props) => set({ activeModal: type, modalProps: props }),
-  closeModal: () => set({ activeModal: 'NONE', modalProps: null }),
+export const useModalStore = create<ModalState>()((set) => ({
+  isOpen: false,
+  modalType: null,
+  modalData: null,
+  openModal: (modalType, modalData) => set({ isOpen: true, modalType, modalData }),
+  closeModal: () => set({ isOpen: false, modalType: null, modalData: null }),
 }));

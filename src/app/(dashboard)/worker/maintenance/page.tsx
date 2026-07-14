@@ -29,7 +29,7 @@ export default async function MaintenancePage() {
 
   return (
     <div className="w-full h-full">
-      <MaintenanceLogsClient logs={res.data} />
+      <MaintenanceLogsClient logs={res.data ?? []} />
     </div>
   );
 }

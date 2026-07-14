@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getBranchContext } from "@/lib/action-utils";
+import { auth } from "@/auth";
 
 export async function getPayments(page = 1, limit = 10, status?: string) {
   try {
@@ -53,6 +54,10 @@ export async function getPayments(page = 1, limit = 10, status?: string) {
 }
 
 export async function createPayment(data: { memberId: string, subscriptionId?: string, amount: number, method: any, receiptNo: string, transactionId?: string }) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const payment = await prisma.payment.create({
       data: {

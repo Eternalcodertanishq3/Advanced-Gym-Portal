@@ -1,6 +1,8 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+
+import { prisma, resolveTenantId } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function getGymSettings() {
@@ -19,11 +21,16 @@ export async function getGymSettings() {
 }
 
 export async function updateGymSetting(key: string, value: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
+    const tenantId = resolveTenantId() || null;
     const setting = await prisma.gymSetting.upsert({
-      where: { key },
+      where: { key_tenantId: { key, tenantId: tenantId || "" } },
       update: { value, updatedBy: "ADMIN" },
-      create: { key, value, updatedBy: "ADMIN" }
+      create: { key, value, tenantId, updatedBy: "ADMIN" }
     });
     revalidatePath("/admin/settings");
     return { success: true, data: setting };

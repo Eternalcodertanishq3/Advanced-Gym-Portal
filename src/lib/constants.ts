@@ -30,6 +30,7 @@ export const APP = {
 export const ROLES = {
   SUPER_ADMIN: "SUPER_ADMIN",
   ADMIN: "ADMIN",
+  MANAGER: "MANAGER",
   RECEPTIONIST: "RECEPTIONIST",
   TRAINER: "TRAINER",
   MEMBER: "MEMBER",
@@ -41,6 +42,7 @@ export type Role = (typeof ROLES)[keyof typeof ROLES];
 export const ROLE_HIERARCHY: Record<Role, number> = {
   SUPER_ADMIN: 100,
   ADMIN: 80,
+  MANAGER: 70,
   RECEPTIONIST: 60,
   TRAINER: 60,
   MEMBER: 40,
@@ -50,6 +52,7 @@ export const ROLE_HIERARCHY: Record<Role, number> = {
 export const ROLE_LABELS: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
   ADMIN: "Admin",
+  MANAGER: "Manager",
   RECEPTIONIST: "Receptionist",
   TRAINER: "Trainer",
   MEMBER: "Member",
@@ -59,6 +62,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 export const ROLE_COLORS: Record<Role, string> = {
   SUPER_ADMIN: "bg-purple-500/20 text-purple-400 border-purple-500/30",
   ADMIN: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  MANAGER: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
   RECEPTIONIST: "bg-electric-cyan/20 text-electric-cyan border-electric-cyan/30",
   TRAINER: "bg-neon-green/20 text-neon-green border-neon-green/30",
   MEMBER: "bg-gold-500/20 text-gold-400 border-gold-500/30",
@@ -272,6 +276,30 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.SETTINGS_UPDATE,
     PERMISSIONS.IMPORT_DATA,
     PERMISSIONS.EXPORT_DATA,
+  ],
+
+  MANAGER: [
+    PERMISSIONS.MEMBER_CREATE,
+    PERMISSIONS.MEMBER_READ,
+    PERMISSIONS.MEMBER_UPDATE,
+    PERMISSIONS.TRAINER_READ,
+    PERMISSIONS.RECEPTIONIST_READ,
+    PERMISSIONS.STAFF_READ,
+    PERMISSIONS.PLAN_READ,
+    PERMISSIONS.SUBSCRIPTION_CREATE,
+    PERMISSIONS.SUBSCRIPTION_READ,
+    PERMISSIONS.SUBSCRIPTION_UPDATE,
+    PERMISSIONS.PAYMENT_CREATE,
+    PERMISSIONS.PAYMENT_READ,
+    PERMISSIONS.ATTENDANCE_CHECKIN,
+    PERMISSIONS.ATTENDANCE_READ,
+    PERMISSIONS.CLASS_READ,
+    PERMISSIONS.CLASS_BOOK,
+    PERMISSIONS.CLASS_CANCEL,
+    PERMISSIONS.INVENTORY_READ,
+    PERMISSIONS.POS_SALE,
+    PERMISSIONS.ANALYTICS_READ,
+    PERMISSIONS.NOTIFICATION_READ,
   ],
 
   RECEPTIONIST: [
@@ -883,3 +911,19 @@ export const INDIAN_STATES = [
 export const GST_RATE = 18; // 18% GST on gym services
 
 export const SESSION_DURATION_MINUTES = 60;
+
+// ═══════════════════════════════════════════════════════════════
+// SECURITY & CRYPTO
+// ═══════════════════════════════════════════════════════════════
+
+export const SECURITY = {
+  BCRYPT_ROUNDS: 12, // 2026 standard
+  DEFAULT_TEMP_PASSWORD: () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let pwd = "";
+    for (let i = 0; i < 10; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return pwd + "!A1";
+  },
+} as const;

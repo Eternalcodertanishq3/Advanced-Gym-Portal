@@ -1,9 +1,16 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { SECURITY } from "@/lib/constants";
 
 export async function getStaff(page = 1, limit = 10, search = "") {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const skip = (page - 1) * limit;
     
@@ -46,6 +53,10 @@ export async function getStaff(page = 1, limit = 10, search = "") {
  * Fetches attendance records for staff members.
  */
 export async function getStaffAttendance(limit = 20) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const attendance = await prisma.attendance.findMany({
       where: {
@@ -65,6 +76,10 @@ export async function getStaffAttendance(limit = 20) {
 }
 
 export async function getStaffById(id: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const worker = await prisma.worker.findUnique({
       where: { id },
@@ -78,9 +93,13 @@ export async function getStaffById(id: string) {
 }
 
 export async function createStaff(data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const bcrypt = require("bcryptjs");
-    const hashedPassword = await bcrypt.hash("Eagle@123", 10);
+    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
 
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -121,6 +140,10 @@ export async function createStaff(data: any) {
 }
 
 export async function updateStaff(id: string, data: any) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const result = await prisma.$transaction(async (tx) => {
       const worker = await tx.worker.update({

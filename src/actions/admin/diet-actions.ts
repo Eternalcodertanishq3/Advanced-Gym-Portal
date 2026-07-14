@@ -1,9 +1,15 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function getDietPlans(page = 1, limit = 10, search = "") {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const skip = (page - 1) * limit;
     
@@ -41,6 +47,10 @@ export async function getDietPlans(page = 1, limit = 10, search = "") {
 }
 
 export async function getDietTemplates() {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const templates = await prisma.dietPlan.findMany({
       where: { isTemplate: true },
@@ -54,6 +64,10 @@ export async function getDietTemplates() {
 }
 
 export async function createDietPlan(data: { name: string, description?: string, trainerId: string, memberId?: string, type: any }) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const plan = await prisma.dietPlan.create({
       data: {

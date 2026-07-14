@@ -4,6 +4,7 @@ import { prisma as db } from "@/lib/prisma";
 import { Role, UserStatus, MemberStatus, Gender, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
+import { SECURITY } from "@/lib/constants";
 
 export type ImportMemberData = {
   firstName: string;
@@ -22,9 +23,13 @@ export type ImportMemberData = {
 const BATCH_SIZE = 100; // Optimal batch size for Prisma transactions
 
 export async function bulkImportMembers(data: ImportMemberData[], branchId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     // 1. Pre-hash default password to save CPU cycles during the loop
-    const defaultPassword = await bcrypt.hash("Eagle@123", 10);
+    const defaultPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
     
     const results = {
       total: data.length,
@@ -38,7 +43,7 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
       const batch = data.slice(i, i + BATCH_SIZE);
       
-      await db.$transaction(async (tx: Prisma.TransactionClient) => {
+      await db.$transaction(async (tx) => {
         for (const item of batch) {
           try {
             // 3. Clean and Validate Data

@@ -231,6 +231,8 @@ export async function logMeal(data: {
  * Fetches curated recipes.
  */
 export async function getRecipes() {
+  const session = await auth();
+  if (!session?.user) return { success: false, error: "Unauthorized" };
   try {
     const recipes = await (prisma as any).recipe.findMany({
       where: { isPublic: true },

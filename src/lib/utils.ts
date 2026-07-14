@@ -33,28 +33,59 @@ export function formatRelative(date: Date | string | number): string {
 }
 
 /**
- * Format number to Indian currency (₹)
+ * Format number to currency dynamically based on locale/settings
  */
 export function formatCurrency(
   amount: number | string | null | undefined,
-  options: { showSymbol?: boolean; decimals?: number } = {}
+  options: { showSymbol?: boolean; decimals?: number; currency?: string; locale?: string } = {}
 ): string {
   const { showSymbol = true, decimals = 2 } = options;
   
-  if (amount === null || amount === undefined || amount === "") return showSymbol ? "₹0.00" : "0.00";
+  let currencyCode = options.currency || "INR";
+  let locale = options.locale || (currencyCode === "INR" ? "en-IN" : "en-US");
+
+  // Client-side fallback to stored tenant config
+  if (typeof window !== "undefined" && !options.currency) {
+    try {
+      const stored = localStorage.getItem("gymflow-currency");
+      if (stored) {
+        currencyCode = stored;
+        locale = currencyCode === "INR" ? "en-IN" : (currencyCode === "EUR" ? "de-DE" : "en-US");
+      }
+    } catch {
+      // safe fallback
+    }
+  }
+
+  const symbolMap: Record<string, string> = {
+    USD: "$",
+    INR: "₹",
+    EUR: "€",
+    GBP: "£",
+  };
+  const symbol = symbolMap[currencyCode] || "$";
+
+  if (amount === null || amount === undefined || amount === "") {
+    return showSymbol ? `${symbol}0.00` : "0.00";
+  }
   
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
-  if (isNaN(num)) return showSymbol ? "₹0.00" : "0.00";
+  if (isNaN(num)) {
+    return showSymbol ? `${symbol}0.00` : "0.00";
+  }
 
-  const formatter = new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-
-  const formatted = formatter.format(Math.abs(num));
-  return num < 0 ? `-${formatted}` : formatted;
+  try {
+    const formatter = new Intl.NumberFormat(locale, {
+      style: showSymbol ? "currency" : "decimal",
+      currency: currencyCode,
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+    return formatter.format(num);
+  } catch {
+    const formattedNum = num.toFixed(decimals);
+    return showSymbol ? `${symbol}${formattedNum}` : formattedNum;
+  }
 }
 
 /**

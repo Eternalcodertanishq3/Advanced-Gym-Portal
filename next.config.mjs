@@ -1,24 +1,37 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // ═══════════════════════════════════════════════════════════════
-  // 🦅 EAGLE GYM — Next.js Configuration
+  // 🦅 GymFlow SaaS — Next.js Configuration (ESM)
   // ═══════════════════════════════════════════════════════════════
 
-  // Enable React Strict Mode for development
   reactStrictMode: true,
 
-  // Image optimization
+  // Image optimization - removed wildcard remote patterns for security
   images: {
-    domains: [
-      "localhost",
-      "eaglegym.in",
-      "res.cloudinary.com",
-      "images.unsplash.com",
-    ],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "localhost",
+      },
+      {
+        protocol: "https",
+        hostname: "eaglegym.in",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
       },
     ],
     formats: ["image/webp", "image/avif"],
@@ -26,7 +39,7 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  // PWA / Manifest
+  // PWA / Manifest / Security Headers
   async headers() {
     return [
       {
@@ -61,20 +74,24 @@ const nextConfig = {
             key: "Referrer-Policy",
             value: "origin-when-cross-origin",
           },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' blob: data: https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com https://res.cloudinary.com; connect-src 'self' wss://*; frame-src 'self'; media-src 'self';",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
         ],
       },
     ];
   },
 
-  // Rewrites (if needed for API proxying)
-  async rewrites() {
-    return [
-      {
-        source: "/api/external/:path*",
-        destination: "https://api.external-service.com/:path*",
-      },
-    ];
-  },
+  // Removed rewrites to proxy external services to eliminate rewrite SSRF/proxy risks
 
   // Redirects
   async redirects() {
@@ -102,25 +119,17 @@ const nextConfig = {
     return config;
   },
 
-  // Experimental features
+  // Experimental features - limit body size to 5MB (from 10MB) for resource exhaustion protection
   experimental: {
     serverActions: {
-      bodySizeLimit: "10mb",
+      bodySizeLimit: "5mb",
     },
     typedRoutes: true,
   },
 
-  // Output configuration
-  // output: "standalone",
-
-  // Powered by header
   poweredByHeader: false,
-
-  // Compress responses
   compress: true,
-
-  // Trailing slash
   trailingSlash: false,
 };
 
-module.exports = nextConfig;
+export default nextConfig;

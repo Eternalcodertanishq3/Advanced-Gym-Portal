@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { SECURITY } from "@/lib/constants";
 
 interface MemberImportClientProps {
   branchId: string | null;
@@ -342,7 +343,7 @@ export function MemberImportClient({ branchId: initialBranchId, branches = [] }:
             <CardTitle className="text-lg">Post-Import Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
-            <p>1. Members can log in using their email and the default password: <code className="rounded bg-muted px-1.5 py-0.5 font-bold text-primary">Eagle@123</code></p>
+            <p>1. Members can log in using their email and their randomly generated temporary password.</p>
             <p>2. They will be prompted to update their profile and set a custom password on their first login.</p>
             <p>3. All imported members are assigned to the currently selected branch.</p>
           </CardContent>

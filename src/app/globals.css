@@ -130,31 +130,30 @@
    ═══════════════════════════════════════════════════════════════ */
 
 @layer components {
-  /* ── Surface Card ── */
+  /* ── Surface Card (Liquid Glass Edition) ── */
   .surface-card {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
-    transition: all 200ms ease;
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm transition-all duration-300;
   }
 
   .surface-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-    border-color: hsl(var(--ring) / 0.2);
-    transform: translateY(-2px);
+    @apply bg-white/90 border-brand-orange/30 shadow-md shadow-brand-orange/10 -translate-y-0.5;
   }
 
   .dark .surface-card {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.15);
+    @apply bg-[#1A1D27]/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+  }
+
+  .dark .surface-card:hover {
+    @apply bg-[#1A1D27]/60 border-brand-orange/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),0_0_20px_rgba(232,93,38,0.1)];
   }
 
   /* Static variant (no hover lift) */
   .surface-card-static {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm;
+  }
+
+  .dark .surface-card-static {
+    @apply bg-[#1A1D27]/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
   }
 
   /* ── Backward compat: glass-card → surface-card ── */
@@ -371,3 +370,25 @@
                     radial-gradient(at 50% 0%, hsla(37,89%,53%,0.05) 0, transparent 50%),
                     radial-gradient(at 100% 0%, hsla(16,79%,53%,0.08) 0, transparent 50%);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ACCESSIBILITY — Reduced Motion & Focus
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visible focus ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+

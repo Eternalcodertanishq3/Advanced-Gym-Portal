@@ -1,9 +1,12 @@
 "use server";
 
+import { ensureSuperAdmin } from "@/lib/action-utils";
+
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
 export async function getDashboardStats() {
+  await ensureSuperAdmin();
   try {
     const today = new Date();
     const last7Days = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -151,6 +154,7 @@ export async function getDashboardStats() {
 }
 
 export async function getSystemHealth() {
+  await ensureSuperAdmin();
   try {
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);

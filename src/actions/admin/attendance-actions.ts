@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getBranchContext } from "@/lib/action-utils";
+import { auth } from "@/auth";
 
 export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
   try {
@@ -72,6 +73,10 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
 }
 
 export async function checkInMember(memberId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -105,6 +110,10 @@ export async function checkInMember(memberId: string) {
 }
 
 export async function checkOutMember(attendanceId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const attendance = await prisma.attendance.update({
       where: { id: attendanceId },
@@ -124,6 +133,10 @@ export async function checkOutMember(attendanceId: string) {
  * Searches for a member by phone or member ID (specifically for Kiosk mode).
  */
 export async function searchMemberByPhone(query: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     if (!query || query.length < 3) return { success: false, error: "Query too short" };
 

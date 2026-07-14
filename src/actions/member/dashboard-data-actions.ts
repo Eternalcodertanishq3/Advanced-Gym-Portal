@@ -1,8 +1,14 @@
 "use server";
 
+import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prisma";
 
 export async function getMemberDashboardStats(userId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.id !== userId && session.user.role !== "SUPER_ADMIN")) {
+    return { success: false, error: "Unauthorized" };
+  }
   try {
     const member = await prisma.member.findUnique({
       where: { userId },

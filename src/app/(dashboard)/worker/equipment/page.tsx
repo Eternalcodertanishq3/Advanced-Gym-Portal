@@ -30,7 +30,7 @@ export default async function EquipmentPage() {
 
   return (
     <div className="w-full h-full">
-      <EquipmentClient equipment={res.data.equipment} />
+      <EquipmentClient equipment={res.data?.equipment ?? []} />
     </div>
   );
 }

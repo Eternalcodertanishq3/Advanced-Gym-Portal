@@ -7,11 +7,11 @@ import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from "luci
 
 export function MarketingFooter({ config = {} }: { config?: Record<string, any> }) {
   const currentYear = new Date().getFullYear();
-  const gymName = config.gymName || "EAGLE GYM";
+  const gymName = config.gymName || "GymFlow SaaS";
   const gymLogo = config.gymLogo || "/logo-white.png";
   const address = config.gymAddress || "123 Elite Fitness Ave, Downtown, New York, NY 10001";
   const phone = config.contactPhone || "+1 (555) 000-8888";
-  const email = config.supportEmail || "contact@eaglegym.in";
+  const email = config.supportEmail || "support@gymflowsaas.com";
 
   const socials = [
     { icon: Instagram, href: config.instagramUrl || "#", title: "Instagram" },
