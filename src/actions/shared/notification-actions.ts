@@ -13,8 +13,8 @@ export async function getNotifications(userId: string) {
   try {
     const notifications = await prisma.notification.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 20
+      orderBy: { createdAt: "desc" },
+      take: 20,
     });
     return { success: true, data: notifications };
   } catch (error: any) {
@@ -29,9 +29,9 @@ export async function getAllSentNotifications() {
   }
   try {
     const notifications = await prisma.notification.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       include: { user: { select: { firstName: true, lastName: true } } },
-      take: 50
+      take: 50,
     });
     return { success: true, data: notifications };
   } catch (error: any) {
@@ -46,15 +46,15 @@ export async function sendBroadcast(title: string, message: string, type: string
   }
   try {
     const users = await prisma.user.findMany({ select: { id: true } });
-    
+
     await prisma.notification.createMany({
-      data: users.map(user => ({
+      data: users.map((user) => ({
         userId: user.id,
         title,
         body: message,
         type: type as any,
-        isRead: false
-      }))
+        isRead: false,
+      })),
     });
 
     revalidatePath("/admin/notifications");
@@ -64,7 +64,6 @@ export async function sendBroadcast(title: string, message: string, type: string
   }
 }
 
-
 export async function markAsRead(notificationId: string) {
   const session = await auth();
   if (!session?.user) {
@@ -73,7 +72,7 @@ export async function markAsRead(notificationId: string) {
   try {
     await prisma.notification.update({
       where: { id: notificationId },
-      data: { isRead: true }
+      data: { isRead: true },
     });
     revalidatePath("/");
     return { success: true };
@@ -81,4 +80,3 @@ export async function markAsRead(notificationId: string) {
     return { success: false, error: error.message };
   }
 }
-

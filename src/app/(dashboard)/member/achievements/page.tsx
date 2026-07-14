@@ -12,7 +12,7 @@ export const metadata = {
 
 export default async function AchievementsPage() {
   const session = await auth();
-  
+
   if (!session?.user || session.user.role !== "MEMBER") {
     redirect("/login");
   }
@@ -22,24 +22,24 @@ export default async function AchievementsPage() {
     getLeaderboard(10),
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, firstName: true, lastName: true, xp: true, avatar: true }
-    })
+      select: { id: true, firstName: true, lastName: true, xp: true, avatar: true },
+    }),
   ]);
 
   if (!achievementsRes.success || !leaderboardRes.success) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+      <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
         <h2 className="text-xl font-bold text-foreground">Failed to load gamification data</h2>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full">
-      <AchievementClient 
-        user={user} 
-        achievementsData={achievementsRes.data} 
-        leaderboard={leaderboardRes.data || []} 
+    <div className="h-full w-full">
+      <AchievementClient
+        user={user}
+        achievementsData={achievementsRes.data}
+        leaderboard={leaderboardRes.data || []}
       />
     </div>
   );

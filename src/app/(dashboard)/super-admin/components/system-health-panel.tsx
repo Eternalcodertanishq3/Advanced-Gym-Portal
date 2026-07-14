@@ -30,87 +30,118 @@ export default function SystemHealthPanel() {
 
   if (loading) {
     return (
-      <div className="glass-card p-6 rounded-2xl border border-border flex flex-col items-center justify-center h-[300px]">
-        <Loader2 className="w-8 h-8 animate-spin text-brand-orange/40 mb-2" />
-        <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Scanning Infrastructure...</p>
+      <div className="glass-card flex h-[300px] flex-col items-center justify-center rounded-2xl border border-border p-6">
+        <Loader2 className="mb-2 h-8 w-8 animate-spin text-brand-orange/40" />
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          Scanning Infrastructure...
+        </p>
       </div>
     );
   }
 
   const modules = [
-    { 
-      name: "Database Cluster", 
-      status: data?.database?.status || "Optimal", 
-      health: Math.round(data?.database?.health ?? 100), 
-      icon: Database, 
+    {
+      name: "Database Cluster",
+      status: data?.database?.status || "Optimal",
+      health: Math.round(data?.database?.health ?? 100),
+      icon: Database,
       color: "text-blue-500",
-      sub: `${data?.database?.latency ?? 0}ms latency`
+      sub: `${data?.database?.latency ?? 0}ms latency`,
     },
-    { 
-      name: "Payments Gateway", 
-      status: data?.payments?.status || "Active", 
-      health: Math.round(data?.payments?.health ?? 100), 
-      icon: Zap, 
+    {
+      name: "Payments Gateway",
+      status: data?.payments?.status || "Active",
+      health: Math.round(data?.payments?.health ?? 100),
+      icon: Zap,
       color: "text-amber-500",
-      sub: data?.payments?.stuckCount > 0 ? `${data.payments.stuckCount} stuck payments` : "No delays"
+      sub:
+        data?.payments?.stuckCount > 0 ? `${data.payments.stuckCount} stuck payments` : "No delays",
     },
-    { 
-      name: "System Core", 
-      status: data?.system?.status || "Operational", 
-      health: Math.round(data?.system?.health ?? 100), 
-      icon: Shield, 
+    {
+      name: "System Core",
+      status: data?.system?.status || "Operational",
+      health: Math.round(data?.system?.health ?? 100),
+      icon: Shield,
       color: "text-emerald-500",
-      sub: data?.system?.errorCount > 0 ? `${data.system.errorCount} recent errors` : "0 recent errors"
+      sub:
+        data?.system?.errorCount > 0
+          ? `${data.system.errorCount} recent errors`
+          : "0 recent errors",
     },
   ];
 
   const overallHealth = Math.round(modules.reduce((acc, m) => acc + m.health, 0) / modules.length);
 
   return (
-    <div className="glass-card p-6 rounded-2xl border border-border relative overflow-hidden group">
+    <div className="glass-card group relative overflow-hidden rounded-2xl border border-border p-6">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(16,185,129,0.03),transparent_70%)]" />
-      
-      <div className="flex items-center justify-between mb-6 relative z-10">
+
+      <div className="relative z-10 mb-6 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Server className="w-5 h-5 text-emerald-500" />
+          <h3 className="flex items-center gap-2 text-lg font-bold text-foreground">
+            <Server className="h-5 w-5 text-emerald-500" />
             Infrastructure Status
           </h3>
-          <p className="text-xs text-muted-foreground">Real-time health monitoring of system core</p>
+          <p className="text-xs text-muted-foreground">
+            Real-time health monitoring of system core
+          </p>
         </div>
-        <div className={cn(
-          "flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition-all",
-          overallHealth > 90 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" : "bg-amber-500/10 border-amber-500/20 text-amber-500"
-        )}>
-          <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", overallHealth > 90 ? "bg-emerald-500" : "bg-amber-500")} />
+        <div
+          className={cn(
+            "flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all",
+            overallHealth > 90
+              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
+              : "border-amber-500/20 bg-amber-500/10 text-amber-500",
+          )}
+        >
+          <div
+            className={cn(
+              "h-1.5 w-1.5 animate-pulse rounded-full",
+              overallHealth > 90 ? "bg-emerald-500" : "bg-amber-500",
+            )}
+          />
           <span className="text-[10px] font-bold uppercase tracking-wider">
             {overallHealth > 90 ? "All Systems Normal" : "Degraded Performance"}
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+      <div className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-3">
         {modules.map((m) => (
-          <div key={m.name} className="flex flex-col p-4 rounded-xl bg-muted/30 border border-border/50 transition-all hover:border-border hover:bg-muted/50 gap-3">
+          <div
+            key={m.name}
+            className="flex flex-col gap-3 rounded-xl border border-border/50 bg-muted/30 p-4 transition-all hover:border-border hover:bg-muted/50"
+          >
             <div className="flex items-center gap-3">
-              <div className={cn("w-10 h-10 rounded-lg bg-background flex items-center justify-center shadow-sm", m.color)}>
-                <m.icon className="w-5 h-5" />
+              <div
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-lg bg-background shadow-sm",
+                  m.color,
+                )}
+              >
+                <m.icon className="h-5 w-5" />
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground">{m.name}</p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">{m.sub}</p>
+                <p className="text-[10px] uppercase tracking-tight text-muted-foreground">
+                  {m.sub}
+                </p>
               </div>
             </div>
             <div className="mt-auto">
-              <div className="flex items-center justify-between mb-1">
+              <div className="mb-1 flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">Health</span>
-                <span className="text-sm font-mono font-bold text-foreground">{m.health}%</span>
+                <span className="font-mono text-sm font-bold text-foreground">{m.health}%</span>
               </div>
-              <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                <div 
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
                   className={cn(
-                    "h-full transition-all duration-1000", 
-                    m.health > 90 ? "bg-emerald-500" : m.health > 70 ? "bg-blue-500" : "bg-rose-500"
+                    "h-full transition-all duration-1000",
+                    m.health > 90
+                      ? "bg-emerald-500"
+                      : m.health > 70
+                        ? "bg-blue-500"
+                        : "bg-rose-500",
                   )}
                   style={{ width: `${m.health}%` }}
                 />
@@ -119,7 +150,6 @@ export default function SystemHealthPanel() {
           </div>
         ))}
       </div>
-
     </div>
   );
 }

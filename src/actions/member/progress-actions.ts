@@ -17,7 +17,7 @@ export async function addProgressPhoto(formData: FormData) {
     }
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) {
@@ -25,7 +25,7 @@ export async function addProgressPhoto(formData: FormData) {
     }
 
     const file = formData.get("file") as File;
-    const photoType = formData.get("photoType") as string || "FRONT";
+    const photoType = (formData.get("photoType") as string) || "FRONT";
     const weight = formData.get("weight") as string;
 
     if (!file) {
@@ -41,7 +41,7 @@ export async function addProgressPhoto(formData: FormData) {
     const buffer = new Uint8Array(bytes);
 
     // Create a safe filename
-    const fileExtension = file.name.split('.').pop();
+    const fileExtension = file.name.split(".").pop();
     const fileName = `progress_${member.id}_${Date.now()}.${fileExtension}`;
     const uploadPath = join(process.cwd(), "public", "uploads", "progress", fileName);
 
@@ -53,8 +53,8 @@ export async function addProgressPhoto(formData: FormData) {
         memberId: member.id,
         photoUrl,
         photoType,
-        weight: weight ? parseFloat(weight) : null
-      }
+        weight: weight ? parseFloat(weight) : null,
+      },
     });
 
     revalidatePath("/member/progress");
@@ -76,7 +76,7 @@ export async function getMemberProgress() {
     }
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) {
@@ -86,25 +86,25 @@ export async function getMemberProgress() {
     const [measurements, photos, goals] = await Promise.all([
       prisma.progress.findMany({
         where: { memberId: member.id },
-        orderBy: { createdAt: 'asc' }
+        orderBy: { createdAt: "asc" },
       }),
       prisma.progressPhoto.findMany({
         where: { memberId: member.id },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: "desc" },
       }),
       prisma.goal.findMany({
         where: { memberId: member.id },
-        orderBy: { createdAt: 'desc' }
-      })
+        orderBy: { createdAt: "desc" },
+      }),
     ]);
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         measurements,
         photos,
-        goals
-      }
+        goals,
+      },
     };
   } catch (error) {
     console.error("Error fetching progress:", error);
@@ -123,7 +123,7 @@ export async function addMeasurement(data: any) {
     }
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) {
@@ -133,8 +133,8 @@ export async function addMeasurement(data: any) {
     const progress = await prisma.progress.create({
       data: {
         memberId: member.id,
-        ...data
-      }
+        ...data,
+      },
     });
 
     revalidatePath("/member/progress");
@@ -163,8 +163,8 @@ export async function updateGoalProgress(goalId: string, newValue: number) {
       data: {
         currentValue: newValue,
         isAchieved,
-        achievedAt: isAchieved ? new Date() : null
-      }
+        achievedAt: isAchieved ? new Date() : null,
+      },
     });
 
     revalidatePath("/member/progress");

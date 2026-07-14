@@ -12,7 +12,10 @@ export const PERMISSIONS = {
   MANAGE_SETTINGS: [Role.SUPER_ADMIN, Role.ADMIN],
 };
 
-export function hasPermission(userRole: Role | string | undefined, permissionLevel: Role[]): boolean {
+export function hasPermission(
+  userRole: Role | string | undefined,
+  permissionLevel: Role[],
+): boolean {
   if (!userRole) return false;
   return permissionLevel.includes(userRole as Role);
 }

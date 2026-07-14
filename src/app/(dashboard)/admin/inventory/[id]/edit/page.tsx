@@ -111,33 +111,36 @@ export default function EditProductPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-3xl mx-auto p-4">
-        <Skeleton className="h-8 w-48 mb-6" />
+      <div className="mx-auto max-w-3xl space-y-6 p-4">
+        <Skeleton className="mb-6 h-8 w-48" />
         <Skeleton className="h-[500px] rounded-2xl" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto pb-12">
+    <div className="mx-auto max-w-3xl space-y-6 pb-12">
       <div className="flex items-center justify-between">
-        <Link href="/admin/inventory" className="flex items-center text-sm text-obsidian-500 hover:text-obsidian-900 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+        <Link
+          href="/admin/inventory"
+          className="flex items-center text-sm text-obsidian-500 transition-colors hover:text-obsidian-900"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Inventory
         </Link>
       </div>
 
-      <Card className="bg-surface-card border-surface-sunken shadow-sm">
+      <Card className="border-surface-sunken bg-surface-card shadow-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-display text-obsidian-950 flex items-center">
-            <Package className="w-6 h-6 mr-3 text-brand-orange" />
+          <CardTitle className="flex items-center font-display text-2xl text-obsidian-950">
+            <Package className="mr-3 h-6 w-6 text-brand-orange" />
             Edit Product Details
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="name"
@@ -145,7 +148,11 @@ export default function EditProductPage() {
                     <FormItem className="md:col-span-2">
                       <FormLabel>Product Name</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -159,7 +166,11 @@ export default function EditProductPage() {
                     <FormItem>
                       <FormLabel>SKU / Barcode</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -172,22 +183,24 @@ export default function EditProductPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <Select 
-                        disabled={isPending} 
-                        onValueChange={field.onChange} 
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-surface-base border-surface-sunken focus:ring-brand-orange">
+                          <SelectTrigger className="border-surface-sunken bg-surface-base focus:ring-brand-orange">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-surface-card border-surface-sunken">
-                          {["SUPPLEMENT", "MERCHANDISE", "BEVERAGE", "EQUIPMENT", "OTHER"].map((cat) => (
-                            <SelectItem key={cat} value={cat}>
-                              {cat}
-                            </SelectItem>
-                          ))}
+                        <SelectContent className="border-surface-sunken bg-surface-card">
+                          {["SUPPLEMENT", "MERCHANDISE", "BEVERAGE", "EQUIPMENT", "OTHER"].map(
+                            (cat) => (
+                              <SelectItem key={cat} value={cat}>
+                                {cat}
+                              </SelectItem>
+                            ),
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -202,7 +215,12 @@ export default function EditProductPage() {
                     <FormItem>
                       <FormLabel>Selling Price (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          type="number"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -216,7 +234,12 @@ export default function EditProductPage() {
                     <FormItem>
                       <FormLabel>Current Stock Level</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          type="number"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -230,10 +253,10 @@ export default function EditProductPage() {
                     <FormItem className="md:col-span-2">
                       <FormLabel>Description (Optional)</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          {...field} 
-                          disabled={isPending} 
-                          className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange min-h-[100px]" 
+                        <Textarea
+                          {...field}
+                          disabled={isPending}
+                          className="min-h-[100px] border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
                         />
                       </FormControl>
                       <FormMessage />
@@ -242,11 +265,21 @@ export default function EditProductPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-4 pt-4 border-t border-surface-sunken">
-                <Button variant="outline" type="button" onClick={() => router.back()} disabled={isPending} className="bg-surface-base border-surface-sunken">
+              <div className="flex justify-end gap-4 border-t border-surface-sunken pt-4">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => router.back()}
+                  disabled={isPending}
+                  className="border-surface-sunken bg-surface-base"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isPending} className="bg-brand-orange text-white hover:bg-brand-orange/90 min-w-[140px]">
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="min-w-[140px] bg-brand-orange text-white hover:bg-brand-orange/90"
+                >
                   {isPending ? "Updating..." : "Save Changes"}
                 </Button>
               </div>

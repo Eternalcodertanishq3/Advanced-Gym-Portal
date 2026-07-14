@@ -29,8 +29,11 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
   }
   try {
     // 1. Pre-hash default password to save CPU cycles during the loop
-    const defaultPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
-    
+    const defaultPassword = await bcrypt.hash(
+      SECURITY.DEFAULT_TEMP_PASSWORD(),
+      SECURITY.BCRYPT_ROUNDS,
+    );
+
     const results = {
       total: data.length,
       success: 0,
@@ -42,7 +45,7 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
     // 2. Process in batches to prevent timeouts and memory overflow
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
       const batch = data.slice(i, i + BATCH_SIZE);
-      
+
       await db.$transaction(async (tx) => {
         for (const item of batch) {
           try {
@@ -54,7 +57,9 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
 
             if (!email || !firstName || !lastName) {
               results.failed++;
-              results.errors.push(`Row ${i + batch.indexOf(item) + 1}: Missing mandatory fields (Email, FirstName, or LastName)`);
+              results.errors.push(
+                `Row ${i + batch.indexOf(item) + 1}: Missing mandatory fields (Email, FirstName, or LastName)`,
+              );
               continue;
             }
 
@@ -67,7 +72,7 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
               else if (cleanGender === "OTHER" || cleanGender === "O") gender = Gender.OTHER;
               else gender = Gender.OTHER; // Default to OTHER for unrecognized values
             }
-            
+
             // Safe Date Parsing
             let dob = null;
             if (item.dateOfBirth) {
@@ -80,10 +85,7 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
             // Check for existing user
             const existingUser = await tx.user.findFirst({
               where: {
-                OR: [
-                  { email },
-                  ...(phone ? [{ phone }] : []),
-                ],
+                OR: [{ email }, ...(phone ? [{ phone }] : [])],
               },
             });
 
@@ -143,9 +145,9 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
               success: results.success,
               failed: results.failed,
               duplicates: results.duplicates,
-              branchId: branchId
-            }
-          }
+              branchId: branchId,
+            },
+          },
         });
       }
     } catch (logErr) {

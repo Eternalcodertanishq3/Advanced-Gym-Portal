@@ -6,7 +6,12 @@ import bcryptjs from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { authConfig } from "./auth.config";
 
-export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
@@ -15,7 +20,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -23,7 +28,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string }
+          where: { email: credentials.email as string },
         });
 
         if (!user || !user.password) {
@@ -32,7 +37,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
 
         const passwordsMatch = await bcryptjs.compare(
           credentials.password as string,
-          user.password
+          user.password,
         );
 
         if (passwordsMatch) {
@@ -49,7 +54,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           };
         }
         return null;
-      }
-    })
-  ]
+      },
+    }),
+  ],
 });

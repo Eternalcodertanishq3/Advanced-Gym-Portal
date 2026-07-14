@@ -10,33 +10,36 @@ import { SECURITY } from "@/lib/constants";
 export async function getMembers(page = 1, limit = 10, search = "", filterBranchId?: string) {
   try {
     const skip = (page - 1) * limit;
-    
+
     const { branchId: contextBranchId, role } = await getBranchContext();
-    
+
     // For SUPER_ADMIN, they can filter by any branch. For others, restrict to context branch.
-    const effectiveBranchId = (role === "SUPER_ADMIN" && filterBranchId && filterBranchId !== "ALL") ? filterBranchId : contextBranchId;
+    const effectiveBranchId =
+      role === "SUPER_ADMIN" && filterBranchId && filterBranchId !== "ALL"
+        ? filterBranchId
+        : contextBranchId;
 
     let where: any = {};
 
     if (effectiveBranchId) {
       where.user = {
-        branchId: effectiveBranchId
+        branchId: effectiveBranchId,
       };
     }
 
     if (search) {
       const searchTerms = search.trim().split(/\s+/);
-      
+
       where.user = {
         ...where.user,
-        AND: searchTerms.map(term => ({
+        AND: searchTerms.map((term) => ({
           OR: [
-            { firstName: { contains: term, mode: 'insensitive' as const } },
-            { lastName: { contains: term, mode: 'insensitive' as const } },
-            { email: { contains: term, mode: 'insensitive' as const } },
-            { phone: { contains: term, mode: 'insensitive' as const } }
-          ]
-        }))
+            { firstName: { contains: term, mode: "insensitive" as const } },
+            { lastName: { contains: term, mode: "insensitive" as const } },
+            { email: { contains: term, mode: "insensitive" as const } },
+            { phone: { contains: term, mode: "insensitive" as const } },
+          ],
+        })),
       };
     }
 
@@ -48,18 +51,18 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
         include: {
           user: {
             include: {
-              branch: true
-            }
+              branch: true,
+            },
           },
           subscription: {
             include: {
-              plan: true
-            }
-          }
+              plan: true,
+            },
+          },
         },
-        orderBy: { joinDate: 'desc' }
+        orderBy: { joinDate: "desc" },
       }),
-      prisma.member.count({ where })
+      prisma.member.count({ where }),
     ]);
 
     return {
@@ -69,8 +72,8 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error: any) {
     console.error("Error fetching members:", error);
@@ -80,7 +83,13 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
 
 export async function getMemberById(id: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "TRAINER" && session.user.role !== "SUPER_ADMIN")) {
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "TRAINER" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -90,23 +99,23 @@ export async function getMemberById(id: string) {
         user: true,
         subscription: {
           include: {
-            plan: true
-          }
+            plan: true,
+          },
         },
         trainer: {
           include: {
-            user: true
-          }
+            user: true,
+          },
         },
         attendance: {
           take: 5,
-          orderBy: { date: 'desc' }
+          orderBy: { date: "desc" },
         },
         payments: {
           take: 5,
-          orderBy: { createdAt: 'desc' }
-        }
-      }
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     if (!member) {
@@ -124,15 +133,12 @@ export async function createMember(formData: any) {
   try {
     const { branchId: contextBranchId } = await getBranchContext();
     const branchId = formData.branchId || contextBranchId;
-    
+
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [
-          { email: formData.email },
-          { phone: formData.phone }
-        ]
-      }
+        OR: [{ email: formData.email }, { phone: formData.phone }],
+      },
     });
 
     if (existingUser) {
@@ -140,7 +146,10 @@ export async function createMember(formData: any) {
     }
 
     // Hash default password
-    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(
+      SECURITY.DEFAULT_TEMP_PASSWORD(),
+      SECURITY.BCRYPT_ROUNDS,
+    );
 
     // Create User and Member in a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -154,8 +163,8 @@ export async function createMember(formData: any) {
           passwordResetRequired: true,
           role: "MEMBER",
           branchId: branchId,
-          status: "ACTIVE"
-        }
+          status: "ACTIVE",
+        },
       });
 
       const member = await tx.member.create({
@@ -166,8 +175,8 @@ export async function createMember(formData: any) {
           address: formData.address,
           emergencyContact: formData.emergencyContact,
           status: "ACTIVE",
-          joinDate: new Date()
-        }
+          joinDate: new Date(),
+        },
       });
 
       // Record Activity
@@ -179,8 +188,8 @@ export async function createMember(formData: any) {
             action: "CREATE",
             entityType: "MEMBER",
             entityId: member.id,
-            newValue: { email: user.email, name: `${user.firstName} ${user.lastName}` }
-          }
+            newValue: { email: user.email, name: `${user.firstName} ${user.lastName}` },
+          },
         });
       }
 
@@ -198,7 +207,12 @@ export async function createMember(formData: any) {
 
 export async function updateMember(id: string, formData: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -210,7 +224,7 @@ export async function updateMember(id: string, formData: any) {
           dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : null,
           address: formData.address,
           emergencyContact: formData.emergencyContact,
-        }
+        },
       });
 
       await tx.user.update({
@@ -219,7 +233,7 @@ export async function updateMember(id: string, formData: any) {
           firstName: formData.firstName,
           lastName: formData.lastName,
           phone: formData.phone,
-        }
+        },
       });
 
       return member;

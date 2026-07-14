@@ -16,30 +16,32 @@ export default async function ReferPage() {
   const referralCode = `EAGLE-${userId.substring(0, 8).toUpperCase()}`;
 
   const referralTransactions = await prisma.xPTransaction.findMany({
-    where: { 
+    where: {
       userId: userId,
-      reason: { contains: "Referral" }
-    }
+      reason: { contains: "Referral" },
+    },
   });
 
   const totalReferralXP = referralTransactions.reduce((sum, tx) => sum + tx.amount, 0);
   const referralCount = referralTransactions.length;
 
   return (
-    <div className="w-full h-full p-6 space-y-10 max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-center md:text-left">
+    <div className="mx-auto h-full w-full max-w-5xl space-y-10 p-6">
+      <div className="flex flex-col justify-between gap-6 text-center md:flex-row md:items-center md:text-left">
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground mb-1 uppercase tracking-tight">
+          <h1 className="mb-1 font-display text-3xl font-bold uppercase tracking-tight text-foreground">
             Refer <span className="text-brand-orange">& Earn</span>
           </h1>
-          <p className="text-sm text-txt-secondary font-medium">Strength is better with friends. Invite them and get rewarded!</p>
+          <p className="text-sm font-medium text-txt-secondary">
+            Strength is better with friends. Invite them and get rewarded!
+          </p>
         </div>
       </div>
 
-      <ReferClient 
-        referralCode={referralCode} 
-        referralCount={referralCount} 
-        totalReferralXP={totalReferralXP} 
+      <ReferClient
+        referralCode={referralCode}
+        referralCount={referralCount}
+        totalReferralXP={totalReferralXP}
       />
     </div>
   );

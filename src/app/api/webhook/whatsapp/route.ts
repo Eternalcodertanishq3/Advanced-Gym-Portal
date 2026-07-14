@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     }
 
     const payload = JSON.parse(rawBody);
-    
+
     // Log incoming event hook for debugging and tracking
     console.log("[WhatsApp Event Webhook Received]:", JSON.stringify(payload, null, 2));
 
@@ -95,6 +95,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ received: true });
   } catch (error: any) {
     console.error("WhatsApp webhook handler failed:", error);
-    return NextResponse.json({ error: error.message || "Webhook processing error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Webhook processing error" },
+      { status: 500 },
+    );
   }
 }

@@ -2,17 +2,17 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  CreditCard, 
-  Calendar, 
-  ShieldCheck, 
-  ArrowLeft, 
+import {
+  CreditCard,
+  Calendar,
+  ShieldCheck,
+  ArrowLeft,
   ChevronRight,
   History,
   Download,
   AlertCircle,
   Clock,
-  Crown
+  Crown,
 } from "lucide-react";
 import Link from "next/link";
 import { cn, formatDate } from "@/lib/utils";
@@ -22,11 +22,11 @@ import html2canvas from "html2canvas";
 import { toast } from "sonner";
 
 const containerVariants = {
-// ... (omitted)
+  // ... (omitted)
 };
 
 const itemVariants = {
-// ... (omitted)
+  // ... (omitted)
 };
 
 interface Props {
@@ -40,7 +40,7 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
 
   const downloadReceipt = async (payment: any) => {
     toast.loading("Generating receipt...", { id: "receipt-gen" });
-    
+
     try {
       // Create a hidden receipt element
       const receiptEl = document.createElement("div");
@@ -52,7 +52,7 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
       receiptEl.style.backgroundColor = "#ffffff";
       receiptEl.style.color = "#111827";
       receiptEl.style.fontFamily = "sans-serif";
-      
+
       receiptEl.innerHTML = `
         <div style="border: 2px solid #E85D26; padding: 40px; border-radius: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f3f4f6; padding-bottom: 30px; margin-bottom: 40px;">
@@ -61,14 +61,14 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
               <p style="color: #6b7280; margin: 5px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase;">Official Payment Receipt</p>
             </div>
             <div style="text-align: right;">
-              <p style="margin: 0; font-weight: 700; font-size: 16px;">Receipt #: ${payment.receiptNo || 'REC-' + payment.id.slice(0,8)}</p>
+              <p style="margin: 0; font-weight: 700; font-size: 16px;">Receipt #: ${payment.receiptNo || "REC-" + payment.id.slice(0, 8)}</p>
               <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 14px;">Date: ${new Date(payment.createdAt).toLocaleDateString()}</p>
             </div>
           </div>
 
           <div style="margin-bottom: 40px;">
             <p style="color: #6b7280; text-transform: uppercase; font-size: 12px; font-weight: 700; margin-bottom: 15px;">Billed To</p>
-            <p style="margin: 0; font-size: 18px; font-weight: 700;">${subscription.member?.user?.firstName || 'Valued Member'}</p>
+            <p style="margin: 0; font-size: 18px; font-weight: 700;">${subscription.member?.user?.firstName || "Valued Member"}</p>
             <p style="margin: 5px 0 0 0; color: #4b5563;">Membership ID: ${subscription.memberId}</p>
           </div>
 
@@ -81,7 +81,7 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
             </thead>
             <tbody>
               <tr>
-                <td style="padding: 20px 0; font-weight: 600;">${payment.description || 'Gym Membership Subscription'}</td>
+                <td style="padding: 20px 0; font-weight: 600;">${payment.description || "Gym Membership Subscription"}</td>
                 <td style="padding: 20px 0; text-align: right; font-weight: 700; font-size: 18px;">₹${payment.amount}</td>
               </tr>
             </tbody>
@@ -104,20 +104,20 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
           </div>
         </div>
       `;
-      
+
       document.body.appendChild(receiptEl);
-      
+
       const canvas = await html2canvas(receiptEl, {
         scale: 2,
         logging: false,
-        useCORS: true
+        useCORS: true,
       });
-      
+
       const link = document.createElement("a");
       link.download = `EagleGym_Receipt_${payment.receiptNo || payment.id}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
-      
+
       document.body.removeChild(receiptEl);
       toast.success("Receipt downloaded successfully!", { id: "receipt-gen" });
     } catch (error) {
@@ -127,77 +127,93 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
   };
 
   return (
-// ... (logic continues)
+    // ... (logic continues)
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="max-w-5xl mx-auto space-y-10 py-6"
+      className="mx-auto max-w-5xl space-y-10 py-6"
     >
       {/* Navigation Header */}
       <motion.div variants={itemVariants} className="flex flex-col gap-4">
-        <Link 
+        <Link
           href="/member"
-          className="flex items-center gap-2 text-txt-tertiary hover:text-brand-orange transition-colors text-sm font-bold uppercase tracking-widest group"
+          className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-txt-tertiary transition-colors hover:text-brand-orange"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Back to Dashboard
         </Link>
-        <h1 className="text-4xl font-display font-bold text-foreground tracking-tight">
+        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
           My <span className="text-brand-orange">Subscription</span>
         </h1>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Current Plan Card */}
-        <motion.div variants={itemVariants} className="lg:col-span-2 space-y-6">
-          <div className="surface-card p-8 relative overflow-hidden group">
-
+        <motion.div variants={itemVariants} className="space-y-6 lg:col-span-2">
+          <div className="surface-card group relative overflow-hidden p-8">
             <div className="relative z-10 space-y-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-brand-orange/10 flex items-center justify-center border border-brand-orange/20">
-                    <Crown className="w-8 h-8 text-brand-orange" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-brand-orange/20 bg-brand-orange/10">
+                    <Crown className="h-8 w-8 text-brand-orange" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-brand-orange uppercase tracking-widest mb-1">Current Active Plan</p>
-                    <h3 className="text-3xl font-display font-bold text-foreground">{plan?.name || "No Active Plan"}</h3>
+                    <p className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-orange">
+                      Current Active Plan
+                    </p>
+                    <h3 className="font-display text-3xl font-bold text-foreground">
+                      {plan?.name || "No Active Plan"}
+                    </h3>
                   </div>
                 </div>
-                <div className={cn(
-                  "px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border",
-                  isActive 
-                    ? "bg-success-soft text-success border-success/20" 
-                    : "bg-danger-soft text-danger border-danger/20"
-                )}>
+                <div
+                  className={cn(
+                    "rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-widest",
+                    isActive
+                      ? "border-success/20 bg-success-soft text-success"
+                      : "border-danger/20 bg-danger-soft text-danger",
+                  )}
+                >
                   {isActive ? "Active" : "Inactive"}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border">
+              <div className="grid grid-cols-1 gap-6 border-t border-border pt-4 md:grid-cols-2">
                 <div className="space-y-1">
-                  <p className="text-xs font-bold text-txt-tertiary uppercase tracking-wider">Member Since</p>
-                  <div className="flex items-center gap-2 text-foreground font-semibold">
-                    <Calendar className="w-4 h-4 text-brand-orange" />
-                    {subscription?.startDate ? formatDate(subscription.startDate, "dd MMM yyyy") : "N/A"}
+                  <p className="text-xs font-bold uppercase tracking-wider text-txt-tertiary">
+                    Member Since
+                  </p>
+                  <div className="flex items-center gap-2 font-semibold text-foreground">
+                    <Calendar className="h-4 w-4 text-brand-orange" />
+                    {subscription?.startDate
+                      ? formatDate(subscription.startDate, "dd MMM yyyy")
+                      : "N/A"}
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-bold text-txt-tertiary uppercase tracking-wider">Renewal Date</p>
-                  <div className="flex items-center gap-2 text-foreground font-semibold">
-                    <Clock className="w-4 h-4 text-brand-orange" />
-                    {subscription?.endDate ? formatDate(subscription.endDate, "dd MMM yyyy") : "N/A"}
+                  <p className="text-xs font-bold uppercase tracking-wider text-txt-tertiary">
+                    Renewal Date
+                  </p>
+                  <div className="flex items-center gap-2 font-semibold text-foreground">
+                    <Clock className="h-4 w-4 text-brand-orange" />
+                    {subscription?.endDate
+                      ? formatDate(subscription.endDate, "dd MMM yyyy")
+                      : "N/A"}
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 pt-4">
                 <Link href="/member/select-plan" className="flex-1">
-                  <Button className="w-full bg-brand-orange hover:bg-brand-orange-dark h-12 text-white font-bold text-base shadow-lg shadow-brand-orange/20">
+                  <Button className="hover:bg-brand-orange-dark h-12 w-full bg-brand-orange text-base font-bold text-white shadow-lg shadow-brand-orange/20">
                     Change Plan
                   </Button>
                 </Link>
-                <Button variant="ghost" className="h-12 border border-border px-8 font-bold text-txt-secondary hover:bg-surface-sunken">
+                <Button
+                  variant="ghost"
+                  className="h-12 border border-border px-8 font-bold text-txt-secondary hover:bg-surface-sunken"
+                >
                   Cancel Subscription
                 </Button>
               </div>
@@ -207,7 +223,7 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
           {/* Billing History */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 px-2">
-              <History className="w-5 h-5 text-brand-orange" />
+              <History className="h-5 w-5 text-brand-orange" />
               <h3 className="text-xl font-bold text-foreground">Billing History</h3>
             </div>
 
@@ -216,44 +232,64 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
                 <table className="w-full text-left">
                   <thead className="bg-surface-sunken">
                     <tr>
-                      <th className="px-6 py-4 text-xs font-bold text-txt-tertiary uppercase tracking-widest">Date</th>
-                      <th className="px-6 py-4 text-xs font-bold text-txt-tertiary uppercase tracking-widest">Invoice</th>
-                      <th className="px-6 py-4 text-xs font-bold text-txt-tertiary uppercase tracking-widest">Amount</th>
-                      <th className="px-6 py-4 text-xs font-bold text-txt-tertiary uppercase tracking-widest">Status</th>
-                      <th className="px-6 py-4 text-xs font-bold text-txt-tertiary uppercase tracking-widest text-right">Receipt</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-txt-tertiary">
+                        Date
+                      </th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-txt-tertiary">
+                        Invoice
+                      </th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-txt-tertiary">
+                        Amount
+                      </th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-txt-tertiary">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-widest text-txt-tertiary">
+                        Receipt
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {payments.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-txt-tertiary font-medium italic">
+                        <td
+                          colSpan={5}
+                          className="px-6 py-12 text-center font-medium italic text-txt-tertiary"
+                        >
                           No billing records found.
                         </td>
                       </tr>
                     ) : (
                       payments.map((payment) => (
-                        <tr key={payment.id} className="hover:bg-surface-sunken/50 transition-colors group">
+                        <tr
+                          key={payment.id}
+                          className="group transition-colors hover:bg-surface-sunken/50"
+                        >
                           <td className="px-6 py-5">
-                            <p className="text-sm font-bold text-foreground">{formatDate(payment.createdAt, "dd MMM yyyy")}</p>
+                            <p className="text-sm font-bold text-foreground">
+                              {formatDate(payment.createdAt, "dd MMM yyyy")}
+                            </p>
                           </td>
                           <td className="px-6 py-5">
-                            <p className="text-sm font-medium text-txt-secondary">{payment.receiptNo || `INV-${payment.id.slice(0, 8)}`}</p>
+                            <p className="text-sm font-medium text-txt-secondary">
+                              {payment.receiptNo || `INV-${payment.id.slice(0, 8)}`}
+                            </p>
                           </td>
                           <td className="px-6 py-5">
                             <p className="text-sm font-bold text-foreground">₹{payment.amount}</p>
                           </td>
                           <td className="px-6 py-5">
-                            <span className="px-3 py-1 rounded-full bg-success-soft text-success text-[10px] font-bold uppercase tracking-wider">
+                            <span className="rounded-full bg-success-soft px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-success">
                               {payment.status}
                             </span>
                           </td>
                           <td className="px-6 py-5 text-right">
-                            <button 
+                            <button
                               onClick={() => downloadReceipt(payment)}
                               aria-label="Download Receipt"
-                              className="p-2 rounded-lg bg-surface-elevated text-txt-tertiary hover:text-brand-orange transition-colors"
+                              className="rounded-lg bg-surface-elevated p-2 text-txt-tertiary transition-colors hover:text-brand-orange"
                             >
-                              <Download className="w-4 h-4" />
+                              <Download className="h-4 w-4" />
                             </button>
                           </td>
                         </tr>
@@ -268,22 +304,26 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
 
         {/* Support & Help Sidebar */}
         <motion.div variants={itemVariants} className="space-y-6">
-          <div className="surface-card p-6 bg-surface-sunken border-dashed">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-info-soft flex items-center justify-center">
-                <AlertCircle className="w-6 h-6 text-info" />
+          <div className="surface-card border-dashed bg-surface-sunken p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-info-soft">
+                <AlertCircle className="h-6 w-6 text-info" />
               </div>
               <h4 className="font-bold text-foreground">Payment Help</h4>
             </div>
-            <p className="text-sm text-txt-secondary mb-6">
-              Need help with your subscription or have questions about your bill? Our support team is here for you.
+            <p className="mb-6 text-sm text-txt-secondary">
+              Need help with your subscription or have questions about your bill? Our support team
+              is here for you.
             </p>
-            <Button variant="outline" className="w-full border-brand-orange/30 text-brand-orange hover:bg-brand-orange/5 font-bold">
+            <Button
+              variant="outline"
+              className="w-full border-brand-orange/30 font-bold text-brand-orange hover:bg-brand-orange/5"
+            >
               Contact Support
             </Button>
           </div>
 
-          <div className="surface-card p-6 space-y-4">
+          <div className="surface-card space-y-4 p-6">
             <h4 className="font-bold text-foreground">Plan Benefits</h4>
             <div className="space-y-3">
               {[
@@ -291,10 +331,10 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
                 "Personalized Workout Plans",
                 "Custom Nutrition Guides",
                 "Advanced Progress Tracking",
-                "Locker & Shower Access"
+                "Locker & Shower Access",
               ].map((benefit, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm text-txt-secondary">
-                  <ShieldCheck className="w-4 h-4 text-success" />
+                  <ShieldCheck className="h-4 w-4 text-success" />
                   <span>{benefit}</span>
                 </div>
               ))}

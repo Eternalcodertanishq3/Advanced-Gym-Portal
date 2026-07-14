@@ -1,4 +1,4 @@
-import Papa from 'papaparse';
+import Papa from "papaparse";
 
 export function parseCSVData(file: File): Promise<any[]> {
   return new Promise((resolve, reject) => {
@@ -6,7 +6,7 @@ export function parseCSVData(file: File): Promise<any[]> {
       header: true,
       skipEmptyLines: true,
       complete: (results) => resolve(results.data),
-      error: (error: any) => reject(error)
+      error: (error: any) => reject(error),
     });
   });
 }

@@ -8,16 +8,16 @@ import { auth } from "@/auth";
 export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
   try {
     const skip = (page - 1) * limit;
-    
+
     const { branchId } = await getBranchContext();
-    
+
     let where: any = {};
 
     if (branchId) {
       where.member = {
         user: {
-          branchId: branchId
-        }
+          branchId: branchId,
+        },
       };
     }
 
@@ -27,12 +27,12 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
         user: {
           ...where.member?.user,
           OR: [
-            { firstName: { contains: search, mode: 'insensitive' as const } },
-            { lastName: { contains: search, mode: 'insensitive' as const } },
-            { email: { contains: search, mode: 'insensitive' as const } },
-            { phone: { contains: search, mode: 'insensitive' as const } }
-          ]
-        }
+            { firstName: { contains: search, mode: "insensitive" as const } },
+            { lastName: { contains: search, mode: "insensitive" as const } },
+            { email: { contains: search, mode: "insensitive" as const } },
+            { phone: { contains: search, mode: "insensitive" as const } },
+          ],
+        },
       };
     }
 
@@ -43,29 +43,29 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
           member: {
             include: {
               user: {
-                select: { firstName: true, lastName: true, email: true, avatar: true }
-              }
-            }
-          }
+                select: { firstName: true, lastName: true, email: true, avatar: true },
+              },
+            },
+          },
         },
-        orderBy: { date: 'desc' },
+        orderBy: { date: "desc" },
         skip,
         take: limit,
       }),
-      prisma.attendance.count({ where: where })
+      prisma.attendance.count({ where: where }),
     ]);
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         logs,
         pagination: {
           total,
           pages: Math.ceil(total / limit),
           page,
-          limit
-        }
-      }
+          limit,
+        },
+      },
     };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -74,7 +74,12 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
 
 export async function checkInMember(memberId: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -85,7 +90,7 @@ export async function checkInMember(memberId: string) {
       where: {
         memberId,
         date: { gte: today },
-      }
+      },
     });
 
     if (activeSession) {
@@ -98,8 +103,8 @@ export async function checkInMember(memberId: string) {
         member: { connect: { id: memberId } },
         date: now,
         checkIn: now,
-        status: "PRESENT"
-      }
+        status: "PRESENT",
+      },
     });
 
     revalidatePath("/admin/attendance");
@@ -111,17 +116,22 @@ export async function checkInMember(memberId: string) {
 
 export async function checkOutMember(attendanceId: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
     return { success: false, error: "Unauthorized" };
   }
   try {
     const attendance = await prisma.attendance.update({
       where: { id: attendanceId },
       data: {
-        checkOut: new Date()
-      }
+        checkOut: new Date(),
+      },
     });
-    
+
     revalidatePath("/admin/attendance");
     return { success: true, data: attendance };
   } catch (error: any) {
@@ -134,7 +144,12 @@ export async function checkOutMember(attendanceId: string) {
  */
 export async function searchMemberByPhone(query: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -142,15 +157,12 @@ export async function searchMemberByPhone(query: string) {
 
     const member = await prisma.member.findFirst({
       where: {
-        OR: [
-          { user: { phone: { contains: query } } },
-          { id: { contains: query } }
-        ]
+        OR: [{ user: { phone: { contains: query } } }, { id: { contains: query } }],
       },
       include: {
         user: { select: { firstName: true, lastName: true, avatar: true, phone: true } },
-        subscription: { include: { plan: true } }
-      }
+        subscription: { include: { plan: true } },
+      },
     });
 
     if (!member) return { success: false, error: "Member not found" };
@@ -160,4 +172,3 @@ export async function searchMemberByPhone(query: string) {
     return { success: false, error: "Search failed" };
   }
 }
-

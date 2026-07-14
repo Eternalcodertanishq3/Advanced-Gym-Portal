@@ -3,16 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Phone, 
-  ArrowRight, 
-  Dumbbell, 
+import {
+  User,
+  Mail,
+  Lock,
+  Phone,
+  ArrowRight,
+  Dumbbell,
   CheckCircle2,
   ShieldCheck,
-  ChevronLeft
+  ChevronLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -70,7 +70,7 @@ export default function RegisterPage() {
         phone: formData.phone,
         password: formData.password,
       });
-      
+
       if (res.success) {
         toast.success("Account created successfully! Please log in.");
         router.push("/login");
@@ -85,23 +85,28 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background py-8">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background py-8">
       {/* Premium Background Pattern */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
+        <div className="bg-mesh-gradient absolute inset-0 opacity-30 dark:opacity-20" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-xl px-6">
         {/* Header */}
-        <div className="text-center mb-6">
-          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20 mb-4">
-            <Dumbbell className="w-6 h-6" />
+        <div className="mb-6 text-center">
+          <Link
+            href="/"
+            className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20"
+          >
+            <Dumbbell className="h-6 w-6" />
           </Link>
           <h1 className="text-2xl font-bold text-foreground">
             JOIN <span className="text-brand-orange">THE ELITE</span>
           </h1>
-          <p className="text-xs text-txt-secondary mt-1 font-medium">Start your transformation journey today</p>
+          <p className="mt-1 text-xs font-medium text-txt-secondary">
+            Start your transformation journey today
+          </p>
         </div>
 
         {/* Form Card */}
@@ -112,9 +117,9 @@ export default function RegisterPage() {
           transition={{ duration: 0.4 }}
         >
           {/* Progress Bar */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="flex-1 h-1 rounded-full bg-surface-sunken overflow-hidden">
-              <motion.div 
+          <div className="mb-8 flex items-center gap-3">
+            <div className="h-1 flex-1 overflow-hidden rounded-full bg-surface-sunken">
+              <motion.div
                 className="h-full bg-brand-orange"
                 initial={{ width: "50%" }}
                 animate={{ width: step === 1 ? "50%" : "100%" }}
@@ -128,12 +133,22 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {step === 1 ? (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4 duration-300 animate-in fade-in slide-in-from-right-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label htmlFor="firstName" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">First Name</label>
+                    <label
+                      htmlFor="firstName"
+                      className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                    >
+                      First Name
+                    </label>
                     <div className="relative">
-                      <User className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "firstName" ? "text-brand-orange" : "text-txt-tertiary")} />
+                      <User
+                        className={cn(
+                          "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+                          focusedField === "firstName" ? "text-brand-orange" : "text-txt-tertiary",
+                        )}
+                      />
                       <input
                         id="firstName"
                         name="firstName"
@@ -147,9 +162,19 @@ export default function RegisterPage() {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="lastName" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Last Name</label>
+                    <label
+                      htmlFor="lastName"
+                      className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                    >
+                      Last Name
+                    </label>
                     <div className="relative">
-                      <User className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "lastName" ? "text-brand-orange" : "text-txt-tertiary")} />
+                      <User
+                        className={cn(
+                          "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+                          focusedField === "lastName" ? "text-brand-orange" : "text-txt-tertiary",
+                        )}
+                      />
                       <input
                         id="lastName"
                         name="lastName"
@@ -165,9 +190,19 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="email" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Email Address</label>
+                  <label
+                    htmlFor="email"
+                    className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                  >
+                    Email Address
+                  </label>
                   <div className="relative">
-                    <Mail className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary")} />
+                    <Mail
+                      className={cn(
+                        "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+                        focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary",
+                      )}
+                    />
                     <input
                       id="email"
                       name="email"
@@ -183,9 +218,19 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="phone" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Phone Number</label>
+                  <label
+                    htmlFor="phone"
+                    className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                  >
+                    Phone Number
+                  </label>
                   <div className="relative">
-                    <Phone className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "phone" ? "text-brand-orange" : "text-txt-tertiary")} />
+                    <Phone
+                      className={cn(
+                        "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+                        focusedField === "phone" ? "text-brand-orange" : "text-txt-tertiary",
+                      )}
+                    />
                     <input
                       id="phone"
                       name="phone"
@@ -202,18 +247,28 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="btn-primary w-full h-11 text-sm font-bold mt-2"
+                  className="btn-primary mt-2 h-11 w-full text-sm font-bold"
                 >
                   Continue to Security
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             ) : (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="space-y-4 duration-300 animate-in fade-in slide-in-from-right-4">
                 <div className="space-y-1.5">
-                  <label htmlFor="password" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Create Password</label>
+                  <label
+                    htmlFor="password"
+                    className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                  >
+                    Create Password
+                  </label>
                   <div className="relative">
-                    <Lock className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary")} />
+                    <Lock
+                      className={cn(
+                        "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+                        focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary",
+                      )}
+                    />
                     <input
                       id="password"
                       name="password"
@@ -229,9 +284,21 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="confirmPassword" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">Confirm Password</label>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                  >
+                    Confirm Password
+                  </label>
                   <div className="relative">
-                    <ShieldCheck className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors", focusedField === "confirmPassword" ? "text-brand-orange" : "text-txt-tertiary")} />
+                    <ShieldCheck
+                      className={cn(
+                        "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+                        focusedField === "confirmPassword"
+                          ? "text-brand-orange"
+                          : "text-txt-tertiary",
+                      )}
+                    />
                     <input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -246,27 +313,27 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div className="pt-2 space-y-3">
+                <div className="space-y-3 pt-2">
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="btn-primary w-full h-11 text-sm font-bold"
+                    className="btn-primary h-11 w-full text-sm font-bold"
                   >
                     {isLoading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                     ) : (
                       <>
                         Complete Registration
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle2 className="h-4 w-4" />
                       </>
                     )}
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-txt-tertiary hover:text-foreground transition-colors"
+                    className="flex w-full items-center justify-center gap-1.5 text-xs font-bold text-txt-tertiary transition-colors hover:text-foreground"
                   >
-                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <ChevronLeft className="h-3.5 w-3.5" />
                     Back to Details
                   </button>
                 </div>
@@ -286,17 +353,22 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <Link
-            href="/login"
-            className="btn-ghost w-full h-11 text-xs font-bold border-2"
-          >
+          <Link href="/login" className="btn-ghost h-11 w-full border-2 text-xs font-bold">
             Sign In to your Account
           </Link>
         </motion.div>
 
         {/* Footer */}
-        <p className="text-center mt-6 text-[10px] text-txt-tertiary leading-relaxed">
-          By joining, you agree to our <Link href="/terms" className="text-brand-orange font-bold hover:underline">Terms</Link> and <Link href="/privacy" className="text-brand-orange font-bold hover:underline">Privacy</Link>.
+        <p className="mt-6 text-center text-[10px] leading-relaxed text-txt-tertiary">
+          By joining, you agree to our{" "}
+          <Link href="/terms" className="font-bold text-brand-orange hover:underline">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="font-bold text-brand-orange hover:underline">
+            Privacy
+          </Link>
+          .
         </p>
       </div>
     </div>

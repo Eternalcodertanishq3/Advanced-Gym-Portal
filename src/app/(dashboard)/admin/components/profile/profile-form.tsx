@@ -62,32 +62,38 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
   }
 
   return (
-    <div className="glass-card p-6 sm:p-8 shadow-md">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center">
-          <User className="w-5 h-5 text-brand-orange" />
+    <div className="glass-card p-6 shadow-md sm:p-8">
+      <div className="mb-8 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-orange/20 bg-brand-orange/10">
+          <User className="h-5 w-5 text-brand-orange" />
         </div>
         <div>
-          <h3 className="text-lg font-black text-foreground uppercase tracking-tight">Personal Information</h3>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Update your public profile details</p>
+          <h3 className="text-lg font-black uppercase tracking-tight text-foreground">
+            Personal Information
+          </h3>
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+            Update your public profile details
+          </p>
         </div>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">First Name</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    First Name
+                  </FormLabel>
                   <FormControl>
-                    <div className="relative group">
-                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-orange transition-colors" />
-                      <Input 
-                        {...field} 
-                        className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
+                    <div className="group relative">
+                      <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-orange" />
+                      <Input
+                        {...field}
+                        className="rounded-xl border-border bg-muted/50 pl-10 transition-all focus:border-brand-orange/50"
                         placeholder="First Name"
                       />
                     </div>
@@ -101,13 +107,15 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Last Name</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Last Name
+                  </FormLabel>
                   <FormControl>
-                    <div className="relative group">
-                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-orange transition-colors" />
-                      <Input 
-                        {...field} 
-                        className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
+                    <div className="group relative">
+                      <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-orange" />
+                      <Input
+                        {...field}
+                        className="rounded-xl border-border bg-muted/50 pl-10 transition-all focus:border-brand-orange/50"
                         placeholder="Last Name"
                       />
                     </div>
@@ -123,13 +131,15 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Email Address</FormLabel>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Email Address
+                </FormLabel>
                 <FormControl>
-                  <div className="relative group">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-orange transition-colors" />
-                    <Input 
-                      {...field} 
-                      className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
+                  <div className="group relative">
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-orange" />
+                    <Input
+                      {...field}
+                      className="rounded-xl border-border bg-muted/50 pl-10 transition-all focus:border-brand-orange/50"
                       placeholder="Official Email Address"
                     />
                   </div>
@@ -144,14 +154,16 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Phone Number</FormLabel>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Phone Number
+                </FormLabel>
                 <FormControl>
-                  <div className="relative group">
-                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-orange transition-colors" />
-                    <Input 
-                      {...field} 
+                  <div className="group relative">
+                    <Phone className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-orange" />
+                    <Input
+                      {...field}
                       value={field.value || ""}
-                      className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
+                      className="rounded-xl border-border bg-muted/50 pl-10 transition-all focus:border-brand-orange/50"
                       placeholder="Secure Phone Number"
                     />
                   </div>
@@ -161,20 +173,20 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
             )}
           />
 
-          <div className="pt-4 flex justify-end">
-            <Button 
-              type="submit" 
+          <div className="flex justify-end pt-4">
+            <Button
+              type="submit"
               disabled={isPending}
-              className="bg-brand-orange hover:bg-brand-orange-hover text-white px-8 h-11 rounded-xl font-bold transition-all shadow-lg shadow-brand-orange/20"
+              className="h-11 rounded-xl bg-brand-orange px-8 font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:bg-brand-orange-hover"
             >
               {isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="mr-2 h-4 w-4" />
                   Save Changes
                 </>
               )}

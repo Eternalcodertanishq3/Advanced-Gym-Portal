@@ -36,7 +36,7 @@ export function EagleLoader({
       {/* Dumbbell Animation */}
       <div className={cn("relative", s.container)}>
         {/* Central glow */}
-        <div className="absolute inset-0 rounded-full bg-gold-500/10 blur-xl animate-pulse" />
+        <div className="bg-gold-500/10 absolute inset-0 animate-pulse rounded-full blur-xl" />
 
         {/* Dumbbell container */}
         <motion.div
@@ -47,16 +47,16 @@ export function EagleLoader({
           {/* Bar */}
           <div
             className={cn(
-              "absolute h-1 rounded-full bg-gradient-to-r from-liquid-gold via-liquid-amber to-liquid-orange",
-              s.dumbbell
+              "from-liquid-gold via-liquid-amber to-liquid-orange absolute h-1 rounded-full bg-gradient-to-r",
+              s.dumbbell,
             )}
           />
 
           {/* Left plate */}
           <motion.div
             className={cn(
-              "absolute left-0 rounded-lg bg-gradient-to-b from-liquid-gold via-liquid-amber to-liquid-orange shadow-lg shadow-gold-500/30",
-              s.plate
+              "from-liquid-gold via-liquid-amber to-liquid-orange shadow-gold-500/30 absolute left-0 rounded-lg bg-gradient-to-b shadow-lg",
+              s.plate,
             )}
             style={{ left: "10%" }}
             animate={{ scaleY: [1, 1.1, 1] }}
@@ -66,8 +66,8 @@ export function EagleLoader({
           {/* Right plate */}
           <motion.div
             className={cn(
-              "absolute right-0 rounded-lg bg-gradient-to-b from-liquid-gold via-liquid-amber to-liquid-orange shadow-lg shadow-gold-500/30",
-              s.plate
+              "from-liquid-gold via-liquid-amber to-liquid-orange shadow-gold-500/30 absolute right-0 rounded-lg bg-gradient-to-b shadow-lg",
+              s.plate,
             )}
             style={{ right: "10%" }}
             animate={{ scaleY: [1, 1.1, 1] }}
@@ -84,7 +84,16 @@ export function EagleLoader({
         >
           <svg
             viewBox="0 0 100 100"
-            className={cn("text-liquid-gold drop-shadow-lg", size === "sm" ? "w-6 h-6" : size === "md" ? "w-8 h-8" : size === "lg" ? "w-10 h-10" : "w-12 h-12")}
+            className={cn(
+              "text-liquid-gold drop-shadow-lg",
+              size === "sm"
+                ? "h-6 w-6"
+                : size === "md"
+                  ? "h-8 w-8"
+                  : size === "lg"
+                    ? "h-10 w-10"
+                    : "h-12 w-12",
+            )}
             fill="currentColor"
           >
             <path d="M50 15 L60 35 L80 30 L70 45 L85 55 L65 60 L70 75 L50 65 L30 75 L35 60 L15 55 L30 45 L20 30 L40 35 Z" />
@@ -96,7 +105,7 @@ export function EagleLoader({
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-liquid-gold"
+            className="bg-liquid-gold absolute h-1 w-1 rounded-full"
             style={{
               top: "50%",
               left: "50%",
@@ -121,8 +130,8 @@ export function EagleLoader({
       <div className="flex flex-col items-center gap-2">
         <motion.h3
           className={cn(
-            "font-display font-bold tracking-[0.3em] text-gold-gradient uppercase",
-            s.text
+            "text-gold-gradient font-display font-bold uppercase tracking-[0.3em]",
+            s.text,
           )}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -132,7 +141,7 @@ export function EagleLoader({
 
         {subText && (
           <motion.p
-            className="text-xs text-white/40 tracking-wider"
+            className="text-xs tracking-wider text-white/40"
             animate={{ opacity: [0.3, 0.6, 0.3] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -142,9 +151,9 @@ export function EagleLoader({
       </div>
 
       {/* Progress bar */}
-      <div className="w-48 h-[2px] rounded-full bg-white/10 overflow-hidden">
+      <div className="h-[2px] w-48 overflow-hidden rounded-full bg-white/10">
         <motion.div
-          className="h-full bg-gradient-to-r from-liquid-gold to-liquid-orange"
+          className="from-liquid-gold to-liquid-orange h-full bg-gradient-to-r"
           initial={{ width: "0%" }}
           animate={{ width: ["0%", "100%", "0%"] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -156,7 +165,7 @@ export function EagleLoader({
   if (fullScreen) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian-950">
-        <div className="absolute inset-0 bg-mesh-gradient opacity-30" />
+        <div className="bg-mesh-gradient absolute inset-0 opacity-30" />
         {loaderContent}
       </div>
     );
@@ -170,7 +179,9 @@ export function EagleLoader({
 // ═══════════════════════════════════════════════════════════════
 
 export function PageLoader() {
-  return <EagleLoader size="lg" fullScreen text="GymFlow SaaS" subText="Loading your dashboard..." />;
+  return (
+    <EagleLoader size="lg" fullScreen text="GymFlow SaaS" subText="Loading your dashboard..." />
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -179,16 +190,16 @@ export function PageLoader() {
 
 export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("glass-card p-6 space-y-4", className)}>
+    <div className={cn("glass-card space-y-4 p-6", className)}>
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-white/5 shimmer" />
-        <div className="space-y-2 flex-1">
-          <div className="h-4 w-1/3 rounded bg-white/5 shimmer" />
-          <div className="h-3 w-1/4 rounded bg-white/5 shimmer" />
+        <div className="shimmer h-12 w-12 rounded-xl bg-white/5" />
+        <div className="flex-1 space-y-2">
+          <div className="shimmer h-4 w-1/3 rounded bg-white/5" />
+          <div className="shimmer h-3 w-1/4 rounded bg-white/5" />
         </div>
       </div>
-      <div className="h-8 w-2/3 rounded bg-white/5 shimmer" />
-      <div className="h-2 w-full rounded-full bg-white/5 shimmer" />
+      <div className="shimmer h-8 w-2/3 rounded bg-white/5" />
+      <div className="shimmer h-2 w-full rounded-full bg-white/5" />
     </div>
   );
 }
@@ -197,20 +208,23 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
     <div className="glass-card overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b border-white/5">
+      <div className="flex items-center gap-4 border-b border-white/5 p-4">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className={cn("h-4 rounded bg-white/5 shimmer", i === 1 ? "w-8" : "flex-1")} />
+          <div
+            key={i}
+            className={cn("shimmer h-4 rounded bg-white/5", i === 1 ? "w-8" : "flex-1")}
+          />
         ))}
       </div>
       {/* Rows */}
       {[...Array(rows)].map((_, i) => (
-        <div key={i} className="flex items-center gap-4 p-4 border-b border-white/5 last:border-0">
-          <div className="w-8 h-4 rounded bg-white/5 shimmer" />
-          <div className="w-10 h-10 rounded-full bg-white/5 shimmer" />
-          <div className="flex-1 h-4 rounded bg-white/5 shimmer" />
-          <div className="flex-1 h-4 rounded bg-white/5 shimmer" />
-          <div className="w-20 h-6 rounded-full bg-white/5 shimmer" />
-          <div className="w-8 h-8 rounded-lg bg-white/5 shimmer" />
+        <div key={i} className="flex items-center gap-4 border-b border-white/5 p-4 last:border-0">
+          <div className="shimmer h-4 w-8 rounded bg-white/5" />
+          <div className="shimmer h-10 w-10 rounded-full bg-white/5" />
+          <div className="shimmer h-4 flex-1 rounded bg-white/5" />
+          <div className="shimmer h-4 flex-1 rounded bg-white/5" />
+          <div className="shimmer h-6 w-20 rounded-full bg-white/5" />
+          <div className="shimmer h-8 w-8 rounded-lg bg-white/5" />
         </div>
       ))}
     </div>
@@ -219,16 +233,16 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
 
 export function SkeletonChart() {
   return (
-    <div className="glass-card p-6 space-y-4">
-      <div className="h-6 w-1/3 rounded bg-white/5 shimmer" />
-      <div className="h-64 w-full rounded-xl bg-white/5 shimmer" />
+    <div className="glass-card space-y-4 p-6">
+      <div className="shimmer h-6 w-1/3 rounded bg-white/5" />
+      <div className="shimmer h-64 w-full rounded-xl bg-white/5" />
     </div>
   );
 }
 
 export function SkeletonStatGrid({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {[...Array(count)].map((_, i) => (
         <SkeletonCard key={i} />
       ))}

@@ -22,27 +22,27 @@ export async function getMemberProfile() {
             branch: {
               select: {
                 name: true,
-              }
+              },
             },
-          }
+          },
         },
         subscription: {
           include: {
-            plan: true
-          }
+            plan: true,
+          },
         },
         _count: {
           select: {
             attendance: {
               where: {
                 date: {
-                  gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-                }
-              }
-            }
-          }
-        }
-      }
+                  gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!member) {

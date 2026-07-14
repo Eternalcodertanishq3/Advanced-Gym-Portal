@@ -13,11 +13,7 @@ import { getMemberFeatures } from "@/lib/membership";
 
 import { getTenantDetails } from "@/lib/tenant";
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
 
   // Redirect to login if not authenticated
@@ -40,14 +36,14 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground transition-colors duration-300">
       {/* Ambient background mesh gradient to support liquid glass refraction */}
-      <div className="absolute inset-0 bg-mesh-gradient opacity-60 dark:opacity-30 pointer-events-none" />
+      <div className="bg-mesh-gradient pointer-events-none absolute inset-0 opacity-60 dark:opacity-30" />
 
       {/* Sidebar */}
-      <Sidebar 
-        user={session.user as any} 
-        allowedFeatures={allowedFeatures} 
+      <Sidebar
+        user={session.user as any}
+        allowedFeatures={allowedFeatures}
         tenantName={tenant.name}
       />
 
@@ -56,10 +52,8 @@ export default async function DashboardLayout({
 
       {/* Main Content Area */}
       <DashboardContainer>
-        <main className="pt-24 min-h-screen">
-          <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto">
-            {children}
-          </div>
+        <main className="min-h-screen pt-24">
+          <div className="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">{children}</div>
         </main>
       </DashboardContainer>
     </div>

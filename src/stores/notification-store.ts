@@ -37,9 +37,7 @@ export const useNotificationStore = create<NotificationState>()(
 
       markAsRead: (id) =>
         set((state) => ({
-          notifications: state.notifications.map((n) =>
-            n.id === id ? { ...n, isRead: true } : n
-          ),
+          notifications: state.notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
           unreadCount: Math.max(0, state.unreadCount - 1),
         })),
 
@@ -53,6 +51,6 @@ export const useNotificationStore = create<NotificationState>()(
     }),
     {
       name: "eagle-gym-notifications",
-    }
-  )
+    },
+  ),
 );

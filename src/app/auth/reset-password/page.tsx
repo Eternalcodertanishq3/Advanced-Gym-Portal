@@ -34,7 +34,7 @@ export default function ResetPasswordPage() {
     }
 
     const res = await resetInitialPassword(password);
-    
+
     if (res.success) {
       setIsSuccess(true);
       toast.success("Password updated successfully!");
@@ -44,37 +44,37 @@ export default function ResetPasswordPage() {
     } else {
       toast.error(res.error || "Failed to update password");
     }
-    
+
     setIsSubmitting(false);
   };
 
   return (
-    <div className="min-h-screen bg-[#0F1117] flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#0F1117] p-4">
       {/* Subtle Background Accents */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-orange/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-success/5 rounded-full blur-[120px]" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-[-10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-brand-orange/5 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-success/5 blur-[120px]" />
       </div>
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md bg-card border border-border p-8 rounded-3xl shadow-2xl relative z-10"
+        className="relative z-10 w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-2xl"
       >
-        <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-brand-orange/10 flex items-center justify-center mb-4 border border-brand-orange/20">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-orange/20 bg-brand-orange/10">
             {isSuccess ? (
-              <CheckCircle2 className="w-8 h-8 text-success" />
+              <CheckCircle2 className="h-8 w-8 text-success" />
             ) : (
-              <ShieldAlert className="w-8 h-8 text-brand-orange" />
+              <ShieldAlert className="h-8 w-8 text-brand-orange" />
             )}
           </div>
-          <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+          <h1 className="mb-2 font-display text-2xl font-bold text-foreground">
             {isSuccess ? "Password Updated" : "Secure Your Account"}
           </h1>
-          <p className="text-muted-foreground text-sm">
-            {isSuccess 
-              ? "Your password has been changed successfully. Redirecting you to the dashboard..." 
+          <p className="text-sm text-muted-foreground">
+            {isSuccess
+              ? "Your password has been changed successfully. Redirecting you to the dashboard..."
               : "You're logging in with a temporary password. For your security, please set a new private password."}
           </p>
         </div>
@@ -83,35 +83,37 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-foreground/70 ml-1">New Password</label>
+                <label className="ml-1 text-sm font-bold text-foreground/70">New Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                  <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                   <input
                     required
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-12 py-4 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-all"
+                    className="w-full rounded-2xl border border-border bg-muted/30 py-4 pl-12 pr-12 text-foreground transition-all placeholder:text-muted-foreground/30 focus:border-brand-orange/50 focus:outline-none"
                     placeholder="Create secure password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/50 transition-colors hover:text-foreground"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-foreground/70 ml-1">Confirm Password</label>
+                <label className="ml-1 text-sm font-bold text-foreground/70">
+                  Confirm Password
+                </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                  <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                   <input
                     required
                     name="confirm"
                     type={showPassword ? "text" : "password"}
-                    className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-12 py-4 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-brand-orange/50 transition-all"
+                    className="w-full rounded-2xl border border-border bg-muted/30 py-4 pl-12 pr-12 text-foreground transition-all placeholder:text-muted-foreground/30 focus:border-brand-orange/50 focus:outline-none"
                     placeholder="Confirm your password"
                   />
                 </div>
@@ -121,15 +123,17 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 bg-brand-orange text-white font-bold rounded-2xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/40 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-orange py-4 font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:-translate-y-0.5 hover:shadow-brand-orange/40 active:translate-y-0 disabled:opacity-50"
             >
-              {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
+              {isSubmitting && <Loader2 className="h-5 w-5 animate-spin" />}
               {isSubmitting ? "Updating Security..." : "Secure Account & Login"}
             </button>
 
-            <div className="flex items-center gap-2 justify-center py-2">
-              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-[10px] uppercase tracking-widest font-bold text-success">End-to-End Encrypted</span>
+            <div className="flex items-center justify-center gap-2 py-2">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-success" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-success">
+                End-to-End Encrypted
+              </span>
             </div>
           </form>
         )}

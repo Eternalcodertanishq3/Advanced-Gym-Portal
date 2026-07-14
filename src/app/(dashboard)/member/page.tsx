@@ -19,7 +19,7 @@ export default async function MemberDashboardPage() {
   }
 
   return (
-    <MemberDashboardClient 
+    <MemberDashboardClient
       user={session.user as any}
       stats={stats}
       allowedFeatures={allowedFeatures}

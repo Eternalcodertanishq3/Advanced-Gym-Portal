@@ -14,14 +14,14 @@ export async function getAuditLogs(page = 1, limit = 20, search = "") {
     }
 
     const skip = (page - 1) * limit;
-    
+
     let where: any = {};
     if (search) {
       where.OR = [
-        { action: { contains: search, mode: 'insensitive' } },
-        { entityType: { contains: search, mode: 'insensitive' } },
-        { user: { firstName: { contains: search, mode: 'insensitive' } } },
-        { user: { lastName: { contains: search, mode: 'insensitive' } } }
+        { action: { contains: search, mode: "insensitive" } },
+        { entityType: { contains: search, mode: "insensitive" } },
+        { user: { firstName: { contains: search, mode: "insensitive" } } },
+        { user: { lastName: { contains: search, mode: "insensitive" } } },
       ];
     }
 
@@ -29,13 +29,13 @@ export async function getAuditLogs(page = 1, limit = 20, search = "") {
       prisma.auditLog.findMany({
         where,
         include: {
-          user: { select: { firstName: true, lastName: true, role: true, avatar: true } }
+          user: { select: { firstName: true, lastName: true, role: true, avatar: true } },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
-        take: limit
+        take: limit,
       }),
-      prisma.auditLog.count({ where })
+      prisma.auditLog.count({ where }),
     ]);
 
     return {
@@ -46,9 +46,9 @@ export async function getAuditLogs(page = 1, limit = 20, search = "") {
           total,
           pages: Math.ceil(total / limit),
           page,
-          limit
-        }
-      }
+          limit,
+        },
+      },
     };
   } catch (error) {
     console.error("Error fetching audit logs:", error);

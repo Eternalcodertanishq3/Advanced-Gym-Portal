@@ -20,7 +20,7 @@ export async function getLiveAttendanceData() {
         date: todayStart,
         checkIn: { lte: now },
         checkOut: null,
-      }
+      },
     });
 
     // 2. Occupancy 1 hour ago
@@ -29,11 +29,8 @@ export async function getLiveAttendanceData() {
         ...branchFilter,
         date: todayStart,
         checkIn: { lte: oneHourAgo },
-        OR: [
-          { checkOut: null },
-          { checkOut: { gte: oneHourAgo } }
-        ]
-      }
+        OR: [{ checkOut: null }, { checkOut: { gte: oneHourAgo } }],
+      },
     });
 
     // 3. Peak Today (Simple approximation for now)
@@ -47,7 +44,7 @@ export async function getLiveAttendanceData() {
         date: todayStart,
       },
       take: 10,
-      orderBy: { checkIn: 'desc' },
+      orderBy: { checkIn: "desc" },
       include: {
         user: {
           select: {
@@ -61,15 +58,15 @@ export async function getLiveAttendanceData() {
                 subscription: {
                   select: {
                     plan: {
-                      select: { name: true }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                      select: { name: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     // 5. Daily Stats
@@ -77,7 +74,7 @@ export async function getLiveAttendanceData() {
       where: {
         ...branchFilter,
         date: todayStart,
-      }
+      },
     });
 
     return {
@@ -94,7 +91,7 @@ export async function getLiveAttendanceData() {
           averageStayMinutes: 45, // Mocked
           topHour: "18:00",
         },
-        recentCheckins: recentCheckins.map(a => ({
+        recentCheckins: recentCheckins.map((a) => ({
           id: a.id,
           name: `${a.user?.firstName} ${a.user?.lastName}`,
           avatar: a.user?.avatar,
@@ -102,9 +99,9 @@ export async function getLiveAttendanceData() {
           time: a.checkIn.toISOString(),
           plan: a.user?.member?.subscription?.plan?.name || "No Plan",
           status: a.user?.member?.status || "INACTIVE",
-          mode: a.mode
-        }))
-      }
+          mode: a.mode,
+        })),
+      },
     };
   } catch (error: any) {
     console.error("Error fetching live attendance data:", error);

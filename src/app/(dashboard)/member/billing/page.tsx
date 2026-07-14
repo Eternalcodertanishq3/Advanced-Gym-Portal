@@ -15,8 +15,8 @@ export default async function BillingPage() {
 
   const res = await getBillingInfo();
   if (!res.success || !res.data) {
-     // Handle error or redirect
-     redirect("/member");
+    // Handle error or redirect
+    redirect("/member");
   }
 
   return <BillingClient initialData={res.data} />;

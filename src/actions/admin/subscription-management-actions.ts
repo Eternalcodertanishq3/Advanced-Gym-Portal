@@ -7,12 +7,17 @@ import { auth } from "@/auth";
 
 export async function getSubscriptions(page = 1, limit = 10, search = "") {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "RECEPTIONIST" && session.user.role !== "SUPER_ADMIN")) {
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
     return { success: false, error: "Unauthorized" };
   }
   try {
     const skip = (page - 1) * limit;
-    
+
     let whereClause = {};
     if (search) {
       whereClause = {
@@ -22,9 +27,9 @@ export async function getSubscriptions(page = 1, limit = 10, search = "") {
               { firstName: { contains: search, mode: "insensitive" } },
               { lastName: { contains: search, mode: "insensitive" } },
               { email: { contains: search, mode: "insensitive" } },
-            ]
-          }
-        }
+            ],
+          },
+        },
       };
     }
 
@@ -34,36 +39,41 @@ export async function getSubscriptions(page = 1, limit = 10, search = "") {
         include: {
           member: {
             include: {
-              user: { select: { firstName: true, lastName: true, email: true } }
-            }
+              user: { select: { firstName: true, lastName: true, email: true } },
+            },
           },
           plan: true,
         },
-        orderBy: { startDate: 'desc' },
+        orderBy: { startDate: "desc" },
         skip,
         take: limit,
       }),
-      prisma.subscription.count({ where: whereClause })
+      prisma.subscription.count({ where: whereClause }),
     ]);
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         subscriptions,
-        pagination: { total, pages: Math.ceil(total / limit), page, limit }
-      }
+        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+      },
     };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
 }
 
-export async function createSubscription(data: { memberId: string, planId: string, startDate: Date, endDate: Date }) {
+export async function createSubscription(data: {
+  memberId: string;
+  planId: string;
+  startDate: Date;
+  endDate: Date;
+}) {
   try {
     const { branchId } = await getBranchContext();
-    
+
     const plan = await prisma.plan.findUnique({
-      where: { id: data.planId }
+      where: { id: data.planId },
     });
 
     if (!plan) throw new Error("Plan not found");
@@ -76,8 +86,8 @@ export async function createSubscription(data: { memberId: string, planId: strin
         startDate: data.startDate,
         endDate: data.endDate,
         amount: plan.price,
-        status: "ACTIVE"
-      }
+        status: "ACTIVE",
+      },
     });
 
     revalidatePath("/admin/members");

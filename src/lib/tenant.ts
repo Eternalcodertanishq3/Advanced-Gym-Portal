@@ -27,7 +27,7 @@ export function getTenantDetails(): TenantDetails {
       name: "GymFlow SaaS",
       logo: "/logo.png",
       currency: "INR",
-      locale: "en-IN"
+      locale: "en-IN",
     };
   }
 
@@ -39,7 +39,7 @@ export function getTenantDetails(): TenantDetails {
       name: headersList.get("x-tenant-name") || "GymFlow SaaS",
       logo: headersList.get("x-tenant-logo") || "/logo.png",
       currency: headersList.get("x-tenant-currency") || "INR",
-      locale: headersList.get("x-tenant-locale") || "en-IN"
+      locale: headersList.get("x-tenant-locale") || "en-IN",
     };
   } catch {
     return {
@@ -48,7 +48,7 @@ export function getTenantDetails(): TenantDetails {
       name: "GymFlow SaaS",
       logo: "/logo.png",
       currency: "INR",
-      locale: "en-IN"
+      locale: "en-IN",
     };
   }
 }

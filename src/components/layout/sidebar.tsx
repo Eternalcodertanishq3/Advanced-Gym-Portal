@@ -113,9 +113,7 @@ const navSections: Record<Role, NavSection[]> = {
     },
     {
       title: "Data",
-      items: [
-        { label: "Backups", href: "/super-admin/backups", icon: Database },
-      ],
+      items: [{ label: "Backups", href: "/super-admin/backups", icon: Database }],
     },
   ],
 
@@ -166,9 +164,7 @@ const navSections: Record<Role, NavSection[]> = {
     },
     {
       title: "People",
-      items: [
-        { label: "Members", href: "/admin/members", icon: Users },
-      ],
+      items: [{ label: "Members", href: "/admin/members", icon: Users }],
     },
     {
       title: "Operations",
@@ -225,42 +221,112 @@ const navSections: Record<Role, NavSection[]> = {
       title: "Overview",
       items: [
         { label: "Dashboard", href: "/member", icon: LayoutDashboard },
-        { label: "Digital Card", href: "/member/digital-card", icon: QrCode, requiredFeature: "gym_access" },
+        {
+          label: "Digital Card",
+          href: "/member/digital-card",
+          icon: QrCode,
+          requiredFeature: "gym_access",
+        },
         { label: "My Subscription", href: "/member/subscription", icon: Crown },
       ],
     },
     {
       title: "Fitness",
       items: [
-        { label: "Workout Plan", href: "/member/workout", icon: Dumbbell, requiredFeature: "gym_access" },
+        {
+          label: "Workout Plan",
+          href: "/member/workout",
+          icon: Dumbbell,
+          requiredFeature: "gym_access",
+        },
         { label: "Diet Plan", href: "/member/diet", icon: Utensils, requiredFeature: "diet_plan" },
-        { label: "Progress", href: "/member/progress", icon: TrendingUp, requiredFeature: "gym_access" },
-        { label: "Progress Photos", href: "/member/progress?tab=photos", icon: Camera, requiredFeature: "mobile_app" },
-        { label: "Goals", href: "/member/progress?tab=goals", icon: Target, requiredFeature: "gym_access" },
+        {
+          label: "Progress",
+          href: "/member/progress",
+          icon: TrendingUp,
+          requiredFeature: "gym_access",
+        },
+        {
+          label: "Progress Photos",
+          href: "/member/progress?tab=photos",
+          icon: Camera,
+          requiredFeature: "mobile_app",
+        },
+        {
+          label: "Goals",
+          href: "/member/progress?tab=goals",
+          icon: Target,
+          requiredFeature: "gym_access",
+        },
       ],
     },
     {
       title: "Activities",
       items: [
-        { label: "Book Classes", href: "/member/classes", icon: Calendar, requiredFeature: "group_classes" },
-        { label: "My Bookings", href: "/member/classes/my-bookings", icon: BookOpen, requiredFeature: "group_classes" },
-        { label: "My Trainer", href: "/member/trainer", icon: UserCog, requiredFeature: "pt_sessions" },
+        {
+          label: "Book Classes",
+          href: "/member/classes",
+          icon: Calendar,
+          requiredFeature: "group_classes",
+        },
+        {
+          label: "My Bookings",
+          href: "/member/classes/my-bookings",
+          icon: BookOpen,
+          requiredFeature: "group_classes",
+        },
+        {
+          label: "My Trainer",
+          href: "/member/trainer",
+          icon: UserCog,
+          requiredFeature: "pt_sessions",
+        },
       ],
     },
     {
       title: "Gamification",
       items: [
-        { label: "Achievements", href: "/member/achievements", icon: Award, requiredFeature: "mobile_app" },
-        { label: "Leaderboard", href: "/member/leaderboard", icon: Trophy, requiredFeature: "mobile_app" },
-        { label: "Challenges", href: "/member/challenges", icon: Flame, requiredFeature: "mobile_app" },
+        {
+          label: "Achievements",
+          href: "/member/achievements",
+          icon: Award,
+          requiredFeature: "mobile_app",
+        },
+        {
+          label: "Leaderboard",
+          href: "/member/leaderboard",
+          icon: Trophy,
+          requiredFeature: "mobile_app",
+        },
+        {
+          label: "Challenges",
+          href: "/member/challenges",
+          icon: Flame,
+          requiredFeature: "mobile_app",
+        },
       ],
     },
     {
       title: "Wellness",
       items: [
-        { label: "Nutrition Log", href: "/member/nutrition", icon: Droplets, requiredFeature: "diet_plan" },
-        { label: "Supplements", href: "/member/nutrition/supplements", icon: Pill, requiredFeature: "diet_plan" },
-        { label: "Messages", href: "/member/messages", icon: MessageSquare, requiredFeature: "mobile_app" },
+        {
+          label: "Nutrition Log",
+          href: "/member/nutrition",
+          icon: Droplets,
+          requiredFeature: "diet_plan",
+        },
+        {
+          label: "Supplements",
+          href: "/member/nutrition/supplements",
+          icon: Pill,
+          requiredFeature: "diet_plan",
+        },
+        {
+          label: "Messages",
+          href: "/member/messages",
+          icon: MessageSquare,
+          requiredFeature: "mobile_app",
+        },
       ],
     },
     {
@@ -268,7 +334,12 @@ const navSections: Record<Role, NavSection[]> = {
       items: [
         { label: "Attendance", href: "/member/attendance", icon: Clock },
         { label: "Billing & Payments", href: "/member/billing", icon: CreditCard },
-        { label: "Refer & Earn", href: "/member/refer", icon: Share2, requiredFeature: "mobile_app" },
+        {
+          label: "Refer & Earn",
+          href: "/member/refer",
+          icon: Share2,
+          requiredFeature: "mobile_app",
+        },
         { label: "Profile", href: "/member/profile", icon: UserCog },
       ],
     },
@@ -315,21 +386,22 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
   const role = (user?.role ?? "MEMBER") as Role;
   const sections = React.useMemo(() => {
     const rawSections = navSections[role] ?? navSections.MEMBER;
-    
+
     // Filter for members based on features
     if (role === "MEMBER") {
-      return rawSections.map(section => ({
-        ...section,
-        items: section.items.filter(item => {
-          if (!item.requiredFeature) return true;
-          return allowedFeatures.includes(item.requiredFeature);
-        })
-      })).filter(section => section.items.length > 0);
+      return rawSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter((item) => {
+            if (!item.requiredFeature) return true;
+            return allowedFeatures.includes(item.requiredFeature);
+          }),
+        }))
+        .filter((section) => section.items.length > 0);
     }
 
     return rawSections;
   }, [role, allowedFeatures]);
-
 
   return (
     <>
@@ -340,7 +412,7 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] lg:hidden"
+            className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
         )}
@@ -350,9 +422,9 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
       <button
         onClick={toggleMobile}
         aria-label="Toggle Mobile Menu"
-        className="fixed top-4 left-4 z-[120] lg:hidden w-10 h-10 rounded-xl bg-brand-navy shadow-sm flex items-center justify-center text-white"
+        className="fixed left-4 top-4 z-[120] flex h-10 w-10 items-center justify-center rounded-xl bg-brand-navy text-white shadow-sm lg:hidden"
       >
-        <LayoutDashboard className="w-5 h-5" />
+        <LayoutDashboard className="h-5 w-5" />
       </button>
 
       {/* Sidebar */}
@@ -364,16 +436,16 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
-          "fixed left-0 top-0 z-[115] h-screen flex flex-col",
-          "bg-brand-navy/80 backdrop-blur-2xl border-r border-white/10 shadow-[4px_0_24px_rgba(0,0,0,0.2)]",
+          "fixed left-0 top-0 z-[115] flex h-screen flex-col",
+          "border-r border-white/10 bg-brand-navy/80 shadow-[4px_0_24px_rgba(0,0,0,0.2)] backdrop-blur-2xl",
           "lg:translate-x-0 lg:opacity-100",
-          !mobileOpen && "translate-x-[-100%] lg:translate-x-0"
+          !mobileOpen && "translate-x-[-100%] lg:translate-x-0",
         )}
       >
         {/* Logo Area */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10 group">
-          <div className="w-10 h-10 rounded-xl bg-brand-orange flex items-center justify-center shrink-0 shadow-lg shadow-brand-orange/20 transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-3">
-            <span className="text-white font-display font-bold text-xl tracking-tight">
+        <div className="group flex items-center gap-3 border-b border-white/10 px-4 py-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-orange shadow-lg shadow-brand-orange/20 transition-transform duration-500 group-hover:-rotate-3 group-hover:scale-105">
+            <span className="font-display text-xl font-bold tracking-tight text-white">
               {tenantName.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -385,10 +457,10 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
                 exit={{ opacity: 0, width: 0 }}
                 className="overflow-hidden"
               >
-                <h1 className="text-lg font-display font-bold text-white tracking-tight leading-none">
+                <h1 className="font-display text-lg font-bold leading-none tracking-tight text-white">
                   {tenantName}
                 </h1>
-                <p className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
                   {getRoleLabel(role)}
                 </p>
               </motion.div>
@@ -397,7 +469,7 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6 scrollbar-thin">
+        <nav className="scrollbar-thin flex-1 space-y-6 overflow-y-auto px-3 py-4">
           {sections.map((section, sIdx) => (
             <div key={section.title}>
               <AnimatePresence>
@@ -406,7 +478,7 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="px-3 mb-2 text-[10px] font-bold text-white/30 uppercase tracking-widest"
+                    className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-white/30"
                   >
                     {section.title}
                   </motion.h3>
@@ -423,16 +495,16 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
-                        "group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 relative",
+                        "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200",
                         isActive
                           ? "sidebar-item-active"
-                          : "text-white/70 hover:text-white hover:bg-white/10"
+                          : "text-white/70 hover:bg-white/10 hover:text-white",
                       )}
                     >
                       <Icon
                         className={cn(
-                          "w-5 h-5 shrink-0 transition-colors",
-                          isActive ? "text-white" : "text-white/50 group-hover:text-white"
+                          "h-5 w-5 shrink-0 transition-colors",
+                          isActive ? "text-white" : "text-white/50 group-hover:text-white",
                         )}
                       />
                       <AnimatePresence>
@@ -442,8 +514,8 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
                             animate={{ opacity: 1, width: "auto" }}
                             exit={{ opacity: 0, width: 0 }}
                             className={cn(
-                              "text-sm font-medium whitespace-nowrap overflow-hidden",
-                              isActive ? "text-white font-semibold" : ""
+                              "overflow-hidden whitespace-nowrap text-sm font-medium",
+                              isActive ? "font-semibold text-white" : "",
                             )}
                           >
                             {item.label}
@@ -451,7 +523,7 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
                         )}
                       </AnimatePresence>
                       {item.badge && !collapsed && (
-                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-brand-orange text-white">
+                        <span className="ml-auto rounded-full bg-brand-orange px-1.5 py-0.5 text-[10px] text-white">
                           {item.badge}
                         </span>
                       )}
@@ -464,20 +536,21 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
         </nav>
 
         {/* User Profile */}
-        <div className="p-3 border-t border-white/10">
+        <div className="border-t border-white/10 p-3">
           <div
             className={cn(
-              "flex items-center gap-3 p-2 rounded-xl",
-              "bg-black/20 border border-white/5"
+              "flex items-center gap-3 rounded-xl p-2",
+              "border border-white/5 bg-black/20",
             )}
           >
             <div
               className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 text-white bg-white/10",
-                getRoleBadgeClass(role)
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white",
+                getRoleBadgeClass(role),
               )}
             >
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
             </div>
             <AnimatePresence>
               {!collapsed && (
@@ -485,12 +558,12 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
-                  className="overflow-hidden flex-1 min-w-0"
+                  className="min-w-0 flex-1 overflow-hidden"
                 >
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="truncate text-sm font-medium text-white">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-[10px] text-white/50 truncate">{user?.email}</p>
+                  <p className="truncate text-[10px] text-white/50">{user?.email}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -503,20 +576,20 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
               signOut({ callbackUrl: "/login" });
             }}
             className={cn(
-              "mt-2 flex items-center gap-3 px-3 py-2.5 rounded-lg",
-              "text-white/50 hover:text-danger hover:bg-danger/10",
-              "transition-all duration-200 w-full",
-              collapsed ? "justify-center" : ""
+              "mt-2 flex items-center gap-3 rounded-lg px-3 py-2.5",
+              "text-white/50 hover:bg-danger/10 hover:text-danger",
+              "w-full transition-all duration-200",
+              collapsed ? "justify-center" : "",
             )}
           >
-            <LogOut className="w-5 h-5 shrink-0" />
+            <LogOut className="h-5 w-5 shrink-0" />
             <AnimatePresence>
               {!collapsed && (
                 <motion.span
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
-                  className="text-sm font-medium whitespace-nowrap overflow-hidden"
+                  className="overflow-hidden whitespace-nowrap text-sm font-medium"
                 >
                   Logout
                 </motion.span>
@@ -529,15 +602,15 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
         <button
           onClick={toggleCollapsed}
           aria-label={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          className="hidden lg:flex absolute -right-3 top-20 w-6 h-6 rounded-full bg-brand-orange text-white items-center justify-center shadow-lg shadow-brand-orange/30 hover:scale-110 transition-transform"
+          className="absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full bg-brand-orange text-white shadow-lg shadow-brand-orange/30 transition-transform hover:scale-110 lg:flex"
         >
           {collapsed ? (
-            <ChevronRight className="w-4 h-4 ml-0.5" />
+            <ChevronRight className="ml-0.5 h-4 w-4" />
           ) : (
-            <ChevronLeft className="w-4 h-4 mr-0.5" />
+            <ChevronLeft className="mr-0.5 h-4 w-4" />
           )}
         </button>
       </motion.aside>
     </>
   );
-}
+}

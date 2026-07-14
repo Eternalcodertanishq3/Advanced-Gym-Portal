@@ -7,7 +7,8 @@ import { Dumbbell, Users, Trophy, Zap, Shield, Heart } from "lucide-react";
 const features = [
   {
     title: "Elite Equipment",
-    description: "Train with the world's leading fitness technology and premium strength machinery.",
+    description:
+      "Train with the world's leading fitness technology and premium strength machinery.",
     icon: Dumbbell,
     color: "bg-blue-500",
   },
@@ -19,7 +20,8 @@ const features = [
   },
   {
     title: "Dynamic Classes",
-    description: "From high-intensity HIIT to centered Yoga, find your rhythm in our group sessions.",
+    description:
+      "From high-intensity HIIT to centered Yoga, find your rhythm in our group sessions.",
     icon: Zap,
     color: "bg-yellow-500",
   },
@@ -37,17 +39,18 @@ const features = [
   },
   {
     title: "Secure Environment",
-    description: "24/7 biometric access and high-standard hygiene protocols for your peace of mind.",
+    description:
+      "24/7 biometric access and high-standard hygiene protocols for your peace of mind.",
     icon: Shield,
     color: "bg-emerald-500",
   },
 ];
 
-export function FeaturesGrid({ 
+export function FeaturesGrid({
   title = "EVERYTHING YOU NEED TO",
   subtitle = "BECOME LIMITLESS.",
-  featuresList
-}: { 
+  featuresList,
+}: {
   title?: string;
   subtitle?: string;
   featuresList?: any[];
@@ -55,28 +58,32 @@ export function FeaturesGrid({
   const displayFeatures = featuresList || features;
 
   return (
-    <section id="features" className="py-32 bg-obsidian-950 relative overflow-hidden">
+    <section id="features" className="relative overflow-hidden bg-obsidian-950 py-32">
       {/* Decorative Blur */}
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-orange/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-orange/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 h-[600px] w-[600px] -translate-x-1/2 translate-y-1/2 rounded-full bg-brand-orange/5 blur-[120px]" />
+      <div className="absolute right-0 top-0 h-[500px] w-[500px] -translate-y-1/2 translate-x-1/2 rounded-full bg-brand-orange/5 blur-[120px]" />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-24">
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
+        <div className="mx-auto mb-24 max-w-3xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="space-y-4"
           >
-            <h2 className="text-sm font-black text-brand-orange uppercase tracking-[0.3em]">Premium Experience</h2>
-            <p 
-              className="text-4xl md:text-6xl font-display font-black text-white tracking-tighter uppercase leading-[0.9]"
-              dangerouslySetInnerHTML={{ __html: `${title} <br /><span className="text-white/40">${subtitle}</span>` }}
+            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-brand-orange">
+              Premium Experience
+            </h2>
+            <p
+              className="font-display text-4xl font-black uppercase leading-[0.9] tracking-tighter text-white md:text-6xl"
+              dangerouslySetInnerHTML={{
+                __html: `${title} <br /><span className="text-white/40">${subtitle}</span>`,
+              }}
             />
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
           {displayFeatures.map((feature, idx) => (
             <motion.div
               key={feature.title}
@@ -84,18 +91,18 @@ export function FeaturesGrid({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="group p-10 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:border-brand-orange/30 hover:bg-white/[0.06] transition-all duration-500 relative overflow-hidden"
+              className="group relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-10 transition-all duration-500 hover:border-brand-orange/30 hover:bg-white/[0.06]"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 blur-[40px] rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-brand-orange/20 transition-all duration-500" />
-              
-              <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-brand-orange/20 transition-all duration-500">
-                <feature.icon className="w-8 h-8 text-brand-orange transition-transform duration-500 group-hover:rotate-12" />
+              <div className="absolute right-0 top-0 h-32 w-32 -translate-y-1/2 translate-x-1/2 rounded-full bg-brand-orange/5 blur-[40px] transition-all duration-500 group-hover:bg-brand-orange/20" />
+
+              <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 transition-all duration-500 group-hover:scale-110 group-hover:border-brand-orange/20">
+                <feature.icon className="h-8 w-8 text-brand-orange transition-transform duration-500 group-hover:rotate-12" />
               </div>
 
-              <h3 className="text-2xl font-display font-black text-white mb-4 uppercase tracking-tight group-hover:text-brand-orange transition-colors">
+              <h3 className="mb-4 font-display text-2xl font-black uppercase tracking-tight text-white transition-colors group-hover:text-brand-orange">
                 {feature.title}
               </h3>
-              <p className="text-white/40 leading-relaxed font-medium group-hover:text-white/60 transition-colors">
+              <p className="font-medium leading-relaxed text-white/40 transition-colors group-hover:text-white/60">
                 {feature.description}
               </p>
             </motion.div>

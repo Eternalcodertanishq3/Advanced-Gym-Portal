@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function KioskPage() {
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className="h-full w-full overflow-hidden">
       <KioskClient />
     </div>
   );

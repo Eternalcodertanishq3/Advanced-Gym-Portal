@@ -20,10 +20,10 @@ export async function getWorkerDashboardStats() {
         _count: {
           select: {
             tasks: { where: { status: { not: "COMPLETED" } } },
-            maintenanceLogs: { where: { status: "PENDING" } }
-          }
-        }
-      }
+            maintenanceLogs: { where: { status: "PENDING" } },
+          },
+        },
+      },
     });
 
     if (!worker) return { success: false, error: "Worker profile not found" };
@@ -31,12 +31,12 @@ export async function getWorkerDashboardStats() {
     const [recentTasks, faultyEquipment] = await Promise.all([
       prisma.task.findMany({
         where: { workerId: worker.id },
-        orderBy: { createdAt: 'desc' },
-        take: 5
+        orderBy: { createdAt: "desc" },
+        take: 5,
       }),
       prisma.equipment.count({
-        where: { status: { in: ["UNDER_MAINTENANCE", "OUT_OF_ORDER"] } }
-      })
+        where: { status: { in: ["UNDER_MAINTENANCE", "OUT_OF_ORDER"] } },
+      }),
     ]);
 
     return {
@@ -45,8 +45,8 @@ export async function getWorkerDashboardStats() {
         pendingTasks: worker._count.tasks,
         activeMaintenance: worker._count.maintenanceLogs,
         faultyEquipment,
-        recentTasks
-      }
+        recentTasks,
+      },
     };
   } catch (error: any) {
     console.error("Error fetching worker stats:", error);
@@ -63,7 +63,7 @@ export async function getWorkerTasks() {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const worker = await prisma.worker.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!worker) return { success: false, error: "Worker not found" };
@@ -71,9 +71,9 @@ export async function getWorkerTasks() {
     const tasks = await prisma.task.findMany({
       where: { workerId: worker.id },
       orderBy: [
-        { status: 'asc' }, // PENDING first
-        { dueDate: 'asc' }
-      ]
+        { status: "asc" }, // PENDING first
+        { dueDate: "asc" },
+      ],
     });
 
     return { success: true, data: tasks };
@@ -98,7 +98,7 @@ export async function updateTaskStatus(taskId: string, status: string, photoProo
 
     const task = await prisma.task.update({
       where: { id: taskId },
-      data: updateData
+      data: updateData,
     });
 
     revalidatePath("/worker/tasks");
@@ -118,7 +118,7 @@ export async function reportMaintenanceIssue(equipmentId: string, issue: string)
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const worker = await prisma.worker.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!worker) return { success: false, error: "Worker not found" };
@@ -129,14 +129,14 @@ export async function reportMaintenanceIssue(equipmentId: string, issue: string)
         equipmentId,
         issue,
         workerId: worker.id,
-        status: "PENDING"
-      }
+        status: "PENDING",
+      },
     });
 
     // 2. Update Equipment Status
     await prisma.equipment.update({
       where: { id: equipmentId },
-      data: { status: "UNDER_MAINTENANCE" }
+      data: { status: "UNDER_MAINTENANCE" },
     });
 
     revalidatePath("/worker/equipment");
@@ -156,9 +156,9 @@ export async function getMaintenanceLogs() {
 
     const logs = await prisma.maintenanceLog.findMany({
       include: {
-        equipment: true
+        equipment: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
     return { success: true, data: logs };

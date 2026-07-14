@@ -75,26 +75,26 @@ const activityConfig: Record<
 export function ActivityFeed({ data = [] }: { data?: ActivityItem[] }) {
   const displayActivities = data.length > 0 ? data : [];
   return (
-    <div className="surface-card p-6 h-full flex flex-col">
+    <div className="surface-card flex h-full flex-col p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-            <RefreshCw className="w-5 h-5 text-purple-500" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10">
+            <RefreshCw className="h-5 w-5 text-purple-500" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-foreground">Recent Activity</h3>
             <p className="text-xs text-muted-foreground">Latest actions across the system</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10 border border-success/20">
-          <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-          <span className="text-[10px] text-success font-bold uppercase tracking-wider">Live</span>
+        <div className="flex items-center gap-1.5 rounded-full border border-success/20 bg-success/10 px-2.5 py-1">
+          <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-success">Live</span>
         </div>
       </div>
 
       {/* Activity List */}
-      <div className="flex-1 space-y-0.5 max-h-[380px] overflow-y-auto pr-1 scrollbar-thin">
+      <div className="scrollbar-thin max-h-[380px] flex-1 space-y-0.5 overflow-y-auto pr-1">
         {displayActivities.map((activity, index) => {
           const config = activityConfig[activity.action] || activityConfig.UPDATE;
           const Icon = config.icon;
@@ -105,34 +105,29 @@ export function ActivityFeed({ data = [] }: { data?: ActivityItem[] }) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.02 }}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 transition-all group"
+              className="group flex items-center gap-3 rounded-lg p-2 transition-all hover:bg-muted/40"
             >
               {/* Icon Container */}
               <div
                 className={cn(
-                  "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-border/20 shadow-sm",
-                  config.bg
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/20 shadow-sm",
+                  config.bg,
                 )}
               >
-                <Icon className={cn("w-4 h-4", config.color)} />
+                <Icon className={cn("h-4 w-4", config.color)} />
               </div>
 
               {/* Content */}
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <div className="truncate">
-                    <p className="text-[12px] text-foreground/90 leading-tight">
-                      <span className="font-bold">{config.label}</span>
-                      {" "}
-                      <span className="text-muted-foreground lowercase">
-                        {activity.entityType}
-                      </span>
+                    <p className="text-[12px] leading-tight text-foreground/90">
+                      <span className="font-bold">{config.label}</span>{" "}
+                      <span className="lowercase text-muted-foreground">{activity.entityType}</span>
                     </p>
-                    <p className="text-[10px] text-muted-foreground truncate">
-                      by {activity.user}
-                    </p>
+                    <p className="truncate text-[10px] text-muted-foreground">by {activity.user}</p>
                   </div>
-                  <span className="text-[9px] font-bold text-muted-foreground whitespace-nowrap shrink-0 opacity-60">
+                  <span className="shrink-0 whitespace-nowrap text-[9px] font-bold text-muted-foreground opacity-60">
                     {formatRelative(new Date(activity.time))}
                   </span>
                 </div>
@@ -143,11 +138,11 @@ export function ActivityFeed({ data = [] }: { data?: ActivityItem[] }) {
       </div>
 
       {/* Footer */}
-      <div className="mt-auto pt-4 border-t border-border flex items-center justify-between">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+      <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           Last {displayActivities.length} Events
         </p>
-        <button className="text-xs font-bold text-primary hover:underline transition-all">
+        <button className="text-xs font-bold text-primary transition-all hover:underline">
           View All Logs
         </button>
       </div>

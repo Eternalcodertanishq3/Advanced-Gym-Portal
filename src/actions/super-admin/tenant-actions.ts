@@ -7,7 +7,11 @@ import { z } from "zod";
 
 const TenantSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
-  subdomain: z.string().min(2, "Subdomain must be at least 2 characters").max(50).regex(/^[a-z0-9-]+$/, "Subdomain can only contain lowercase letters, numbers, and hyphens"),
+  subdomain: z
+    .string()
+    .min(2, "Subdomain must be at least 2 characters")
+    .max(50)
+    .regex(/^[a-z0-9-]+$/, "Subdomain can only contain lowercase letters, numbers, and hyphens"),
   currency: z.string().length(3, "Currency code must be exactly 3 characters"),
   locale: z.string().min(2, "Locale is required").max(10),
   saasPlanId: z.string().optional(),
@@ -22,10 +26,10 @@ export async function getTenants() {
       include: {
         saasPlan: true,
         _count: {
-          select: { users: true }
-        }
+          select: { users: true },
+        },
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     return { success: true, data: tenants };
@@ -42,7 +46,7 @@ export async function createTenant(rawValues: z.infer<typeof TenantSchema>) {
     const data = TenantSchema.parse(rawValues);
 
     const existing = await prisma.tenant.findFirst({
-      where: { subdomain: data.subdomain }
+      where: { subdomain: data.subdomain },
     });
 
     if (existing) {
@@ -58,7 +62,7 @@ export async function createTenant(rawValues: z.infer<typeof TenantSchema>) {
         saasPlanId: data.saasPlanId || null,
         saasStatus: "ACTIVE",
         saasExpiry: data.saasExpiry ? new Date(data.saasExpiry) : null,
-      }
+      },
     });
 
     revalidatePath("/super-admin/tenants");
@@ -83,7 +87,7 @@ export async function updateTenant(id: string, rawValues: Partial<z.infer<typeof
       data: {
         ...data,
         saasExpiry: data.saasExpiry ? new Date(data.saasExpiry) : undefined,
-      }
+      },
     });
 
     revalidatePath("/super-admin/tenants");
@@ -100,7 +104,7 @@ export async function suspendTenant(id: string) {
 
     const tenant = await prisma.tenant.update({
       where: { id },
-      data: { saasStatus: "SUSPENDED" }
+      data: { saasStatus: "SUSPENDED" },
     });
 
     revalidatePath("/super-admin/tenants");
@@ -117,7 +121,7 @@ export async function activateTenant(id: string) {
 
     const tenant = await prisma.tenant.update({
       where: { id },
-      data: { saasStatus: "ACTIVE" }
+      data: { saasStatus: "ACTIVE" },
     });
 
     revalidatePath("/super-admin/tenants");

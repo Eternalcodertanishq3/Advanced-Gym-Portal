@@ -13,10 +13,10 @@ const navLinks = [
   { name: "About", href: "#about" },
 ];
 
-export function MarketingNav({ 
+export function MarketingNav({
   gymName = "GymFlow SaaS",
-  gymLogo = "/logo-white.png"
-}: { 
+  gymLogo = "/logo-white.png",
+}: {
   gymName?: string;
   gymLogo?: string;
 }) {
@@ -38,37 +38,37 @@ export function MarketingNav({
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-[500] transition-all duration-300 ${
+      className={`fixed left-0 right-0 top-0 z-[500] transition-all duration-300 ${
         isScrolled
-          ? "bg-obsidian-950/80 backdrop-blur-md border-b border-white/5 py-4"
+          ? "border-b border-white/5 bg-obsidian-950/80 py-4 backdrop-blur-md"
           : "bg-transparent py-6"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-brand-orange flex items-center justify-center shadow-lg shadow-brand-orange/20 group-hover:scale-105 transition-transform">
+        <Link href="/" className="group flex items-center gap-2">
+          <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-brand-orange shadow-lg shadow-brand-orange/20 transition-transform group-hover:scale-105">
             <Image
               src={gymLogo}
               alt={gymName}
               width={32}
               height={32}
               className="object-contain"
-              style={{ width: 'auto', height: 'auto' }}
+              style={{ width: "auto", height: "auto" }}
             />
           </div>
-          <span className="text-xl font-display font-black tracking-tighter text-white uppercase">
+          <span className="font-display text-xl font-black uppercase tracking-tighter text-white">
             {firstPart} <span className="text-brand-orange">{restPart}</span>
           </span>
         </Link>
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className="text-sm font-bold text-white/70 hover:text-white transition-colors"
+              className="text-sm font-bold text-white/70 transition-colors hover:text-white"
             >
               {link.name}
             </Link>
@@ -76,27 +76,27 @@ export function MarketingNav({
         </div>
 
         {/* Action Buttons */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden items-center gap-4 md:flex">
           <Link
             href="/login"
-            className="text-sm font-bold text-white/70 hover:text-white transition-colors px-4 py-2"
+            className="px-4 py-2 text-sm font-bold text-white/70 transition-colors hover:text-white"
           >
             Log In
           </Link>
           <Link
             href="/register"
-            className="bg-brand-orange text-white text-sm font-bold px-6 py-2.5 rounded-full shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/40 hover:-translate-y-0.5 transition-all flex items-center gap-2"
+            className="flex items-center gap-2 rounded-full bg-brand-orange px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:-translate-y-0.5 hover:shadow-brand-orange/40"
           >
-            Join Now <ArrowRight className="w-4 h-4" />
+            Join Now <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+          className="p-2 text-white/70 transition-colors hover:text-white md:hidden"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
@@ -107,14 +107,14 @@ export function MarketingNav({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 bg-obsidian-900 border-b border-white/5 p-6 md:hidden flex flex-col gap-6 shadow-2xl"
+            className="absolute left-0 right-0 top-full flex flex-col gap-6 border-b border-white/5 bg-obsidian-900 p-6 shadow-2xl md:hidden"
           >
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-lg font-bold text-white/70 hover:text-white transition-colors"
+                className="text-lg font-bold text-white/70 transition-colors hover:text-white"
               >
                 {link.name}
               </Link>
@@ -123,13 +123,13 @@ export function MarketingNav({
             <div className="flex flex-col gap-4">
               <Link
                 href="/login"
-                className="w-full py-3 text-center font-bold text-white/70 hover:text-white transition-colors"
+                className="w-full py-3 text-center font-bold text-white/70 transition-colors hover:text-white"
               >
                 Log In
               </Link>
               <Link
                 href="/register"
-                className="w-full py-4 bg-brand-orange text-white text-center font-bold rounded-xl shadow-lg shadow-brand-orange/20"
+                className="w-full rounded-xl bg-brand-orange py-4 text-center font-bold text-white shadow-lg shadow-brand-orange/20"
               >
                 Join Now
               </Link>

@@ -15,45 +15,40 @@ export async function getTrainerDashboardStats(trainerId: string) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [
-      myMembers,
-      upcomingSessionsCount,
-      completedSessions,
-      activeClasses,
-      sessionsRaw
-    ] = await Promise.all([
-      prisma.member.count({ where: { trainerId, status: "ACTIVE" } }),
-      prisma.pTSession.count({
-        where: {
-          trainerId,
-          status: "SCHEDULED",
-          date: { gte: new Date() }
-        }
-      }),
-      prisma.pTSession.count({
-        where: {
-          trainerId,
-          status: "COMPLETED",
-          date: { gte: new Date(today.getFullYear(), today.getMonth(), 1) }
-        }
-      }),
-      prisma.gymClass.count({ where: { trainerId, isActive: true } }),
-      (prisma.pTSession as any).findMany({
-        where: { trainerId, date: { gte: today } },
-        take: 5,
-        orderBy: { date: 'asc' },
-        include: {
-          member: { include: { user: true } }
-        }
-      })
-    ]);
+    const [myMembers, upcomingSessionsCount, completedSessions, activeClasses, sessionsRaw] =
+      await Promise.all([
+        prisma.member.count({ where: { trainerId, status: "ACTIVE" } }),
+        prisma.pTSession.count({
+          where: {
+            trainerId,
+            status: "SCHEDULED",
+            date: { gte: new Date() },
+          },
+        }),
+        prisma.pTSession.count({
+          where: {
+            trainerId,
+            status: "COMPLETED",
+            date: { gte: new Date(today.getFullYear(), today.getMonth(), 1) },
+          },
+        }),
+        prisma.gymClass.count({ where: { trainerId, isActive: true } }),
+        (prisma.pTSession as any).findMany({
+          where: { trainerId, date: { gte: today } },
+          take: 5,
+          orderBy: { date: "asc" },
+          include: {
+            member: { include: { user: true } },
+          },
+        }),
+      ]);
 
     const schedule = sessionsRaw.map((s: any) => ({
       id: s.id,
       time: s.date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
       client: `${s.member.user?.firstName || "Member"} ${s.member.user?.lastName || ""}`.trim(),
       type: "Personal Training",
-      status: s.status.toLowerCase()
+      status: s.status.toLowerCase(),
     }));
 
     // Calculate real average rating from completed sessions
@@ -61,10 +56,10 @@ export async function getTrainerDashboardStats(trainerId: string) {
       where: {
         trainerId,
         status: "COMPLETED",
-        rating: { not: null }
+        rating: { not: null },
       },
       _avg: { rating: true },
-      _count: { rating: true }
+      _count: { rating: true },
     });
 
     const rating = ratingAggregate._avg.rating ? Number(ratingAggregate._avg.rating.toFixed(1)) : 0;
@@ -77,8 +72,8 @@ export async function getTrainerDashboardStats(trainerId: string) {
         completedSessions,
         activeClasses,
         rating,
-        schedule
-      }
+        schedule,
+      },
     };
   } catch (error: any) {
     console.error("Error fetching trainer stats:", error);
@@ -96,7 +91,7 @@ export async function getTrainers() {
       include: {
         user: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
     return { success: true, data: trainers };
   } catch (error: any) {
@@ -116,19 +111,19 @@ export async function getTrainerMembers(trainerId: string) {
         user: true,
         subscription: {
           include: {
-            plan: true
-          }
+            plan: true,
+          },
         },
         workoutPlans: {
           take: 1,
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: "desc" },
         },
         dietPlans: {
           take: 1,
-          orderBy: { createdAt: 'desc' }
-        }
+          orderBy: { createdAt: "desc" },
+        },
       },
-      orderBy: { joinDate: 'desc' }
+      orderBy: { joinDate: "desc" },
     });
 
     return { success: true, data: members };
@@ -146,7 +141,7 @@ export async function assignWorkoutPlan(memberId: string, planId: string) {
   try {
     await prisma.workoutPlan.update({
       where: { id: planId },
-      data: { memberId }
+      data: { memberId },
     });
 
     revalidatePath("/trainer/my-members");
@@ -164,7 +159,7 @@ export async function assignDietPlan(memberId: string, planId: string) {
   try {
     await prisma.dietPlan.update({
       where: { id: planId },
-      data: { memberId }
+      data: { memberId },
     });
 
     revalidatePath("/trainer/my-members");
@@ -186,29 +181,29 @@ export async function getMemberProfileForTrainer(memberId: string) {
         user: true,
         subscription: {
           include: {
-            plan: true
-          }
+            plan: true,
+          },
         },
         workoutPlans: {
-          orderBy: { createdAt: 'desc' },
-          include: { exercises: true }
+          orderBy: { createdAt: "desc" },
+          include: { exercises: true },
         },
         dietPlans: {
-          orderBy: { createdAt: 'desc' },
-          include: { meals: true }
+          orderBy: { createdAt: "desc" },
+          include: { meals: true },
         },
         progress: {
-          orderBy: { createdAt: 'desc' },
-          take: 20
+          orderBy: { createdAt: "desc" },
+          take: 20,
         },
         progressPhotos: {
-          orderBy: { createdAt: 'desc' },
-          take: 10
+          orderBy: { createdAt: "desc" },
+          take: 10,
         },
         goals: {
-          orderBy: { deadline: 'asc' }
-        }
-      }
+          orderBy: { deadline: "asc" },
+        },
+      },
     });
 
     if (!member) return { success: false, error: "Member not found" };
@@ -228,7 +223,7 @@ export async function schedulePTSession(data: {
   trainerId: string;
   date: Date;
   startTime: string; // HH:MM
-  endTime: string;   // HH:MM
+  endTime: string; // HH:MM
   notes?: string;
 }) {
   const session = await auth();
@@ -244,8 +239,8 @@ export async function schedulePTSession(data: {
         startTime: data.startTime,
         endTime: data.endTime,
         notes: data.notes,
-        status: "SCHEDULED"
-      }
+        status: "SCHEDULED",
+      },
     });
 
     revalidatePath("/trainer/sessions");
@@ -267,9 +262,9 @@ export async function getTrainerById(id: string) {
       include: {
         user: true,
         _count: {
-          select: { members: true }
-        }
-      }
+          select: { members: true },
+        },
+      },
     });
 
     if (!trainer) return { success: false, error: "Trainer not found" };
@@ -290,10 +285,10 @@ export async function updateSessionStatus(sessionId: string, status: string, fee
   try {
     const session = await prisma.pTSession.update({
       where: { id: sessionId },
-      data: { 
+      data: {
         status: status as any,
-        feedback: feedback
-      }
+        feedback: feedback,
+      },
     });
 
     revalidatePath("/trainer/sessions");
@@ -314,7 +309,10 @@ export async function createTrainer(data: any) {
   }
   try {
     const bcrypt = require("bcryptjs");
-    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(
+      SECURITY.DEFAULT_TEMP_PASSWORD(),
+      SECURITY.BCRYPT_ROUNDS,
+    );
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Create the base User
@@ -335,7 +333,9 @@ export async function createTrainer(data: any) {
       const trainer = await tx.trainer.create({
         data: {
           userId: user.id,
-          specialization: Array.isArray(data.specialization) ? data.specialization : [data.specialization],
+          specialization: Array.isArray(data.specialization)
+            ? data.specialization
+            : [data.specialization],
           experience: Number(data.experience),
           salary: data.salary,
           isActive: true,
@@ -349,7 +349,7 @@ export async function createTrainer(data: any) {
     return { success: true, data: result };
   } catch (error: any) {
     console.error("Error creating trainer:", error);
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       return { success: false, error: "Email or phone number already exists." };
     }
     return { success: false, error: error.message || "Failed to onboard trainer" };
@@ -369,7 +369,9 @@ export async function updateTrainer(id: string, data: any) {
       const trainer = await tx.trainer.update({
         where: { id },
         data: {
-          specialization: Array.isArray(data.specialization) ? data.specialization : [data.specialization],
+          specialization: Array.isArray(data.specialization)
+            ? data.specialization
+            : [data.specialization],
           experience: Number(data.experience),
           salary: data.salary,
           isActive: data.isActive,
@@ -379,10 +381,10 @@ export async function updateTrainer(id: string, data: any) {
               lastName: data.lastName,
               email: data.email,
               phone: data.phone,
-            }
-          }
+            },
+          },
         },
-        include: { user: true }
+        include: { user: true },
       });
       return trainer;
     });

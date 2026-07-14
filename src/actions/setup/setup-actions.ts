@@ -41,9 +41,9 @@ export async function createInitialSuperAdmin(data: any) {
         status: "ACTIVE",
         passwordResetRequired: false,
         superAdmin: {
-          create: {}
-        }
-      } as any
+          create: {},
+        },
+      } as any,
     });
 
     revalidatePath("/");

@@ -2,17 +2,19 @@ import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 
 export function formatDate(
   date: Date | string | number | null | undefined,
-  pattern: string = "dd MMM yyyy"
+  pattern: string = "dd MMM yyyy",
 ): string {
   if (!date) return "-";
-  const d = typeof date === "string" ? parseISO(date) : typeof date === "number" ? new Date(date) : date;
+  const d =
+    typeof date === "string" ? parseISO(date) : typeof date === "number" ? new Date(date) : date;
   if (!isValid(d)) return "-";
   return format(d, pattern);
 }
 
 export function formatRelative(date: Date | string | number | null | undefined): string {
   if (!date) return "-";
-  const d = typeof date === "string" ? parseISO(date) : typeof date === "number" ? new Date(date) : date;
+  const d =
+    typeof date === "string" ? parseISO(date) : typeof date === "number" ? new Date(date) : date;
   if (!isValid(d)) return "-";
   return formatDistanceToNow(d, { addSuffix: true });
 }

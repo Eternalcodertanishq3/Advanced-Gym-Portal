@@ -59,20 +59,18 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {searchKey && (
-        <div className="flex items-center gap-2 max-w-sm rounded-xl border border-border bg-muted/30 px-4 py-2.5 backdrop-blur-md shadow-inner transition-colors focus-within:border-brand-orange/30">
+        <div className="flex max-w-sm items-center gap-2 rounded-xl border border-border bg-muted/30 px-4 py-2.5 shadow-inner backdrop-blur-md transition-colors focus-within:border-brand-orange/30">
           <Search className="h-4 w-4 text-muted-foreground/60" />
           <input
             placeholder={searchPlaceholder}
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(searchKey)?.setFilterValue(event.target.value)
-            }
-            className="w-full bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground/50 focus:ring-0"
+            onChange={(event) => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
+            className="w-full border-none bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:ring-0"
           />
         </div>
       )}
-      
-      <div className="rounded-2xl border border-border overflow-hidden shadow-2xl bg-muted/10">
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-muted/10 shadow-2xl">
         <Table>
           <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -82,10 +80,7 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   );
                 })}
@@ -114,10 +109,12 @@ export function DataTable<TData, TValue>({
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={columns.length} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto">
-                      <Search className="w-5 h-5 text-muted-foreground/40" />
+                    <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                      <Search className="h-5 w-5 text-muted-foreground/40" />
                     </div>
-                    <span className="text-sm font-medium text-muted-foreground">No results found.</span>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      No results found.
+                    </span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -125,18 +122,18 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      
+
       {/* Pagination Controls */}
       <div className="flex items-center justify-end space-x-3 py-4">
         <button
-          className="px-4 py-2 rounded-xl border border-border text-xs font-bold bg-card text-foreground hover:bg-muted shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+          className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-bold text-foreground shadow-sm transition-all hover:bg-muted active:scale-95 disabled:cursor-not-allowed disabled:opacity-30"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           Previous
         </button>
         <button
-          className="px-4 py-2 rounded-xl border border-border text-xs font-bold bg-card text-foreground hover:bg-muted shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+          className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-bold text-foreground shadow-sm transition-all hover:bg-muted active:scale-95 disabled:cursor-not-allowed disabled:opacity-30"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

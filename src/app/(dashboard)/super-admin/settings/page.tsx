@@ -1,16 +1,16 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PasswordForm } from "@/app/(dashboard)/admin/components/settings/password-form";
-import { 
-  Settings, 
-  ShieldCheck, 
-  Bell, 
-  Key, 
+import {
+  Settings,
+  ShieldCheck,
+  Bell,
+  Key,
   History,
   Lock,
   Smartphone,
   Eye,
-  Zap
+  Zap,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -24,71 +24,87 @@ export default async function SuperAdminSettingsPage() {
   if (!session?.user) redirect("/login");
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8 duration-700 animate-in fade-in slide-in-from-bottom-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-display font-black text-foreground tracking-tight uppercase">
+          <h1 className="font-display text-3xl font-black uppercase tracking-tight text-foreground">
             Account <span className="text-brand-orange">Settings</span>
           </h1>
-          <p className="text-sm font-black text-muted-foreground mt-1 uppercase tracking-widest">Manage your security and account preferences</p>
+          <p className="mt-1 text-sm font-black uppercase tracking-widest text-muted-foreground">
+            Manage your security and account preferences
+          </p>
         </div>
       </div>
 
       <Tabs defaultValue="security" className="w-full">
-        <TabsList className="bg-card border border-border p-1.5 h-auto rounded-2xl flex-wrap shadow-md">
-          <TabsTrigger value="security" className="gap-2 px-8 py-3 rounded-xl data-[state=active]:bg-brand-orange data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all">
-            <ShieldCheck className="w-4 h-4" />
+        <TabsList className="h-auto flex-wrap rounded-2xl border border-border bg-card p-1.5 shadow-md">
+          <TabsTrigger
+            value="security"
+            className="gap-2 rounded-xl px-8 py-3 text-[10px] font-black uppercase tracking-widest transition-all data-[state=active]:bg-brand-orange data-[state=active]:text-white"
+          >
+            <ShieldCheck className="h-4 w-4" />
             Security
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2 px-8 py-3 rounded-xl data-[state=active]:bg-brand-orange data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all">
-            <Bell className="w-4 h-4" />
+          <TabsTrigger
+            value="notifications"
+            className="gap-2 rounded-xl px-8 py-3 text-[10px] font-black uppercase tracking-widest transition-all data-[state=active]:bg-brand-orange data-[state=active]:text-white"
+          >
+            <Bell className="h-4 w-4" />
             Notifications
           </TabsTrigger>
-          <TabsTrigger value="sessions" className="gap-2 px-8 py-3 rounded-xl data-[state=active]:bg-brand-orange data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all">
-            <History className="w-4 h-4" />
+          <TabsTrigger
+            value="sessions"
+            className="gap-2 rounded-xl px-8 py-3 text-[10px] font-black uppercase tracking-widest transition-all data-[state=active]:bg-brand-orange data-[state=active]:text-white"
+          >
+            <History className="h-4 w-4" />
             Active Sessions
           </TabsTrigger>
         </TabsList>
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="space-y-8 lg:col-span-2">
             <TabsContent value="security" className="m-0 focus-visible:outline-none">
               <PasswordForm />
             </TabsContent>
 
             <TabsContent value="notifications" className="m-0 focus-visible:outline-none">
-              <div className="glass-card p-12 text-center shadow-lg relative overflow-hidden">
+              <div className="glass-card relative overflow-hidden p-12 text-center shadow-lg">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(232,93,38,0.03),transparent)]" />
-                <div className="w-20 h-20 rounded-3xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center mx-auto mb-6 relative z-10">
-                  <Bell className="w-10 h-10 text-brand-orange" />
+                <div className="relative z-10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand-orange/20 bg-brand-orange/10">
+                  <Bell className="h-10 w-10 text-brand-orange" />
                 </div>
-                <h3 className="text-xl font-black text-foreground mb-3 uppercase tracking-tight relative z-10">Notification Center</h3>
-                <p className="text-sm text-muted-foreground max-w-sm mx-auto font-bold relative z-10 leading-relaxed">
-                  System-wide notification protocols are managed at the branch level. Personalized admin alerts will be enabled in the next deployment cycle.
+                <h3 className="relative z-10 mb-3 text-xl font-black uppercase tracking-tight text-foreground">
+                  Notification Center
+                </h3>
+                <p className="relative z-10 mx-auto max-w-sm text-sm font-bold leading-relaxed text-muted-foreground">
+                  System-wide notification protocols are managed at the branch level. Personalized
+                  admin alerts will be enabled in the next deployment cycle.
                 </p>
               </div>
             </TabsContent>
 
             <TabsContent value="sessions" className="m-0 focus-visible:outline-none">
               <div className="glass-card overflow-hidden shadow-lg">
-                <div className="p-8 border-b border-border bg-muted/30">
-                  <h3 className="text-xs font-black text-foreground flex items-center gap-3 uppercase tracking-[0.2em]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse" />
+                <div className="border-b border-border bg-muted/30 p-8">
+                  <h3 className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-foreground">
+                    <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-orange" />
                     Current Device
                   </h3>
                 </div>
                 <div className="p-8">
-                  <div className="flex items-center justify-between p-6 rounded-2xl bg-muted/20 border border-border group hover:border-brand-orange/20 transition-all duration-300">
+                  <div className="group flex items-center justify-between rounded-2xl border border-border bg-muted/20 p-6 transition-all duration-300 hover:border-brand-orange/20">
                     <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center transition-transform group-hover:scale-110">
-                        <Smartphone className="w-6 h-6 text-brand-orange" />
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-brand-orange/20 bg-brand-orange/10 transition-transform group-hover:scale-110">
+                        <Smartphone className="h-6 w-6 text-brand-orange" />
                       </div>
                       <div>
                         <p className="text-base font-black text-foreground">Windows PC — Chrome</p>
-                        <p className="text-xs text-brand-orange font-black uppercase tracking-widest mt-0.5">Active Now</p>
+                        <p className="mt-0.5 text-xs font-black uppercase tracking-widest text-brand-orange">
+                          Active Now
+                        </p>
                       </div>
                     </div>
-                    <div className="px-4 py-1.5 rounded-full bg-muted border border-border text-[10px] font-black text-brand-orange uppercase tracking-widest shadow-inner">
+                    <div className="rounded-full border border-border bg-muted px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-brand-orange shadow-inner">
                       Current
                     </div>
                   </div>
@@ -99,12 +115,12 @@ export default async function SuperAdminSettingsPage() {
 
           {/* Right Sidebar: Security Tips */}
           <div className="space-y-6">
-            <div className="glass-card p-8 shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
-                <Lock className="w-24 h-24" />
+            <div className="glass-card relative overflow-hidden p-8 shadow-lg">
+              <div className="absolute right-0 top-0 p-4 opacity-[0.03]">
+                <Lock className="h-24 w-24" />
               </div>
-              <h3 className="text-xs font-black text-foreground mb-8 flex items-center gap-3 tracking-[0.2em] uppercase">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse" />
+              <h3 className="mb-8 flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-foreground">
+                <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-orange" />
                 Security Checklist
               </h3>
               <div className="space-y-4">
@@ -116,15 +132,24 @@ export default async function SuperAdminSettingsPage() {
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
-                    <div key={item.label} className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border group hover:border-brand-orange/20 transition-all duration-300">
+                    <div
+                      key={item.label}
+                      className="group flex items-center justify-between rounded-2xl border border-border bg-muted/30 p-4 transition-all duration-300 hover:border-brand-orange/20"
+                    >
                       <div className="flex items-center gap-3">
-                        <Icon className="w-4 h-4 text-muted-foreground group-hover:text-brand-orange transition-colors" />
-                        <span className="text-[11px] font-black text-muted-foreground uppercase tracking-wider group-hover:text-foreground transition-colors">{item.label}</span>
+                        <Icon className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-brand-orange" />
+                        <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground transition-colors group-hover:text-foreground">
+                          {item.label}
+                        </span>
                       </div>
-                      <span className={cn(
-                        "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md",
-                        item.status === "Recommended" ? "bg-brand-orange/10 text-brand-orange" : "bg-emerald-500/10 text-emerald-500"
-                      )}>
+                      <span
+                        className={cn(
+                          "rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-widest",
+                          item.status === "Recommended"
+                            ? "bg-brand-orange/10 text-brand-orange"
+                            : "bg-emerald-500/10 text-emerald-500",
+                        )}
+                      >
                         {item.status}
                       </span>
                     </div>
@@ -133,22 +158,29 @@ export default async function SuperAdminSettingsPage() {
               </div>
             </div>
 
-            <div className="glass-card p-8 relative overflow-hidden group shadow-lg">
+            <div className="glass-card group relative overflow-hidden p-8 shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/5 to-transparent" />
-              <div className="flex items-center gap-3 mb-6 relative z-10">
-                <Zap className="w-4 h-4 text-brand-orange" />
-                <h4 className="text-[10px] font-black text-brand-orange uppercase tracking-[0.25em]">Security Protocol</h4>
+              <div className="relative z-10 mb-6 flex items-center gap-3">
+                <Zap className="h-4 w-4 text-brand-orange" />
+                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-brand-orange">
+                  Security Protocol
+                </h4>
               </div>
-              <div className="flex items-center gap-2 mb-6 relative z-10">
-                {[1,2,3,4,5].map((i) => (
-                  <div key={i} className={cn(
-                    "h-1.5 flex-1 rounded-full shadow-inner",
-                    i <= 4 ? "bg-brand-orange" : "bg-muted"
-                  )} />
+              <div className="relative z-10 mb-6 flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      "h-1.5 flex-1 rounded-full shadow-inner",
+                      i <= 4 ? "bg-brand-orange" : "bg-muted",
+                    )}
+                  />
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground font-bold leading-relaxed relative z-10">
-                Your account security is <span className="text-brand-orange">High</span>. Multi-factor authentication is recommended for all root-level administrative accounts.
+              <p className="relative z-10 text-xs font-bold leading-relaxed text-muted-foreground">
+                Your account security is <span className="text-brand-orange">High</span>.
+                Multi-factor authentication is recommended for all root-level administrative
+                accounts.
               </p>
             </div>
           </div>

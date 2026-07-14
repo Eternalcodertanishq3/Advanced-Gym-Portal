@@ -12,15 +12,20 @@ export async function getMemberProgress(memberId: string) {
   }
   // Verify memberId belongs to the current user or is manager
   const member = await prisma.member.findUnique({ where: { id: memberId } });
-  if (!member || (member.userId !== session.user.id && session.user.role !== "SUPER_ADMIN" && session.user.role !== "ADMIN")) {
+  if (
+    !member ||
+    (member.userId !== session.user.id &&
+      session.user.role !== "SUPER_ADMIN" &&
+      session.user.role !== "ADMIN")
+  ) {
     return { success: false, error: "Unauthorized" };
   }
   try {
     const logs = await prisma.workoutLog.findMany({
       where: {
-        memberId
+        memberId,
       },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: "asc" },
     });
     return { success: true, data: logs };
   } catch (error: any) {

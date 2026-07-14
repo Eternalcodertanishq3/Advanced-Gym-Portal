@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  ChevronRight, 
-  CheckCircle2, 
-  X, 
+import {
+  Calendar,
+  Clock,
+  Users,
+  ChevronRight,
+  CheckCircle2,
+  X,
   MapPin,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -54,50 +54,54 @@ export function ClassesClient({ classes }: Props) {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-8 duration-500 animate-in fade-in">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {classes.map((cls: any) => (
-          <motion.div 
-            key={cls.id} 
+          <motion.div
+            key={cls.id}
             layoutId={`class-${cls.id}`}
-            className="surface-card p-6 flex flex-col group border border-border/50 hover:border-brand-orange/30 transition-all rounded-3xl"
+            className="surface-card group flex flex-col rounded-3xl border border-border/50 p-6 transition-all hover:border-brand-orange/30"
           >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded bg-brand-orange/10 text-brand-orange border border-brand-orange/20">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="rounded border border-brand-orange/20 bg-brand-orange/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange">
                 {cls.category}
               </span>
-              <span className="text-xs font-bold text-txt-tertiary flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
+              <span className="flex items-center gap-1.5 text-xs font-bold text-txt-tertiary">
+                <Clock className="h-3.5 w-3.5" />
                 {cls.duration} min
               </span>
             </div>
-            
-            <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-brand-orange transition-colors">
+
+            <h3 className="mb-2 text-xl font-bold text-foreground transition-colors group-hover:text-brand-orange">
               {cls.name}
             </h3>
-            
-            <p className="text-sm text-txt-secondary line-clamp-2 mb-6 flex-1">
-              {cls.description || "Transform your body with our high-intensity group training sessions."}
+
+            <p className="mb-6 line-clamp-2 flex-1 text-sm text-txt-secondary">
+              {cls.description ||
+                "Transform your body with our high-intensity group training sessions."}
             </p>
-            
-            <div className="flex items-center justify-between mt-auto pt-6 border-t border-border/50">
+
+            <div className="mt-auto flex items-center justify-between border-t border-border/50 pt-6">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-surface-elevated flex items-center justify-center text-[10px] font-black text-brand-orange border border-brand-orange/20">
-                  {cls.trainer?.user?.firstName?.[0]}{cls.trainer?.user?.lastName?.[0]}
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-brand-orange/20 bg-surface-elevated text-[10px] font-black text-brand-orange">
+                  {cls.trainer?.user?.firstName?.[0]}
+                  {cls.trainer?.user?.lastName?.[0]}
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-foreground leading-tight">
+                  <p className="text-xs font-bold leading-tight text-foreground">
                     {cls.trainer?.user?.firstName} {cls.trainer?.user?.lastName}
                   </p>
-                  <p className="text-[8px] text-txt-tertiary uppercase font-bold tracking-widest mt-0.5">Expert Coach</p>
+                  <p className="mt-0.5 text-[8px] font-bold uppercase tracking-widest text-txt-tertiary">
+                    Expert Coach
+                  </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setSelectedClass(cls)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated hover:bg-brand-orange hover:text-white text-xs font-bold transition-all shadow-sm"
+                className="flex items-center gap-2 rounded-xl bg-surface-elevated px-4 py-2 text-xs font-bold shadow-sm transition-all hover:bg-brand-orange hover:text-white"
               >
                 View Schedule
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="h-3 w-3" />
               </button>
             </div>
           </motion.div>
@@ -105,128 +109,143 @@ export function ClassesClient({ classes }: Props) {
       </div>
 
       {/* Schedule Modal */}
-      {mounted && createPortal(
-        <AnimatePresence>
-          {selectedClass && (
-            <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedClass(null)}
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-              />
-              
-              <motion.div 
-                layoutId={`class-${selectedClass.id}`}
-                className="relative w-full max-w-2xl bg-surface-card rounded-[2.5rem] border border-border/50 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
-              >
-                {/* Modal Header */}
-                <div className="p-8 pb-0 flex items-start justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-brand-orange text-white">
-                        {selectedClass.category}
-                      </span>
-                      <span className="text-xs font-bold text-txt-tertiary flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5" />
-                        {selectedClass.duration} min
-                      </span>
-                    </div>
-                    <h2 className="text-3xl font-display font-bold text-foreground">
-                      {selectedClass.name} <span className="text-brand-orange">Schedule</span>
-                    </h2>
-                    <p className="text-sm text-txt-secondary">{selectedClass.description}</p>
-                  </div>
-                  <button 
-                    onClick={() => setSelectedClass(null)}
-                    aria-label="Close modal"
-                    className="w-10 h-10 rounded-full bg-surface-sunken flex items-center justify-center text-txt-tertiary hover:text-brand-orange transition-all"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {selectedClass && (
+              <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSelectedClass(null)}
+                  className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                />
 
-                {/* Modal Body */}
-                <div className="p-8 flex-1 overflow-y-auto">
-                  <div className="space-y-4">
-                    <h4 className="text-[10px] font-black text-txt-tertiary uppercase tracking-widest flex items-center gap-2">
-                      <Calendar className="w-3 h-3" />
-                      Weekly Sessions
-                    </h4>
-                    
-                    <div className="grid grid-cols-1 gap-3">
-                      {selectedClass.schedules.length === 0 ? (
-                        <div className="py-10 text-center surface-sunken rounded-2xl border border-dashed">
-                          <p className="text-xs text-txt-tertiary font-bold">No sessions scheduled for this week.</p>
-                        </div>
-                      ) : (
-                        selectedClass.schedules.map((schedule: any) => (
-                          <div 
-                            key={schedule.id}
-                            className="p-5 rounded-2xl bg-surface-sunken border border-border/50 flex items-center justify-between group hover:border-brand-orange/30 transition-all"
-                          >
-                            <div className="flex items-center gap-5">
-                              <div className="w-12 h-12 rounded-2xl bg-surface-card flex flex-col items-center justify-center border border-border/50">
-                                <p className="text-[8px] font-black text-txt-tertiary uppercase">{DAYS[schedule.dayOfWeek].slice(0, 3)}</p>
-                                <p className="text-xs font-bold text-foreground">{schedule.startTime}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm font-bold text-foreground">{DAYS[schedule.dayOfWeek]}</p>
-                                <div className="flex items-center gap-3 mt-1">
-                                  <span className="text-[10px] text-txt-tertiary flex items-center gap-1">
-                                    <MapPin className="w-2.5 h-2.5" />
-                                    {schedule.room || "Studio A"}
-                                  </span>
-                                  <span className="text-[10px] text-txt-tertiary flex items-center gap-1">
-                                    <Users className="w-2.5 h-2.5" />
-                                    {schedule._count.bookings} / {selectedClass.maxCapacity} Booked
-                                  </span>
+                <motion.div
+                  layoutId={`class-${selectedClass.id}`}
+                  className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-[2.5rem] border border-border/50 bg-surface-card shadow-2xl"
+                >
+                  {/* Modal Header */}
+                  <div className="flex items-start justify-between p-8 pb-0">
+                    <div className="space-y-1">
+                      <div className="mb-2 flex items-center gap-3">
+                        <span className="rounded-full bg-brand-orange px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                          {selectedClass.category}
+                        </span>
+                        <span className="flex items-center gap-1.5 text-xs font-bold text-txt-tertiary">
+                          <Clock className="h-3.5 w-3.5" />
+                          {selectedClass.duration} min
+                        </span>
+                      </div>
+                      <h2 className="font-display text-3xl font-bold text-foreground">
+                        {selectedClass.name} <span className="text-brand-orange">Schedule</span>
+                      </h2>
+                      <p className="text-sm text-txt-secondary">{selectedClass.description}</p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedClass(null)}
+                      aria-label="Close modal"
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-sunken text-txt-tertiary transition-all hover:text-brand-orange"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="flex-1 overflow-y-auto p-8">
+                    <div className="space-y-4">
+                      <h4 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-txt-tertiary">
+                        <Calendar className="h-3 w-3" />
+                        Weekly Sessions
+                      </h4>
+
+                      <div className="grid grid-cols-1 gap-3">
+                        {selectedClass.schedules.length === 0 ? (
+                          <div className="surface-sunken rounded-2xl border border-dashed py-10 text-center">
+                            <p className="text-xs font-bold text-txt-tertiary">
+                              No sessions scheduled for this week.
+                            </p>
+                          </div>
+                        ) : (
+                          selectedClass.schedules.map((schedule: any) => (
+                            <div
+                              key={schedule.id}
+                              className="group flex items-center justify-between rounded-2xl border border-border/50 bg-surface-sunken p-5 transition-all hover:border-brand-orange/30"
+                            >
+                              <div className="flex items-center gap-5">
+                                <div className="flex h-12 w-12 flex-col items-center justify-center rounded-2xl border border-border/50 bg-surface-card">
+                                  <p className="text-[8px] font-black uppercase text-txt-tertiary">
+                                    {DAYS[schedule.dayOfWeek].slice(0, 3)}
+                                  </p>
+                                  <p className="text-xs font-bold text-foreground">
+                                    {schedule.startTime}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-bold text-foreground">
+                                    {DAYS[schedule.dayOfWeek]}
+                                  </p>
+                                  <div className="mt-1 flex items-center gap-3">
+                                    <span className="flex items-center gap-1 text-[10px] text-txt-tertiary">
+                                      <MapPin className="h-2.5 w-2.5" />
+                                      {schedule.room || "Studio A"}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-[10px] text-txt-tertiary">
+                                      <Users className="h-2.5 w-2.5" />
+                                      {schedule._count.bookings} / {selectedClass.maxCapacity}{" "}
+                                      Booked
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
 
-                            <Button 
-                              onClick={() => handleBook(schedule.id)}
-                              disabled={isBooking || schedule._count.bookings >= selectedClass.maxCapacity}
-                              className={cn(
-                                "rounded-xl font-bold px-6 h-10 text-xs shadow-sm transition-all",
-                                schedule._count.bookings >= selectedClass.maxCapacity 
-                                  ? "bg-surface-elevated text-txt-tertiary" 
-                                  : "bg-brand-orange hover:bg-brand-orange-dark text-white"
-                              )}
-                            >
-                              {bookingScheduleId === schedule.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : schedule._count.bookings >= selectedClass.maxCapacity ? (
-                                "Waitlist"
-                              ) : (
-                                "Reserve Spot"
-                              )}
-                            </Button>
-                          </div>
-                        ))
-                      )}
+                              <Button
+                                onClick={() => handleBook(schedule.id)}
+                                disabled={
+                                  isBooking || schedule._count.bookings >= selectedClass.maxCapacity
+                                }
+                                className={cn(
+                                  "h-10 rounded-xl px-6 text-xs font-bold shadow-sm transition-all",
+                                  schedule._count.bookings >= selectedClass.maxCapacity
+                                    ? "bg-surface-elevated text-txt-tertiary"
+                                    : "hover:bg-brand-orange-dark bg-brand-orange text-white",
+                                )}
+                              >
+                                {bookingScheduleId === schedule.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : schedule._count.bookings >= selectedClass.maxCapacity ? (
+                                  "Waitlist"
+                                ) : (
+                                  "Reserve Spot"
+                                )}
+                              </Button>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Modal Footer */}
-                <div className="p-8 pt-0 mt-auto">
-                  <div className="p-4 rounded-2xl bg-brand-orange/5 border border-brand-orange/10 flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-brand-orange shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-txt-secondary leading-relaxed">
-                      <span className="font-bold text-brand-orange uppercase">Member Policy:</span> Cancellations must be made at least 2 hours before the session. Failure to attend booked classes may result in temporary booking restrictions.
-                    </p>
+                  {/* Modal Footer */}
+                  <div className="mt-auto p-8 pt-0">
+                    <div className="flex items-start gap-3 rounded-2xl border border-brand-orange/10 bg-brand-orange/5 p-4">
+                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange" />
+                      <p className="text-[10px] leading-relaxed text-txt-secondary">
+                        <span className="font-bold uppercase text-brand-orange">
+                          Member Policy:
+                        </span>{" "}
+                        Cancellations must be made at least 2 hours before the session. Failure to
+                        attend booked classes may result in temporary booking restrictions.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }
-

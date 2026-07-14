@@ -16,8 +16,14 @@ export default async function ProgressPage() {
   }
 
   return (
-    <div className="w-full h-full">
-      <Suspense fallback={<div className="flex items-center justify-center h-full">Loading Evolution Tracker...</div>}>
+    <div className="h-full w-full">
+      <Suspense
+        fallback={
+          <div className="flex h-full items-center justify-center">
+            Loading Evolution Tracker...
+          </div>
+        }
+      >
         <ProgressClient data={res.data} />
       </Suspense>
     </div>

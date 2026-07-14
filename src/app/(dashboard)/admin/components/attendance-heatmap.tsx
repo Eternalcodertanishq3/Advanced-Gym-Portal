@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  Users,
-  TrendingUp,
-  Clock,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Users, TrendingUp, Clock } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 
 import { getAttendanceHeatmapData } from "@/actions/admin/attendance-heatmap-actions";
@@ -22,11 +15,11 @@ interface DayData {
 }
 
 const intensityColors = [
-  "bg-muted/50 hover:bg-muted",          // 0 - Low
-  "bg-primary/20 hover:bg-primary/30",    // 1
-  "bg-primary/40 hover:bg-primary/50",    // 2
-  "bg-primary/60 hover:bg-primary/70",    // 3
-  "bg-primary/80 hover:bg-primary/90",    // 4 - High
+  "bg-muted/50 hover:bg-muted", // 0 - Low
+  "bg-primary/20 hover:bg-primary/30", // 1
+  "bg-primary/40 hover:bg-primary/50", // 2
+  "bg-primary/60 hover:bg-primary/70", // 3
+  "bg-primary/80 hover:bg-primary/90", // 4 - High
 ];
 
 const intensityLabels = ["< 5", "5-10", "10-20", "20-30", "30+"];
@@ -50,18 +43,18 @@ export function AttendanceHeatmap() {
         // Fill in missing days with 0 counts
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const monthData: DayData[] = [];
-        
+
         for (let d = 1; d <= daysInMonth; d++) {
-          const dateStr = new Date(year, month, d).toISOString().split('T')[0];
-          const existing = res.data.find(item => item.date.startsWith(dateStr));
-          
+          const dateStr = new Date(year, month, d).toISOString().split("T")[0];
+          const existing = res.data.find((item) => item.date.startsWith(dateStr));
+
           if (existing) {
             monthData.push(existing);
           } else {
             monthData.push({
               date: new Date(year, month, d).toISOString(),
               count: 0,
-              intensity: 0
+              intensity: 0,
             });
           }
         }
@@ -80,7 +73,10 @@ export function AttendanceHeatmap() {
   // Calculate stats
   const totalAttendance = data.reduce((sum, d) => sum + d.count, 0);
   const avgDaily = daysInMonth > 0 ? Math.round(totalAttendance / daysInMonth) : 0;
-  const bestDay = data.length > 0 ? data.reduce((max, d) => (d.count > max.count ? d : max), data[0]) : { count: 0 };
+  const bestDay =
+    data.length > 0
+      ? data.reduce((max, d) => (d.count > max.count ? d : max), data[0])
+      : { count: 0 };
   const peakDays = data.filter((d) => d.intensity === 4).length;
 
   const prevMonth = () => {
@@ -96,10 +92,10 @@ export function AttendanceHeatmap() {
   return (
     <div className="surface-card p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Calendar className="w-5 h-5 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <Calendar className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-foreground">Attendance Heatmap</h3>
@@ -110,42 +106,40 @@ export function AttendanceHeatmap() {
           <button
             onClick={prevMonth}
             aria-label="Previous month"
-            className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="text-sm font-bold text-foreground min-w-[100px] text-center">
+          <span className="min-w-[100px] text-center text-sm font-bold text-foreground">
             {formatDate(currentDate, "MMMM yyyy")}
           </span>
           <button
             onClick={nextMonth}
             aria-label="Next month"
-            className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+      <div className="mb-6 grid grid-cols-4 gap-3">
+        <div className="rounded-xl bg-muted/50 p-3">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</p>
           <p className="text-lg font-bold text-foreground">{totalAttendance.toLocaleString()}</p>
         </div>
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Daily Avg</p>
+        <div className="rounded-xl bg-muted/50 p-3">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Daily Avg</p>
           <p className="text-lg font-bold text-primary">{avgDaily}</p>
         </div>
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Peak Days</p>
+        <div className="rounded-xl bg-muted/50 p-3">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Peak Days</p>
           <p className="text-lg font-bold text-success">{peakDays}</p>
         </div>
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Best Day</p>
-          <p className="text-lg font-bold text-primary">
-            {bestDay.count}
-          </p>
+        <div className="rounded-xl bg-muted/50 p-3">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Best Day</p>
+          <p className="text-lg font-bold text-primary">{bestDay.count}</p>
         </div>
       </div>
 
@@ -154,7 +148,7 @@ export function AttendanceHeatmap() {
         {/* Week day headers */}
         <div className="grid grid-cols-7 gap-1">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-[10px] text-muted-foreground py-1 font-bold">
+            <div key={day} className="py-1 text-center text-[10px] font-bold text-muted-foreground">
               {day}
             </div>
           ))}
@@ -175,8 +169,8 @@ export function AttendanceHeatmap() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.02 }}
               className={cn(
-                "aspect-square rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 relative group border border-border/10",
-                intensityColors[day.intensity]
+                "group relative flex aspect-square cursor-pointer items-center justify-center rounded-lg border border-border/10 transition-all duration-200",
+                intensityColors[day.intensity],
               )}
               onMouseEnter={() => setHoveredDay(day)}
               onMouseLeave={() => setHoveredDay(null)}
@@ -184,7 +178,7 @@ export function AttendanceHeatmap() {
               <span
                 className={cn(
                   "text-xs font-bold",
-                  day.intensity >= 3 ? "text-primary-foreground" : "text-foreground/60"
+                  day.intensity >= 3 ? "text-primary-foreground" : "text-foreground/60",
                 )}
               >
                 {index + 1}
@@ -192,13 +186,13 @@ export function AttendanceHeatmap() {
 
               {/* Tooltip */}
               {hoveredDay?.date === day.date && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 surface-card p-2 rounded-lg whitespace-nowrap shadow-xl border border-primary/20">
+                <div className="surface-card absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-primary/20 p-2 shadow-xl">
                   <p className="text-xs font-bold text-foreground">
                     {formatDate(day.date, "dd MMM yyyy")}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Users className="w-3 h-3 text-primary" />
-                    <span className="text-xs text-primary font-bold">{day.count}</span>
+                  <div className="mt-1 flex items-center gap-2">
+                    <Users className="h-3 w-3 text-primary" />
+                    <span className="text-xs font-bold text-primary">{day.count}</span>
                     <span className="text-[10px] text-muted-foreground">check-ins</span>
                   </div>
                 </div>
@@ -209,21 +203,21 @@ export function AttendanceHeatmap() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+      <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
         <div className="flex items-center gap-3">
-          <span className="text-[10px] text-muted-foreground font-bold">Less</span>
+          <span className="text-[10px] font-bold text-muted-foreground">Less</span>
           {intensityColors.map((color, i) => (
             <div
               key={i}
-              className={cn("w-4 h-4 rounded shadow-sm", color.split(" ")[0])}
+              className={cn("h-4 w-4 rounded shadow-sm", color.split(" ")[0])}
               title={intensityLabels[i]}
             />
           ))}
-          <span className="text-[10px] text-muted-foreground font-bold">More</span>
+          <span className="text-[10px] font-bold text-muted-foreground">More</span>
         </div>
         <div className="flex items-center gap-4 text-[10px] text-muted-foreground">
           <span className="flex items-center gap-1 font-bold">
-            <Clock className="w-3 h-3" />
+            <Clock className="h-3 w-3" />
             Updated just now
           </span>
         </div>

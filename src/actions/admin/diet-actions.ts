@@ -12,7 +12,7 @@ export async function getDietPlans(page = 1, limit = 10, search = "") {
   }
   try {
     const skip = (page - 1) * limit;
-    
+
     let whereClause: any = {};
     if (search) {
       whereClause.name = { contains: search, mode: "insensitive" };
@@ -23,23 +23,23 @@ export async function getDietPlans(page = 1, limit = 10, search = "") {
         where: whereClause,
         include: {
           trainer: {
-            include: { user: { select: { firstName: true, lastName: true } } }
+            include: { user: { select: { firstName: true, lastName: true } } },
           },
-          meals: true
+          meals: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
-      prisma.dietPlan.count({ where: whereClause })
+      prisma.dietPlan.count({ where: whereClause }),
     ]);
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         plans,
-        pagination: { total, pages: Math.ceil(total / limit), page, limit }
-      }
+        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+      },
     };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -55,7 +55,7 @@ export async function getDietTemplates() {
     const templates = await prisma.dietPlan.findMany({
       where: { isTemplate: true },
       include: { meals: true },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
     return { success: true, data: templates };
   } catch (error: any) {
@@ -63,7 +63,13 @@ export async function getDietTemplates() {
   }
 }
 
-export async function createDietPlan(data: { name: string, description?: string, trainerId: string, memberId?: string, type: any }) {
+export async function createDietPlan(data: {
+  name: string;
+  description?: string;
+  trainerId: string;
+  memberId?: string;
+  type: any;
+}) {
   const session = await auth();
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
     return { success: false, error: "Unauthorized" };
@@ -76,8 +82,8 @@ export async function createDietPlan(data: { name: string, description?: string,
         trainerId: data.trainerId,
         memberId: data.memberId,
         type: data.type,
-        isTemplate: !data.memberId
-      }
+        isTemplate: !data.memberId,
+      },
     });
 
     revalidatePath("/trainer/diet");

@@ -16,7 +16,7 @@ export default async function DigitalCardPage() {
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <DigitalCardClient member={res.data} />
     </div>
   );

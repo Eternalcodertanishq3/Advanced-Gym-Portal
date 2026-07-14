@@ -16,7 +16,7 @@ export function NotificationSettings() {
     billingAlerts: true,
     trainerMessages: true,
     newsletter: false,
-    appUpdates: true
+    appUpdates: true,
   });
 
   const handleSave = async () => {
@@ -31,78 +31,86 @@ export function NotificationSettings() {
   };
 
   const toggle = (key: keyof typeof prefs) => {
-    setPrefs(prev => ({ ...prev, [key]: !prev[key] }));
+    setPrefs((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl"
     >
-      <div className="surface-card p-10 rounded-[2.5rem] border border-border/50 shadow-xl overflow-hidden relative">
+      <div className="surface-card relative overflow-hidden rounded-[2.5rem] border border-border/50 p-10 shadow-xl">
         <div className="relative z-10 space-y-10">
           <div className="flex items-center gap-5">
-            <div className="w-14 h-14 rounded-2xl bg-info/10 flex items-center justify-center border border-info/20 shadow-info-glow">
-              <Bell className="w-6 h-6 text-info" />
+            <div className="shadow-info-glow flex h-14 w-14 items-center justify-center rounded-2xl border border-info/20 bg-info/10">
+              <Bell className="h-6 w-6 text-info" />
             </div>
             <div>
-              <h2 className="text-2xl font-display font-bold text-foreground uppercase tracking-tight">Signal Control</h2>
-              <p className="text-sm text-txt-tertiary font-medium">Calibrate how you receive intelligence and alerts.</p>
+              <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-foreground">
+                Signal Control
+              </h2>
+              <p className="text-sm font-medium text-txt-tertiary">
+                Calibrate how you receive intelligence and alerts.
+              </p>
             </div>
           </div>
 
           <div className="space-y-6">
-            <h3 className="text-[10px] font-black text-brand-orange uppercase tracking-[0.3em] ml-1">Engagement Alerts</h3>
+            <h3 className="ml-1 text-[10px] font-black uppercase tracking-[0.3em] text-brand-orange">
+              Engagement Alerts
+            </h3>
             <div className="grid grid-cols-1 gap-4">
-              <NotificationToggle 
-                title="Trainer Communications" 
-                desc="Direct messages and feedback from your coach." 
-                active={prefs.trainerMessages} 
-                onToggle={() => toggle('trainerMessages')} 
-                icon={<Mail className="w-4 h-4" />}
+              <NotificationToggle
+                title="Trainer Communications"
+                desc="Direct messages and feedback from your coach."
+                active={prefs.trainerMessages}
+                onToggle={() => toggle("trainerMessages")}
+                icon={<Mail className="h-4 w-4" />}
               />
-              <NotificationToggle 
-                title="Workout Reminders" 
-                desc="Daily signals to ensure you never miss a mission." 
-                active={prefs.workoutReminders} 
-                onToggle={() => toggle('workoutReminders')} 
-                icon={<Smartphone className="w-4 h-4" />}
+              <NotificationToggle
+                title="Workout Reminders"
+                desc="Daily signals to ensure you never miss a mission."
+                active={prefs.workoutReminders}
+                onToggle={() => toggle("workoutReminders")}
+                icon={<Smartphone className="h-4 w-4" />}
               />
-              <NotificationToggle 
-                title="Nutrition Optimization" 
-                desc="Updates to your meal blueprints and hydration targets." 
-                active={prefs.nutritionTips} 
-                onToggle={() => toggle('nutritionTips')} 
-                icon={<Info className="w-4 h-4" />}
+              <NotificationToggle
+                title="Nutrition Optimization"
+                desc="Updates to your meal blueprints and hydration targets."
+                active={prefs.nutritionTips}
+                onToggle={() => toggle("nutritionTips")}
+                icon={<Info className="h-4 w-4" />}
               />
             </div>
           </div>
 
           <div className="space-y-6">
-            <h3 className="text-[10px] font-black text-brand-orange uppercase tracking-[0.3em] ml-1">System Intelligence</h3>
+            <h3 className="ml-1 text-[10px] font-black uppercase tracking-[0.3em] text-brand-orange">
+              System Intelligence
+            </h3>
             <div className="grid grid-cols-1 gap-4">
-              <NotificationToggle 
-                title="Billing & Membership" 
-                desc="Invoices, plan updates, and payment confirmations." 
-                active={prefs.billingAlerts} 
-                onToggle={() => toggle('billingAlerts')} 
-                icon={<CheckCircle2 className="w-4 h-4" />}
+              <NotificationToggle
+                title="Billing & Membership"
+                desc="Invoices, plan updates, and payment confirmations."
+                active={prefs.billingAlerts}
+                onToggle={() => toggle("billingAlerts")}
+                icon={<CheckCircle2 className="h-4 w-4" />}
               />
-              <NotificationToggle 
-                title="Eagle Gym Intelligence" 
-                desc="New feature drops, gym events, and community news." 
-                active={prefs.appUpdates} 
-                onToggle={() => toggle('appUpdates')} 
-                icon={<Bell className="w-4 h-4" />}
+              <NotificationToggle
+                title="Eagle Gym Intelligence"
+                desc="New feature drops, gym events, and community news."
+                active={prefs.appUpdates}
+                onToggle={() => toggle("appUpdates")}
+                icon={<Bell className="h-4 w-4" />}
               />
             </div>
           </div>
 
-          <Button 
+          <Button
             onClick={handleSave}
             disabled={loading}
-            className="w-full h-14 bg-info hover:bg-info/90 text-white font-bold rounded-2xl shadow-xl shadow-info/20 transition-all active:scale-95 flex items-center justify-center gap-3"
+            className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-info font-bold text-white shadow-xl shadow-info/20 transition-all hover:bg-info/90 active:scale-95"
           >
             {loading ? "Calibrating..." : "Save Communication Protocol"}
           </Button>
@@ -114,17 +122,19 @@ export function NotificationSettings() {
 
 function NotificationToggle({ title, desc, active, onToggle, icon }: any) {
   return (
-    <div className="p-6 rounded-[2rem] bg-surface-sunken/50 border border-border/50 flex items-center justify-between group hover:border-info/30 transition-all">
+    <div className="group flex items-center justify-between rounded-[2rem] border border-border/50 bg-surface-sunken/50 p-6 transition-all hover:border-info/30">
       <div className="flex items-center gap-5">
-        <div className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
-          active ? "bg-info text-white" : "bg-surface-elevated text-txt-tertiary"
-        )}>
+        <div
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-xl transition-all",
+            active ? "bg-info text-white" : "bg-surface-elevated text-txt-tertiary",
+          )}
+        >
           {icon}
         </div>
         <div>
-          <h4 className="text-base font-bold text-foreground leading-tight">{title}</h4>
-          <p className="text-xs text-txt-tertiary font-medium mt-1">{desc}</p>
+          <h4 className="text-base font-bold leading-tight text-foreground">{title}</h4>
+          <p className="mt-1 text-xs font-medium text-txt-tertiary">{desc}</p>
         </div>
       </div>
       <Switch checked={active} onCheckedChange={onToggle} />

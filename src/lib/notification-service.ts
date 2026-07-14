@@ -60,5 +60,5 @@ export const NotificationService = {
     // Placeholder for Twilio/AWS SNS implementation
     console.log(`[SMS MOCK] To: ${to}, Message: ${message}`);
     return { success: true, provider: "Mock/Twilio Placeholder" };
-  }
+  },
 };

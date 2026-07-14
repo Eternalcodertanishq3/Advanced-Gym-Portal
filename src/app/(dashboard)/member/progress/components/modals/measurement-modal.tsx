@@ -25,13 +25,13 @@ export function MeasurementModal({ isOpen, onClose, latest }: MeasurementModalPr
     biceps: latest.biceps || "",
     thighs: latest.thighs || "",
     neck: latest.neck || "",
-    notes: ""
+    notes: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const res = await addMeasurement(formData);
       if (res.success) {
@@ -50,7 +50,7 @@ export function MeasurementModal({ isOpen, onClose, latest }: MeasurementModalPr
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   if (!isOpen) return null;
@@ -58,61 +58,67 @@ export function MeasurementModal({ isOpen, onClose, latest }: MeasurementModalPr
   return (
     <Portal>
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
           className="absolute inset-0 bg-black/40"
         />
-        
-        <motion.div 
+
+        <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          className="relative w-full max-w-xl bg-surface-card rounded-[2.5rem] border border-border shadow-2xl overflow-hidden max-h-[95vh] flex flex-col"
+          className="relative flex max-h-[95vh] w-full max-w-xl flex-col overflow-hidden rounded-[2.5rem] border border-border bg-surface-card shadow-2xl"
         >
-          <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-display font-bold text-foreground">Log <span className="text-brand-orange">Measurement</span></h2>
-              <button 
+          <div className="custom-scrollbar overflow-y-auto p-6 md:p-8">
+            <div className="mb-8 flex items-center justify-between">
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                Log <span className="text-brand-orange">Measurement</span>
+              </h2>
+              <button
                 aria-label="Close"
-                onClick={onClose} 
-                className="p-2 rounded-xl bg-surface-elevated text-txt-tertiary hover:text-foreground transition-colors"
+                onClick={onClose}
+                className="rounded-xl bg-surface-elevated p-2 text-txt-tertiary transition-colors hover:text-foreground"
               >
-                <Plus className="w-6 h-6 rotate-45" />
+                <Plus className="h-6 w-6 rotate-45" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest ml-1">Weight (kg)</label>
-                  <input 
-                    type="number" 
+                  <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                    Weight (kg)
+                  </label>
+                  <input
+                    type="number"
                     step="0.1"
                     name="weight"
                     value={formData.weight}
                     onChange={handleChange}
                     placeholder="0.0"
-                    className="w-full bg-surface-sunken border border-border rounded-xl px-4 py-3 text-foreground font-bold focus:border-brand-orange outline-none transition-colors h-[50px]"
+                    className="h-[50px] w-full rounded-xl border border-border bg-surface-sunken px-4 py-3 font-bold text-foreground outline-none transition-colors focus:border-brand-orange"
                     required
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest ml-1">Body Fat (%)</label>
-                  <input 
-                    type="number" 
+                  <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                    Body Fat (%)
+                  </label>
+                  <input
+                    type="number"
                     step="0.1"
                     name="bodyFat"
                     value={formData.bodyFat}
                     onChange={handleChange}
                     placeholder="0.0"
-                    className="w-full bg-surface-sunken border border-border rounded-xl px-4 py-3 text-foreground font-bold focus:border-brand-orange outline-none transition-colors"
+                    className="w-full rounded-xl border border-border bg-surface-sunken px-4 py-3 font-bold text-foreground outline-none transition-colors focus:border-brand-orange"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {[
                   { name: "chest", label: "Chest (cm)" },
                   { name: "waist", label: "Waist (cm)" },
@@ -120,37 +126,41 @@ export function MeasurementModal({ isOpen, onClose, latest }: MeasurementModalPr
                   { name: "biceps", label: "Biceps (cm)" },
                   { name: "thighs", label: "Thighs (cm)" },
                   { name: "neck", label: "Neck (cm)" },
-                ].map(field => (
+                ].map((field) => (
                   <div key={field.name} className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest ml-1">{field.label}</label>
-                    <input 
-                      type="number" 
+                    <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                      {field.label}
+                    </label>
+                    <input
+                      type="number"
                       step="0.1"
                       name={field.name}
                       value={(formData as any)[field.name]}
                       onChange={handleChange}
                       placeholder="0.0"
-                      className="w-full bg-surface-sunken border border-border rounded-xl px-4 py-3 text-foreground font-medium focus:border-brand-orange outline-none transition-colors text-sm h-[50px]"
+                      className="h-[50px] w-full rounded-xl border border-border bg-surface-sunken px-4 py-3 text-sm font-medium text-foreground outline-none transition-colors focus:border-brand-orange"
                     />
                   </div>
                 ))}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest ml-1">Notes</label>
-                <textarea 
+                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                  Notes
+                </label>
+                <textarea
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
                   placeholder="How are you feeling today?"
-                  className="w-full bg-surface-sunken border border-border rounded-xl px-4 py-3 text-foreground focus:border-brand-orange outline-none transition-colors min-h-[100px] resize-none text-sm"
+                  className="min-h-[100px] w-full resize-none rounded-xl border border-border bg-surface-sunken px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-brand-orange"
                 />
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading}
-                className="w-full bg-brand-orange hover:bg-brand-orange-dark h-14 rounded-2xl text-white font-bold text-lg shadow-lg shadow-brand-orange/20"
+                className="hover:bg-brand-orange-dark h-14 w-full rounded-2xl bg-brand-orange text-lg font-bold text-white shadow-lg shadow-brand-orange/20"
               >
                 {loading ? "Recording..." : "Save Measurement"}
               </Button>

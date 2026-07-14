@@ -1,4 +1,15 @@
-import { Member, User, Subscription, Payment, Attendance, Progress, ClassBooking, Goal, DietPlan, WorkoutLog } from "@prisma/client";
+import {
+  Member,
+  User,
+  Subscription,
+  Payment,
+  Attendance,
+  Progress,
+  ClassBooking,
+  Goal,
+  DietPlan,
+  WorkoutLog,
+} from "@prisma/client";
 
 export interface MemberWithUser extends Member {
   user: User;

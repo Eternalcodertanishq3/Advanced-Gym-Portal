@@ -13,7 +13,7 @@ export async function getChallenges() {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) return { success: false, error: "Member not found" };
@@ -22,12 +22,12 @@ export async function getChallenges() {
       where: { isActive: true },
       include: {
         participants: {
-          where: { memberId: member.id }
+          where: { memberId: member.id },
         },
         _count: {
-          select: { participants: true }
-        }
-      }
+          select: { participants: true },
+        },
+      },
     });
 
     return { success: true, data: challenges };
@@ -46,7 +46,7 @@ export async function joinChallenge(challengeId: string) {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) return { success: false, error: "Member not found" };
@@ -55,8 +55,8 @@ export async function joinChallenge(challengeId: string) {
       data: {
         challengeId,
         memberId: member.id,
-        progress: 0
-      }
+        progress: 0,
+      },
     });
 
     revalidatePath("/member/challenges");

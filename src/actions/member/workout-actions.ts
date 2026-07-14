@@ -14,7 +14,7 @@ export async function getMemberWorkouts() {
     }
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) {
@@ -24,14 +24,11 @@ export async function getMemberWorkouts() {
     // Get plans specifically assigned to this member OR common templates
     const plans = await prisma.workoutPlan.findMany({
       where: {
-        OR: [
-          { memberId: member.id },
-          { isTemplate: true }
-        ]
+        OR: [{ memberId: member.id }, { isTemplate: true }],
       },
       include: {
         exercises: {
-          orderBy: { sortOrder: 'asc' }
+          orderBy: { sortOrder: "asc" },
         },
         trainer: {
           select: {
@@ -39,36 +36,36 @@ export async function getMemberWorkouts() {
               select: {
                 firstName: true,
                 lastName: true,
-                avatar: true
-              }
-            }
-          }
-        }
+                avatar: true,
+              },
+            },
+          },
+        },
       },
       orderBy: [
-        { memberId: 'desc' }, // Nulls come last in desc order for strings usually, but let's be careful
-        { createdAt: 'desc' }
-      ]
+        { memberId: "desc" }, // Nulls come last in desc order for strings usually, but let's be careful
+        { createdAt: "desc" },
+      ],
     });
 
     // Get recent logs to show progress
     const recentLogs = await prisma.workoutLog.findMany({
       where: { memberId: member.id },
       take: 5,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       include: {
         workoutPlan: {
-          select: { name: true }
-        }
-      }
+          select: { name: true },
+        },
+      },
     });
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         plans,
-        recentLogs
-      }
+        recentLogs,
+      },
     };
   } catch (error) {
     console.error("Error fetching member workouts:", error);
@@ -94,7 +91,7 @@ export async function logWorkoutSession(data: {
     }
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) {
@@ -109,8 +106,8 @@ export async function logWorkoutSession(data: {
         caloriesBurned: data.caloriesBurned,
         feeling: data.feeling,
         notes: data.notes,
-        completedExercises: data.completedExercises
-      }
+        completedExercises: data.completedExercises,
+      },
     });
 
     return { success: true, data: log };

@@ -16,7 +16,7 @@ export default function EditMemberPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [member, setMember] = useState<any>(null);
@@ -54,38 +54,35 @@ export default function EditMemberPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-12">
+    <div className="mx-auto max-w-4xl space-y-8 pb-12">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="rounded-full bg-surface-card border-surface-sunken"
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full border-surface-sunken bg-surface-card"
           onClick={() => router.back()}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
             Edit <span className="text-brand-orange">Profile</span>
           </h1>
-          <p className="text-sm text-muted-foreground">Modify member details and contact information.</p>
+          <p className="text-sm text-muted-foreground">
+            Modify member details and contact information.
+          </p>
         </div>
       </div>
 
-      <MemberForm 
-        initialData={member}
-        onSubmit={handleSubmit}
-        loading={saving}
-        mode="edit"
-      />
+      <MemberForm initialData={member} onSubmit={handleSubmit} loading={saving} mode="edit" />
     </div>
   );
 }

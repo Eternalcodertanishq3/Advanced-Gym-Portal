@@ -114,7 +114,7 @@ export async function togglePlanStatus(id: string, currentStatus: boolean) {
 
     await prisma.plan.update({
       where: { id },
-      data: { isActive: !currentStatus }
+      data: { isActive: !currentStatus },
     });
 
     await recordAudit({
@@ -141,11 +141,14 @@ export async function deletePlan(id: string) {
     const superAdmin = await ensureSuperAdmin();
 
     const activeSubs = await prisma.subscription.count({
-      where: { planId: id, status: "ACTIVE" }
+      where: { planId: id, status: "ACTIVE" },
     });
 
     if (activeSubs > 0) {
-      return { success: false, error: "Cannot delete plan with active subscribers. Deactivate it instead." };
+      return {
+        success: false,
+        error: "Cannot delete plan with active subscribers. Deactivate it instead.",
+      };
     }
 
     await prisma.plan.delete({ where: { id } });

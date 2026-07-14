@@ -25,7 +25,7 @@ export function ProgressRing({
 }: ProgressRingProps) {
   // Ensure progress is between 0 and 100
   const safeProgress = Math.min(Math.max(progress, 0), 100);
-  
+
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (safeProgress / 100) * circumference;
@@ -47,11 +47,11 @@ export function ProgressRing({
   };
 
   return (
-    <div 
-      className={cn("relative flex flex-col items-center justify-center", className)} 
+    <div
+      className={cn("relative flex flex-col items-center justify-center", className)}
       style={{ width: size, height: size }}
     >
-      <svg width={size} height={size} className="transform -rotate-90">
+      <svg width={size} height={size} className="-rotate-90 transform">
         {/* Background track */}
         <circle
           cx={size / 2}
@@ -76,25 +76,25 @@ export function ProgressRing({
           strokeLinecap="round"
         />
       </svg>
-      
+
       {/* Center content */}
       <div className="absolute flex flex-col items-center justify-center text-center">
         {showValue && (
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
-            className={cn("font-mono font-bold text-xl", colorMap[color])}
+            className={cn("font-mono text-xl font-bold", colorMap[color])}
           >
             {safeProgress}%
           </motion.span>
         )}
         {label && (
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
-            className="text-[10px] text-white/40 mt-1 uppercase tracking-wider"
+            className="mt-1 text-[10px] uppercase tracking-wider text-white/40"
           >
             {label}
           </motion.span>

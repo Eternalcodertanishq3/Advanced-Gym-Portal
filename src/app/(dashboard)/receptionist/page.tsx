@@ -75,8 +75,8 @@ export default function ReceptionistDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 animate-pulse-fade">
-        <div className="h-16 bg-surface-elevated rounded-xl w-1/3 mb-8" />
+      <div className="animate-pulse-fade space-y-8">
+        <div className="mb-8 h-16 w-1/3 rounded-xl bg-surface-elevated" />
         <SkeletonStatGrid count={4} />
       </div>
     );
@@ -90,46 +90,51 @@ export default function ReceptionistDashboardPage() {
       className="space-y-8"
     >
       {/* Page Header */}
-      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div
+        variants={itemVariants}
+        className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
+      >
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground mb-1">
+          <h1 className="mb-1 font-display text-3xl font-bold text-foreground">
             Reception <span className="text-brand-orange">Desk</span>
           </h1>
-          <p className="text-sm text-txt-secondary font-medium">Quick actions for daily operations</p>
+          <p className="text-sm font-medium text-txt-secondary">
+            Quick actions for daily operations
+          </p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-info-soft border border-info/20">
-          <Clock className="w-3 h-3 text-info" />
-          <span className="text-xs text-info font-bold tracking-wide">
+        <div className="flex items-center gap-2 rounded-full border border-info/20 bg-info-soft px-3 py-1.5">
+          <Clock className="h-3 w-3 text-info" />
+          <span className="text-xs font-bold tracking-wide text-info">
             {new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
       </motion.div>
 
       {/* Quick Action Cards */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-6 lg:grid-cols-4">
         <QuickActionCard
-          icon={<QrCode className="w-6 h-6" />}
+          icon={<QrCode className="h-6 w-6" />}
           label="Quick Check-In"
           description="Scan QR or search member"
           color="orange"
           href="/receptionist/check-in"
         />
         <QuickActionCard
-          icon={<UserPlus className="w-6 h-6" />}
+          icon={<UserPlus className="h-6 w-6" />}
           label="Walk-In Register"
           description="New member registration"
           color="success"
           href="/receptionist/walk-in"
         />
         <QuickActionCard
-          icon={<CreditCard className="w-6 h-6" />}
+          icon={<CreditCard className="h-6 w-6" />}
           label="Collect Payment"
           description="Record cash/card/UPI"
           color="info"
           href="/receptionist/payments"
         />
         <QuickActionCard
-          icon={<Users className="w-6 h-6" />}
+          icon={<Users className="h-6 w-6" />}
           label="View Members"
           description="Search & view profiles"
           color="navy"
@@ -138,9 +143,9 @@ export default function ReceptionistDashboardPage() {
       </motion.div>
 
       {/* Stats Row */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-6 lg:grid-cols-4">
         <StatCard
-          icon={<Users className="w-6 h-6" />}
+          icon={<Users className="h-6 w-6" />}
           label="Checked In Today"
           value={stats?.todayCheckIns || 0}
           trend="+12"
@@ -148,19 +153,19 @@ export default function ReceptionistDashboardPage() {
           color="success"
         />
         <StatCard
-          icon={<CreditCard className="w-6 h-6" />}
+          icon={<CreditCard className="h-6 w-6" />}
           label="Today's Collection"
           value={formatCurrency(stats?.todayCollection || 0, { showSymbol: true, decimals: 0 })}
           color="orange"
         />
         <StatCard
-          icon={<UserPlus className="w-6 h-6" />}
+          icon={<UserPlus className="h-6 w-6" />}
           label="New Registrations"
           value={stats?.newWalkIns || 0}
           color="info"
         />
         <StatCard
-          icon={<Bell className="w-6 h-6" />}
+          icon={<Bell className="h-6 w-6" />}
           label="Pending Dues"
           value={stats?.pendingPayments || 0}
           color="danger"
@@ -169,13 +174,13 @@ export default function ReceptionistDashboardPage() {
       </motion.div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Quick Check-In */}
         <motion.div variants={itemVariants} className="lg:col-span-2">
           <div className="surface-card p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-brand-orange-soft flex items-center justify-center">
-                <QrCode className="w-6 h-6 text-brand-orange" />
+            <div className="mb-6 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-soft">
+                <QrCode className="h-6 w-6 text-brand-orange" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground">Quick Check-In</h3>
@@ -183,30 +188,30 @@ export default function ReceptionistDashboardPage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-txt-tertiary" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-txt-tertiary" />
                 <input
                   type="text"
                   placeholder="Enter member name or ID..."
                   value={checkInQuery}
                   onChange={(e) => setCheckInQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleQuickCheckIn()}
-                  className="w-full bg-surface-sunken border border-border rounded-xl py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-txt-tertiary outline-none focus:border-brand-orange/50 focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                  className="w-full rounded-xl border border-border bg-surface-sunken py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-all placeholder:text-txt-tertiary focus:border-brand-orange/50 focus:ring-2 focus:ring-brand-orange/20"
                 />
               </div>
               <button
                 onClick={handleQuickCheckIn}
-                className="px-6 py-3 rounded-xl bg-brand-orange text-white font-bold text-sm hover:bg-brand-orange/90 transition-all flex items-center justify-center gap-2 shadow-sm"
+                className="flex items-center justify-center gap-2 rounded-xl bg-brand-orange px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-orange/90"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="h-4 w-4" />
                 Check In
               </button>
             </div>
 
             {/* Recent Check-Ins */}
             <div>
-              <h4 className="text-xs font-bold text-txt-tertiary uppercase tracking-wider mb-4">
+              <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-txt-tertiary">
                 Recent Activity
               </h4>
               <div className="space-y-3">
@@ -216,33 +221,36 @@ export default function ReceptionistDashboardPage() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between p-4 rounded-xl bg-surface-sunken border border-border/50 hover:border-border transition-colors"
+                    className="flex items-center justify-between rounded-xl border border-border/50 bg-surface-sunken p-4 transition-colors hover:border-border"
                   >
                     <div className="flex items-center gap-4">
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold",
+                          "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold",
                           checkIn.status === "checked-in"
                             ? "bg-success text-white shadow-sm"
-                            : "bg-surface-elevated text-txt-secondary"
+                            : "bg-surface-elevated text-txt-secondary",
                         )}
                       >
-                        {checkIn.name.split(" ").map((n: string) => n[0]).join("")}
+                        {checkIn.name
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .join("")}
                       </div>
                       <div>
                         <p className="text-sm font-bold text-foreground">{checkIn.name}</p>
-                        <p className="text-xs font-medium text-txt-tertiary flex items-center gap-1 mt-0.5">
-                          <Clock className="w-3 h-3" />
+                        <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-txt-tertiary">
+                          <Clock className="h-3 w-3" />
                           {checkIn.time}
                         </p>
                       </div>
                     </div>
                     <span
                       className={cn(
-                        "text-xs px-3 py-1 rounded-full font-bold tracking-wide uppercase",
+                        "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide",
                         checkIn.status === "checked-in"
                           ? "bg-success-soft text-success"
-                          : "bg-surface-elevated text-txt-secondary"
+                          : "bg-surface-elevated text-txt-secondary",
                       )}
                     >
                       {checkIn.status === "checked-in" ? "Checked In" : "Checked Out"}
@@ -257,51 +265,57 @@ export default function ReceptionistDashboardPage() {
         {/* Today's Summary */}
         <motion.div variants={itemVariants}>
           <div className="surface-card p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-info-soft flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-info" />
+            <div className="mb-6 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-info-soft">
+                <Calendar className="h-6 w-6 text-info" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground">Today's Summary</h3>
-                <p className="text-sm text-txt-secondary">Overview for {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
+                <p className="text-sm text-txt-secondary">
+                  Overview for{" "}
+                  {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                </p>
               </div>
             </div>
 
             <div className="space-y-3">
               <SummaryRow
-                icon={<Users className="w-5 h-5 text-txt-secondary" />}
+                icon={<Users className="h-5 w-5 text-txt-secondary" />}
                 label="Total Check-ins"
                 value={stats?.todayCheckIns?.toString() || "0"}
                 positive
               />
               <SummaryRow
-                icon={<CreditCard className="w-5 h-5 text-txt-secondary" />}
+                icon={<CreditCard className="h-5 w-5 text-txt-secondary" />}
                 label="Revenue"
-                value={formatCurrency(stats?.todayCollection || 0, { showSymbol: true, decimals: 0 })}
+                value={formatCurrency(stats?.todayCollection || 0, {
+                  showSymbol: true,
+                  decimals: 0,
+                })}
                 positive
               />
               <SummaryRow
-                icon={<UserPlus className="w-5 h-5 text-txt-secondary" />}
+                icon={<UserPlus className="h-5 w-5 text-txt-secondary" />}
                 label="New Members"
                 value={stats?.newWalkIns?.toString() || "0"}
                 positive
               />
               <SummaryRow
-                icon={<Zap className="w-5 h-5 text-txt-secondary" />}
+                icon={<Zap className="h-5 w-5 text-txt-secondary" />}
                 label="Peak Hour"
                 value="6:00 PM"
                 neutral
               />
               <SummaryRow
-                icon={<TrendingUp className="w-5 h-5 text-txt-secondary" />}
+                icon={<TrendingUp className="h-5 w-5 text-txt-secondary" />}
                 label="Occupancy"
                 value="78%"
                 positive
               />
             </div>
 
-            <div className="mt-6 pt-5 border-t border-border">
-              <div className="flex items-center justify-between text-sm font-medium text-txt-secondary mb-2">
+            <div className="mt-6 border-t border-border pt-5">
+              <div className="mb-2 flex items-center justify-between text-sm font-medium text-txt-secondary">
                 <span>Shift started at</span>
                 <span className="text-foreground">6:00 AM</span>
               </div>
@@ -345,25 +359,25 @@ function QuickActionCard({
     <motion.a
       href={href}
       className={cn(
-        "group flex flex-col p-6 rounded-2xl surface-card border-2 border-transparent",
-        "hover:border-border transition-all duration-300",
-        "active:scale-[0.98] hover:shadow-lg"
+        "surface-card group flex flex-col rounded-2xl border-2 border-transparent p-6",
+        "transition-all duration-300 hover:border-border",
+        "hover:shadow-lg active:scale-[0.98]",
       )}
       whileHover={{ y: -4 }}
     >
       <div
         className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110",
-          colorMap[color]
+          "mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform group-hover:scale-110",
+          colorMap[color],
         )}
       >
         {icon}
       </div>
-      <h3 className="text-base font-bold text-foreground mb-1">{label}</h3>
+      <h3 className="mb-1 text-base font-bold text-foreground">{label}</h3>
       <p className="text-sm font-medium text-txt-secondary">{description}</p>
-      <div className="mt-4 flex items-center gap-1.5 text-sm font-bold text-txt-tertiary group-hover:text-brand-orange transition-colors">
+      <div className="mt-4 flex items-center gap-1.5 text-sm font-bold text-txt-tertiary transition-colors group-hover:text-brand-orange">
         <span>Open</span>
-        <ArrowRight className="w-4 h-4" />
+        <ArrowRight className="h-4 w-4" />
       </div>
     </motion.a>
   );
@@ -389,21 +403,27 @@ function SummaryRow({
   neutral?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-xl bg-surface-sunken">
+    <div className="flex items-center justify-between rounded-xl bg-surface-sunken p-4">
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-lg bg-surface-elevated flex items-center justify-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-elevated">
           {icon}
         </div>
         <div>
-          <p className="text-xs font-bold text-txt-tertiary tracking-wide uppercase mb-0.5">{label}</p>
+          <p className="mb-0.5 text-xs font-bold uppercase tracking-wide text-txt-tertiary">
+            {label}
+          </p>
           <p className="text-base font-bold text-foreground">{value}</p>
         </div>
       </div>
       {change && (
         <span
           className={cn(
-            "text-xs px-2.5 py-1 rounded-full font-bold",
-            positive ? "bg-success-soft text-success" : neutral ? "bg-surface-elevated text-txt-secondary" : "bg-danger-soft text-danger"
+            "rounded-full px-2.5 py-1 text-xs font-bold",
+            positive
+              ? "bg-success-soft text-success"
+              : neutral
+                ? "bg-surface-elevated text-txt-secondary"
+                : "bg-danger-soft text-danger",
           )}
         >
           {change}

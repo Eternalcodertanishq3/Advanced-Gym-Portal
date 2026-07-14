@@ -17,28 +17,27 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  icon = <Search className="w-12 h-12 text-obsidian-300" />,
+  icon = <Search className="h-12 w-12 text-obsidian-300" />,
   title,
   description,
   action,
   className,
 }: EmptyStateProps) {
   return (
-    <div className={cn(
-      "flex flex-col items-center justify-center py-12 px-4 text-center bg-surface-card rounded-2xl border border-dashed border-surface-sunken",
-      className
-    )}>
-      <div className="mb-4 p-4 bg-surface-base rounded-full">
-        {icon}
-      </div>
-      <h3 className="text-lg font-semibold text-obsidian-950 mb-1">{title}</h3>
-      {description && (
-        <p className="text-sm text-obsidian-500 max-w-xs mb-6">
-          {description}
-        </p>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center rounded-2xl border border-dashed border-surface-sunken bg-surface-card px-4 py-12 text-center",
+        className,
       )}
+    >
+      <div className="mb-4 rounded-full bg-surface-base p-4">{icon}</div>
+      <h3 className="mb-1 text-lg font-semibold text-obsidian-950">{title}</h3>
+      {description && <p className="mb-6 max-w-xs text-sm text-obsidian-500">{description}</p>}
       {action && (
-        <Button onClick={action.onClick} className="bg-brand-navy hover:bg-brand-navy/90 text-white">
+        <Button
+          onClick={action.onClick}
+          className="bg-brand-navy text-white hover:bg-brand-navy/90"
+        >
           {action.label}
         </Button>
       )}

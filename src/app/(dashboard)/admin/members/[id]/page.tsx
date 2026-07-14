@@ -3,15 +3,19 @@ import { notFound } from "next/navigation";
 import { formatCurrency, formatDate, getInitials, getAvatarColor, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CreditCard, Mail, Phone, Calendar, Clock, Activity, Dumbbell, UserCheck } from "lucide-react";
-import Link from "next/link";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ArrowLeft,
+  CreditCard,
+  Mail,
+  Phone,
+  Calendar,
+  Clock,
+  Activity,
+  Dumbbell,
+  UserCheck,
+} from "lucide-react";
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function MemberDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -27,18 +31,20 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
   const initials = getInitials(name);
   const avatarColor = getAvatarColor(name);
 
-
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="mx-auto max-w-5xl space-y-6">
       {/* Back & Actions */}
       <div className="flex items-center justify-between">
-        <Link href="/admin/members" className="flex items-center text-sm text-obsidian-500 hover:text-obsidian-900 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+        <Link
+          href="/admin/members"
+          className="flex items-center text-sm text-obsidian-500 transition-colors hover:text-obsidian-900"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Members
         </Link>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="bg-surface-card border-surface-sunken">
-            <Mail className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="border-surface-sunken bg-surface-card">
+            <Mail className="mr-2 h-4 w-4" />
             Message
           </Button>
           <Button className="bg-brand-orange text-white hover:bg-brand-orange/90">
@@ -48,22 +54,41 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
       </div>
 
       {/* Main Profile Header */}
-      <div className="bg-surface-card rounded-2xl p-6 md:p-8 border border-surface-sunken shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6">
-        <div className={cn("w-24 h-24 md:w-32 md:h-32 rounded-full flex items-center justify-center text-3xl md:text-5xl font-bold shrink-0", avatarColor)}>
+      <div className="flex flex-col items-center gap-6 rounded-2xl border border-surface-sunken bg-surface-card p-6 shadow-sm md:flex-row md:items-start md:p-8">
+        <div
+          className={cn(
+            "flex h-24 w-24 shrink-0 items-center justify-center rounded-full text-3xl font-bold md:h-32 md:w-32 md:text-5xl",
+            avatarColor,
+          )}
+        >
           {initials}
         </div>
         <div className="flex-1 text-center md:text-left">
           <h1 className="font-display text-3xl font-bold text-obsidian-950">{name}</h1>
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-2 text-obsidian-600 text-sm">
-            <span className="flex items-center gap-1.5"><Mail className="w-4 h-4" /> {user.email}</span>
-            {user.phone && <span className="flex items-center gap-1.5"><Phone className="w-4 h-4" /> {user.phone}</span>}
-            <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Joined {formatDate(member.joinDate)}</span>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-obsidian-600 md:justify-start">
+            <span className="flex items-center gap-1.5">
+              <Mail className="h-4 w-4" /> {user.email}
+            </span>
+            {user.phone && (
+              <span className="flex items-center gap-1.5">
+                <Phone className="h-4 w-4" /> {user.phone}
+              </span>
+            )}
+            <span className="flex items-center gap-1.5">
+              <Calendar className="h-4 w-4" /> Joined {formatDate(member.joinDate)}
+            </span>
           </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <Badge variant="outline" className="px-3 py-1 bg-surface-base text-obsidian-700 font-medium border-surface-sunken">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+            <Badge
+              variant="outline"
+              className="border-surface-sunken bg-surface-base px-3 py-1 font-medium text-obsidian-700"
+            >
               {member.status}
             </Badge>
-            <Badge variant="secondary" className="px-3 py-1 font-medium bg-brand-navy/10 text-brand-navy">
+            <Badge
+              variant="secondary"
+              className="bg-brand-navy/10 px-3 py-1 font-medium text-brand-navy"
+            >
               Plan: {member.subscription?.plan?.name || "No Plan"}
             </Badge>
           </div>
@@ -71,13 +96,13 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
       </div>
 
       {/* Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Left Col - Subscription & Trainer */}
-        <div className="md:col-span-1 space-y-6">
-          <Card className="bg-surface-card border-surface-sunken shadow-sm">
+        <div className="space-y-6 md:col-span-1">
+          <Card className="border-surface-sunken bg-surface-card shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Activity className="w-5 h-5 text-brand-orange" />
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Activity className="h-5 w-5 text-brand-orange" />
                 Active Plan
               </CardTitle>
             </CardHeader>
@@ -85,48 +110,62 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
               {member.subscription ? (
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-obsidian-950">{member.subscription.plan.name}</p>
-                    <p className="text-xs text-obsidian-500 mt-1">{member.subscription.plan.description}</p>
+                    <p className="text-sm font-medium text-obsidian-950">
+                      {member.subscription.plan.name}
+                    </p>
+                    <p className="mt-1 text-xs text-obsidian-500">
+                      {member.subscription.plan.description}
+                    </p>
                   </div>
-                  <div className="flex justify-between items-center text-sm pt-4 border-t border-surface-sunken">
+                  <div className="flex items-center justify-between border-t border-surface-sunken pt-4 text-sm">
                     <span className="text-obsidian-500">Expires On</span>
-                    <span className="font-medium text-obsidian-900">{formatDate(member.subscription.endDate)}</span>
+                    <span className="font-medium text-obsidian-900">
+                      {formatDate(member.subscription.endDate)}
+                    </span>
                   </div>
-                  <Button className="w-full bg-brand-navy text-white hover:bg-brand-navy/90 mt-2">
+                  <Button className="mt-2 w-full bg-brand-navy text-white hover:bg-brand-navy/90">
                     Renew Plan
                   </Button>
                 </div>
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-obsidian-500 mb-4">No active subscription found.</p>
-                  <Button variant="outline" className="w-full">Assign Plan</Button>
+                <div className="py-4 text-center">
+                  <p className="mb-4 text-sm text-obsidian-500">No active subscription found.</p>
+                  <Button variant="outline" className="w-full">
+                    Assign Plan
+                  </Button>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-surface-card border-surface-sunken shadow-sm">
+          <Card className="border-surface-sunken bg-surface-card shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-brand-orange" />
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Dumbbell className="h-5 w-5 text-brand-orange" />
                 Assigned Trainer
               </CardTitle>
             </CardHeader>
             <CardContent>
               {member.trainer ? (
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-surface-sunken flex items-center justify-center text-sm font-bold text-obsidian-500">
-                    {getInitials(member.trainer.user.firstName + ' ' + member.trainer.user.lastName)}
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-sunken text-sm font-bold text-obsidian-500">
+                    {getInitials(
+                      member.trainer.user.firstName + " " + member.trainer.user.lastName,
+                    )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-obsidian-950">{member.trainer.user.firstName} {member.trainer.user.lastName}</p>
+                    <p className="text-sm font-medium text-obsidian-950">
+                      {member.trainer.user.firstName} {member.trainer.user.lastName}
+                    </p>
                     <p className="text-xs text-obsidian-500">{member.trainer.specialization}</p>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-obsidian-500 mb-4">No trainer assigned.</p>
-                  <Button variant="outline" className="w-full">Assign Trainer</Button>
+                <div className="py-4 text-center">
+                  <p className="mb-4 text-sm text-obsidian-500">No trainer assigned.</p>
+                  <Button variant="outline" className="w-full">
+                    Assign Trainer
+                  </Button>
                 </div>
               )}
             </CardContent>
@@ -134,12 +173,12 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
         </div>
 
         {/* Right Col - Activity & Payments */}
-        <div className="md:col-span-2 space-y-6">
-          <Card className="bg-surface-card border-surface-sunken shadow-sm">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+        <div className="space-y-6 md:col-span-2">
+          <Card className="border-surface-sunken bg-surface-card shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-brand-orange" />
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <UserCheck className="h-5 w-5 text-brand-orange" />
                   Recent Check-ins
                 </CardTitle>
                 <CardDescription>Last 5 attendance records</CardDescription>
@@ -149,48 +188,76 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
               {member.attendance && member.attendance.length > 0 ? (
                 <div className="space-y-4">
                   {member.attendance.map((record: any) => (
-                    <div key={record.id} className="flex items-center justify-between p-3 rounded-xl bg-surface-base border border-surface-sunken">
+                    <div
+                      key={record.id}
+                      className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-base p-3"
+                    >
                       <div className="flex items-center gap-3">
-                        <Clock className="w-4 h-4 text-obsidian-400" />
-                        <span className="text-sm font-medium text-obsidian-900">{formatDate(record.date)}</span>
+                        <Clock className="h-4 w-4 text-obsidian-400" />
+                        <span className="text-sm font-medium text-obsidian-900">
+                          {formatDate(record.date)}
+                        </span>
                       </div>
-                      <Badge variant="outline" className={cn(
-                        "text-xs",
-                        record.status === "PRESENT" ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"
-                      )}>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-xs",
+                          record.status === "PRESENT"
+                            ? "border-green-200 bg-green-50 text-green-700"
+                            : "border-red-200 bg-red-50 text-red-700",
+                        )}
+                      >
                         {record.status}
                       </Badge>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-obsidian-500 py-4 text-center">No attendance records found.</p>
+                <p className="py-4 text-center text-sm text-obsidian-500">
+                  No attendance records found.
+                </p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-surface-card border-surface-sunken shadow-sm">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+          <Card className="border-surface-sunken bg-surface-card shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-brand-orange" />
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <CreditCard className="h-5 w-5 text-brand-orange" />
                   Recent Payments
                 </CardTitle>
                 <CardDescription>Last 5 transaction records</CardDescription>
               </div>
-              <Button variant="ghost" size="sm" className="text-brand-orange hover:text-brand-orange/80">View All</Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-brand-orange hover:text-brand-orange/80"
+              >
+                View All
+              </Button>
             </CardHeader>
             <CardContent>
               {member.payments && member.payments.length > 0 ? (
                 <div className="space-y-4">
                   {member.payments.map((payment: any) => (
-                    <div key={payment.id} className="flex items-center justify-between p-3 rounded-xl bg-surface-base border border-surface-sunken">
+                    <div
+                      key={payment.id}
+                      className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-base p-3"
+                    >
                       <div>
-                        <p className="text-sm font-medium text-obsidian-950">{formatCurrency(payment.amount)}</p>
-                        <p className="text-xs text-obsidian-500 mt-0.5">{payment.description || "Membership Fee"}</p>
+                        <p className="text-sm font-medium text-obsidian-950">
+                          {formatCurrency(payment.amount)}
+                        </p>
+                        <p className="mt-0.5 text-xs text-obsidian-500">
+                          {payment.description || "Membership Fee"}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <Badge variant="outline" className="bg-surface-card text-obsidian-600 border-surface-sunken mb-1">
+                        <Badge
+                          variant="outline"
+                          className="mb-1 border-surface-sunken bg-surface-card text-obsidian-600"
+                        >
                           {payment.method}
                         </Badge>
                         <p className="text-xs text-obsidian-400">{formatDate(payment.createdAt)}</p>
@@ -199,7 +266,9 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-obsidian-500 py-4 text-center">No payment history found.</p>
+                <p className="py-4 text-center text-sm text-obsidian-500">
+                  No payment history found.
+                </p>
               )}
             </CardContent>
           </Card>

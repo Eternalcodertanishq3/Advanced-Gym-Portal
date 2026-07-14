@@ -1,52 +1,52 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { 
-  TrendingUp, 
-  Users, 
-  CreditCard, 
-  Calendar, 
-  ArrowUpRight, 
-  ArrowDownRight, 
+import {
+  TrendingUp,
+  Users,
+  CreditCard,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
   Download,
-  Filter
+  Filter,
 } from "lucide-react";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   BarChart,
   Bar,
   Cell,
   PieChart,
-  Pie
+  Pie,
 } from "recharts";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { getAnalyticsChartsData } from "@/actions/admin/analytics-actions";
 
-const tooltipContentStyle = { 
-  backgroundColor: '#FFFFFF', 
-  borderRadius: '12px', 
-  border: '1px solid #EDECE8'
+const tooltipContentStyle = {
+  backgroundColor: "#FFFFFF",
+  borderRadius: "12px",
+  border: "1px solid #EDECE8",
 };
 
 const SkeletonStatGrid = ({ count }: { count: number }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
     {Array.from({ length: count }).map((_, i) => (
       <Skeleton key={i} className="h-32 rounded-xl" />
     ))}
@@ -73,31 +73,43 @@ export default function AnalyticsPage() {
 
   if (statsLoading || isChartsLoading) {
     return (
-      <div className="space-y-8 animate-pulse">
+      <div className="animate-pulse space-y-8">
         <SkeletonStatGrid count={4} />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2"><Skeleton className="h-[400px] rounded-2xl" /></div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <Skeleton className="h-[400px] rounded-2xl" />
+          </div>
           <Skeleton className="h-[400px] rounded-2xl" />
         </div>
       </div>
     );
   }
 
-  const { revenueData, categoryData, attendanceData } = chartData || { revenueData: [], categoryData: [], attendanceData: [] };
+  const { revenueData, categoryData, attendanceData } = chartData || {
+    revenueData: [],
+    categoryData: [],
+    attendanceData: [],
+  };
 
   const StatCard = ({ title, value, icon, trend, trendValue, description, loading }: any) => (
-    <Card className="bg-surface-card border-surface-sunken shadow-sm overflow-hidden group">
+    <Card className="group overflow-hidden border-surface-sunken bg-surface-card shadow-sm">
       <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div className="p-2.5 rounded-xl bg-surface-base border border-surface-sunken text-obsidian-900 group-hover:bg-brand-navy group-hover:text-white transition-colors">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="rounded-xl border border-surface-sunken bg-surface-base p-2.5 text-obsidian-900 transition-colors group-hover:bg-brand-navy group-hover:text-white">
             {icon}
           </div>
           {trend && (
-            <div className={cn(
-              "flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full",
-              trend === "up" ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"
-            )}>
-              {trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+            <div
+              className={cn(
+                "flex items-center gap-1 rounded-full px-2 py-1 text-xs font-bold",
+                trend === "up" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600",
+              )}
+            >
+              {trend === "up" ? (
+                <ArrowUpRight className="h-3 w-3" />
+              ) : (
+                <ArrowDownRight className="h-3 w-3" />
+              )}
               {trendValue}%
             </div>
           )}
@@ -109,9 +121,11 @@ export default function AnalyticsPage() {
           </div>
         ) : (
           <>
-            <h3 className="text-3xl font-display font-bold text-obsidian-950 mb-1">{value}</h3>
-            <p className="text-sm font-medium text-obsidian-500 uppercase tracking-wider">{title}</p>
-            {description && <p className="text-xs text-obsidian-400 mt-2">{description}</p>}
+            <h3 className="mb-1 font-display text-3xl font-bold text-obsidian-950">{value}</h3>
+            <p className="text-sm font-medium uppercase tracking-wider text-obsidian-500">
+              {title}
+            </p>
+            {description && <p className="mt-2 text-xs text-obsidian-400">{description}</p>}
           </>
         )}
       </CardContent>
@@ -121,18 +135,18 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-8 pb-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-display text-3xl font-bold text-obsidian-950">
             Business <span className="text-brand-orange">Insights</span>
           </h1>
-          <p className="text-sm text-obsidian-600 mt-1">
+          <p className="mt-1 text-sm text-obsidian-600">
             Real-time analytics and performance metrics for Eagle Gym.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[140px] bg-surface-card border-surface-sunken">
+            <SelectTrigger className="w-[140px] border-surface-sunken bg-surface-card">
               <SelectValue placeholder="Time Range" />
             </SelectTrigger>
             <SelectContent>
@@ -142,46 +156,46 @@ export default function AnalyticsPage() {
               <SelectItem value="1y">Last Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="bg-surface-card border-surface-sunken">
-            <Download className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="border-surface-sunken bg-surface-card">
+            <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="Monthly Revenue" 
-          value={formatCurrency(stats?.monthlyRevenue || 0)} 
-          icon={<CreditCard className="w-5 h-5" />}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Monthly Revenue"
+          value={formatCurrency(stats?.monthlyRevenue || 0)}
+          icon={<CreditCard className="h-5 w-5" />}
           trend="up"
           trendValue={stats?.revenueGrowth || 0}
           description="Total revenue collected this month"
           loading={statsLoading}
         />
-        <StatCard 
-          title="Active Members" 
-          value={stats?.activeMembers || 0} 
-          icon={<Users className="w-5 h-5" />}
+        <StatCard
+          title="Active Members"
+          value={stats?.activeMembers || 0}
+          icon={<Users className="h-5 w-5" />}
           trend="up"
           trendValue={stats?.memberGrowth || 0}
           description="Members with active subscriptions"
           loading={statsLoading}
         />
-        <StatCard 
-          title="Attendance Rate" 
-          value={`${stats?.attendanceRate || 0}%`} 
-          icon={<Calendar className="w-5 h-5" />}
+        <StatCard
+          title="Attendance Rate"
+          value={`${stats?.attendanceRate || 0}%`}
+          icon={<Calendar className="h-5 w-5" />}
           trend={(stats?.attendanceRate ?? 0) > 10 ? "up" : "down"}
           trendValue={stats?.attendanceRate || 0}
           description="Average daily member turnout"
           loading={statsLoading}
         />
-        <StatCard 
-          title="Conversion Rate" 
-          value={`${stats?.conversionRate || 0}%`} 
-          icon={<TrendingUp className="w-5 h-5" />}
+        <StatCard
+          title="Conversion Rate"
+          value={`${stats?.conversionRate || 0}%`}
+          icon={<TrendingUp className="h-5 w-5" />}
           trend="up"
           trendValue={stats?.conversionRate || 0}
           description="Member conversion from base"
@@ -190,11 +204,13 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Revenue Area Chart */}
-        <Card className="lg:col-span-2 bg-surface-card border-surface-sunken shadow-sm overflow-hidden">
+        <Card className="overflow-hidden border-surface-sunken bg-surface-card shadow-sm lg:col-span-2">
           <CardHeader className="p-6 pb-0">
-            <CardTitle className="text-xl font-display font-bold text-obsidian-950">Revenue Growth</CardTitle>
+            <CardTitle className="font-display text-xl font-bold text-obsidian-950">
+              Revenue Growth
+            </CardTitle>
             <CardDescription>Monthly revenue vs number of active members</CardDescription>
           </CardHeader>
           <CardContent className="p-6">
@@ -203,51 +219,51 @@ export default function AnalyticsPage() {
                 <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#F97316" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#F97316" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#F97316" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#F97316" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorMembers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0F172A" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#0F172A" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#0F172A" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#0F172A" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EDECE8" />
-                  <XAxis 
-                    dataKey="month" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#64748B', fontSize: 12 }} 
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748B", fontSize: 12 }}
                     dy={10}
                   />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#64748B', fontSize: 12 }}
-                    tickFormatter={(value) => `₹${value/1000}k`}
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748B", fontSize: 12 }}
+                    tickFormatter={(value) => `₹${value / 1000}k`}
                   />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#FFFFFF', 
-                      borderRadius: '12px', 
-                      border: '1px solid #EDECE8',
-                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                    }} 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#FFFFFF",
+                      borderRadius: "12px",
+                      border: "1px solid #EDECE8",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    }}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#F97316" 
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#F97316"
                     strokeWidth={3}
-                    fillOpacity={1} 
-                    fill="url(#colorRevenue)" 
+                    fillOpacity={1}
+                    fill="url(#colorRevenue)"
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="members" 
-                    stroke="#0F172A" 
+                  <Area
+                    type="monotone"
+                    dataKey="members"
+                    stroke="#0F172A"
                     strokeWidth={3}
-                    fillOpacity={1} 
-                    fill="url(#colorMembers)" 
+                    fillOpacity={1}
+                    fill="url(#colorMembers)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -256,13 +272,15 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Revenue Distribution */}
-        <Card className="bg-surface-card border-surface-sunken shadow-sm overflow-hidden">
+        <Card className="overflow-hidden border-surface-sunken bg-surface-card shadow-sm">
           <CardHeader className="p-6">
-            <CardTitle className="text-xl font-display font-bold text-obsidian-950">Revenue Split</CardTitle>
+            <CardTitle className="font-display text-xl font-bold text-obsidian-950">
+              Revenue Split
+            </CardTitle>
             <CardDescription>By product and service category</CardDescription>
           </CardHeader>
           <CardContent className="p-6 pt-0">
-            <div className="h-[250px] w-full flex items-center justify-center">
+            <div className="flex h-[250px] w-full items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -278,19 +296,17 @@ export default function AnalyticsPage() {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={tooltipContentStyle} 
-                  />
+                  <Tooltip contentStyle={tooltipContentStyle} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="space-y-3 mt-4">
+            <div className="mt-4 space-y-3">
               {categoryData.map((item: any) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div 
-                      className="w-2.5 h-2.5 rounded-full" 
-                      style={{ backgroundColor: item.color }} 
+                    <div
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: item.color }}
                     />
                     <span className="text-sm font-medium text-obsidian-700">{item.name}</span>
                   </div>
@@ -303,13 +319,15 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Attendance Chart */}
-      <Card className="bg-surface-card border-surface-sunken shadow-sm overflow-hidden">
-        <CardHeader className="p-6 pb-0 flex flex-row items-center justify-between">
+      <Card className="overflow-hidden border-surface-sunken bg-surface-card shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between p-6 pb-0">
           <div>
-            <CardTitle className="text-xl font-display font-bold text-obsidian-950">Daily Attendance</CardTitle>
+            <CardTitle className="font-display text-xl font-bold text-obsidian-950">
+              Daily Attendance
+            </CardTitle>
             <CardDescription>Average member visits per day of week</CardDescription>
           </div>
-          <Button variant="ghost" size="sm" className="text-brand-orange font-bold">
+          <Button variant="ghost" size="sm" className="font-bold text-brand-orange">
             View Reports
           </Button>
         </CardHeader>
@@ -318,36 +336,24 @@ export default function AnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={attendanceData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EDECE8" />
-                <XAxis 
-                  dataKey="day" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#64748B', fontSize: 12 }} 
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748B", fontSize: 12 }}
                 />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#64748B', fontSize: 12 }}
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748B", fontSize: 12 }} />
+                <Tooltip
+                  cursor={{ fill: "#FAFAF8" }}
+                  contentStyle={{
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "12px",
+                    border: "1px solid #EDECE8",
+                  }}
                 />
-                <Tooltip 
-                  cursor={{ fill: '#FAFAF8' }}
-                  contentStyle={{ 
-                    backgroundColor: '#FFFFFF', 
-                    borderRadius: '12px', 
-                    border: '1px solid #EDECE8'
-                  }} 
-                />
-                <Bar 
-                  dataKey="count" 
-                  fill="#0F172A" 
-                  radius={[6, 6, 0, 0]} 
-                  barSize={40}
-                >
+                <Bar dataKey="count" fill="#0F172A" radius={[6, 6, 0, 0]} barSize={40}>
                   {attendanceData.map((entry: any, index: number) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={entry.count > 100 ? '#F97316' : '#0F172A'} 
-                    />
+                    <Cell key={`cell-${index}`} fill={entry.count > 100 ? "#F97316" : "#0F172A"} />
                   ))}
                 </Bar>
               </BarChart>
@@ -358,4 +364,3 @@ export default function AnalyticsPage() {
     </div>
   );
 }
-

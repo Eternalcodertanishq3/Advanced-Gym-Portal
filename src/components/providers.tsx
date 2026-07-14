@@ -25,7 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             retry: 1,
           },
         },
-      })
+      }),
   );
 
   return (
@@ -38,11 +38,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           {children}
-          <Toaster
-            position="top-right"
-            richColors
-            duration={2000}
-          />
+          <Toaster position="top-right" richColors duration={2000} />
         </ThemeProvider>
       </SessionProvider>
     </QueryClientProvider>

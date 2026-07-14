@@ -58,11 +58,11 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
       {/* Premium Background Pattern */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
+        <div className="bg-mesh-gradient absolute inset-0 opacity-30 dark:opacity-20" />
+        <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
       </div>
 
@@ -70,18 +70,18 @@ const LoginPage = () => {
       <div className="relative z-10 w-full max-w-[420px] px-6 py-8">
         {/* Brand Identity */}
         <motion.div
-          className="text-center mb-6"
+          className="mb-6 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20 mb-3">
-            <Dumbbell className="w-7 h-7" />
+          <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20">
+            <Dumbbell className="h-7 w-7" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             EAGLE <span className="text-brand-orange">GYM</span>
           </h1>
-          <p className="text-xs text-txt-secondary mt-1 font-medium">
+          <p className="mt-1 text-xs font-medium text-txt-secondary">
             Portal Access • Secure Authentication
           </p>
         </motion.div>
@@ -95,20 +95,25 @@ const LoginPage = () => {
         >
           <div className="mb-6">
             <h2 className="text-lg font-bold text-foreground">Welcome Back</h2>
-            <p className="text-xs text-txt-tertiary mt-0.5">Please enter your credentials</p>
+            <p className="mt-0.5 text-xs text-txt-tertiary">Please enter your credentials</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">
+              <label
+                htmlFor="email"
+                className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+              >
                 Email Address
               </label>
-              <div className="relative group">
-                <Mail className={cn(
-                  "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
-                  focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary"
-                )} />
+              <div className="group relative">
+                <Mail
+                  className={cn(
+                    "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
+                    focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary",
+                  )}
+                />
                 <input
                   id="email"
                   type="email"
@@ -126,21 +131,26 @@ const LoginPage = () => {
             {/* Password Field */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary">
+                <label
+                  htmlFor="password"
+                  className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                >
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-[11px] font-bold text-brand-orange hover:text-brand-orange-hover transition-colors"
+                  className="text-[11px] font-bold text-brand-orange transition-colors hover:text-brand-orange-hover"
                 >
                   Forgot?
                 </Link>
               </div>
-              <div className="relative group">
-                <Lock className={cn(
-                  "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
-                  focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary"
-                )} />
+              <div className="group relative">
+                <Lock
+                  className={cn(
+                    "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
+                    focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary",
+                  )}
+                />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -155,28 +165,28 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-txt-tertiary hover:text-foreground transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-txt-tertiary transition-colors hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
             {/* Remember Me */}
             <div className="flex items-center py-1">
-              <label className="flex items-center gap-2 cursor-pointer select-none group">
+              <label className="group flex cursor-pointer select-none items-center gap-2">
                 <div
                   className={cn(
-                    "w-4.5 h-4.5 rounded border-2 transition-all duration-200 flex items-center justify-center",
+                    "flex h-4.5 w-4.5 items-center justify-center rounded border-2 transition-all duration-200",
                     rememberMe
-                      ? "bg-brand-orange border-brand-orange"
-                      : "border-surface-border group-hover:border-brand-orange/50"
+                      ? "border-brand-orange bg-brand-orange"
+                      : "border-surface-border group-hover:border-brand-orange/50",
                   )}
                   onClick={() => setRememberMe(!rememberMe)}
                 >
-                  {rememberMe && <ShieldCheck className="w-3 h-3 text-white" />}
+                  {rememberMe && <ShieldCheck className="h-3 w-3 text-white" />}
                 </div>
-                <span className="text-xs font-semibold text-txt-secondary group-hover:text-foreground transition-colors">
+                <span className="text-xs font-semibold text-txt-secondary transition-colors group-hover:text-foreground">
                   Remember me
                 </span>
               </label>
@@ -186,14 +196,14 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-primary w-full h-11 text-sm font-bold active:scale-[0.98]"
+              className="btn-primary h-11 w-full text-sm font-bold active:scale-[0.98]"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               ) : (
                 <>
                   Sign In to Dashboard
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
@@ -215,16 +225,16 @@ const LoginPage = () => {
           <div className="text-center">
             <Link
               href="/register"
-              className="text-xs font-bold text-brand-orange hover:text-brand-orange-hover transition-colors inline-flex items-center gap-1 group"
+              className="group inline-flex items-center gap-1 text-xs font-bold text-brand-orange transition-colors hover:text-brand-orange-hover"
             >
               Join Eagle Gym Today
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
 
           {/* Social Proof/Trust */}
-          <div className="mt-6 pt-4 border-t border-surface-border text-center">
-            <p className="text-[10px] text-txt-tertiary font-medium">
+          <div className="mt-6 border-t border-surface-border pt-4 text-center">
+            <p className="text-[10px] font-medium text-txt-tertiary">
               Authorized personnel only. Access monitored.
             </p>
           </div>
@@ -237,8 +247,9 @@ const LoginPage = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <p className="text-[10px] text-txt-tertiary uppercase tracking-wider">
-            © {new Date().getFullYear()} Eagle Gym • <span className="text-brand-orange font-bold">Athletic Clarity</span>
+          <p className="text-[10px] uppercase tracking-wider text-txt-tertiary">
+            © {new Date().getFullYear()} Eagle Gym •{" "}
+            <span className="font-bold text-brand-orange">Athletic Clarity</span>
           </p>
         </motion.div>
       </div>

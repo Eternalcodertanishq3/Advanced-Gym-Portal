@@ -16,7 +16,7 @@ export default async function DietPage() {
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <DietClient plans={res.data} />
     </div>
   );

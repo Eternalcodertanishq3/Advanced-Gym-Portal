@@ -421,16 +421,7 @@ export const GENDER = {
   PREFER_NOT_TO_SAY: "PREFER_NOT_TO_SAY",
 } as const;
 
-export const BLOOD_GROUP = [
-  "A+",
-  "A-",
-  "B+",
-  "B-",
-  "AB+",
-  "AB-",
-  "O+",
-  "O-",
-] as const;
+export const BLOOD_GROUP = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 
 export const CLASS_STATUS = {
   SCHEDULED: "SCHEDULED",
@@ -514,12 +505,7 @@ export const DEFAULT_PLANS = [
     name: "Silver",
     duration: 30,
     price: 1499,
-    features: [
-      "All Bronze Features",
-      "Steam Room",
-      "Group Classes",
-      "Diet Consultation",
-    ],
+    features: ["All Bronze Features", "Steam Room", "Group Classes", "Diet Consultation"],
     color: "silver",
   },
   {

@@ -21,7 +21,7 @@ export async function getReceptionistDashboardStats() {
       todayClasses,
       newWalkIns,
       todayPayments,
-      recentCheckInsRaw
+      recentCheckInsRaw,
     ] = await Promise.all([
       prisma.attendance.count({ where: { date: { gte: today } } }),
       prisma.payment.count({ where: { status: "PENDING" } }),
@@ -29,35 +29,45 @@ export async function getReceptionistDashboardStats() {
       prisma.member.count({ where: { joinDate: { gte: today } } }),
       prisma.payment.findMany({
         where: { status: "COMPLETED", createdAt: { gte: today } },
-        select: { total: true }
+        select: { total: true },
       }),
       prisma.attendance.findMany({
         where: { date: { gte: today } },
         take: 5,
-        orderBy: { checkIn: 'desc' },
+        orderBy: { checkIn: "desc" },
         include: {
           member: {
-            include: { user: true }
+            include: { user: true },
           },
           user: {
-            select: { firstName: true, lastName: true }
-          }
-        }
-      })
+            select: { firstName: true, lastName: true },
+          },
+        },
+      }),
     ]);
 
     const todayCollection = todayPayments.reduce((sum, p) => sum + Number(p.total), 0);
-    const recentCheckIns = recentCheckInsRaw.map(a => {
+    const recentCheckIns = recentCheckInsRaw.map((a) => {
       const person = a.member?.user || (a as any).user;
       return {
         id: a.id,
         name: person ? `${person.firstName} ${person.lastName}`.trim() : "Unknown",
         time: a.date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
-        status: "checked-in"
+        status: "checked-in",
       };
     });
 
-    return { success: true, data: { todayCheckIns, pendingPayments, todayClasses, todayCollection, recentCheckIns, newWalkIns } };
+    return {
+      success: true,
+      data: {
+        todayCheckIns,
+        pendingPayments,
+        todayClasses,
+        todayCollection,
+        recentCheckIns,
+        newWalkIns,
+      },
+    };
   } catch (error: any) {
     console.error("Error fetching receptionist stats:", error);
     return { success: false, error: error.message || "Failed to fetch stats" };
@@ -87,8 +97,8 @@ export async function generateVisitorPass(data: {
         purpose: data.purpose,
         validUntil: data.validUntil,
         passCode: `GUEST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        createdBy: "RECEPTIONIST" // Should ideally be session user ID
-      }
+        createdBy: "RECEPTIONIST", // Should ideally be session user ID
+      },
     });
 
     return { success: true, data: pass };
@@ -109,10 +119,10 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
     if (search) {
       where.user = {
         OR: [
-          { firstName: { contains: search, mode: 'insensitive' as const } },
-          { lastName: { contains: search, mode: 'insensitive' as const } },
-          { email: { contains: search, mode: 'insensitive' as const } },
-        ]
+          { firstName: { contains: search, mode: "insensitive" as const } },
+          { lastName: { contains: search, mode: "insensitive" as const } },
+          { email: { contains: search, mode: "insensitive" as const } },
+        ],
       };
     }
 
@@ -122,11 +132,11 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
         skip,
         take: limit,
         include: {
-          user: true
+          user: true,
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: "desc" },
       }),
-      prisma.receptionist.count({ where })
+      prisma.receptionist.count({ where }),
     ]);
 
     return {
@@ -136,8 +146,8 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error: any) {
     console.error("Error fetching receptionists:", error);
@@ -153,7 +163,7 @@ export async function getReceptionistById(id: string) {
   try {
     const rec = await prisma.receptionist.findUnique({
       where: { id },
-      include: { user: true }
+      include: { user: true },
     });
     if (!rec) return { success: false, error: "Receptionist not found" };
     return { success: true, data: rec };
@@ -169,7 +179,10 @@ export async function createReceptionist(data: any) {
   }
   try {
     const bcrypt = require("bcryptjs");
-    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(
+      SECURITY.DEFAULT_TEMP_PASSWORD(),
+      SECURITY.BCRYPT_ROUNDS,
+    );
 
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -201,7 +214,7 @@ export async function createReceptionist(data: any) {
     return { success: true, data: result };
   } catch (error: any) {
     console.error("Error creating receptionist:", error);
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       return { success: false, error: "Email or phone number already exists." };
     }
     return { success: false, error: error.message || "Failed to onboard staff" };
@@ -228,10 +241,10 @@ export async function updateReceptionist(id: string, data: any) {
               lastName: data.lastName,
               email: data.email,
               phone: data.phone,
-            }
-          }
+            },
+          },
         },
-        include: { user: true }
+        include: { user: true },
       });
       return rec;
     });

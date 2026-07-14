@@ -23,7 +23,7 @@ export async function getDashboardStats() {
       prevMembers,
       activeBranches,
       activeBranchesList,
-      revenueByBranch
+      revenueByBranch,
     ] = await Promise.all([
       // Total Revenue
       prisma.payment.aggregate({
@@ -37,7 +37,9 @@ export async function getDashboardStats() {
       // Staff Count
       prisma.user.count({
         where: {
-          role: { in: [Role.SUPER_ADMIN, Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER, Role.WORKER] },
+          role: {
+            in: [Role.SUPER_ADMIN, Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER, Role.WORKER],
+          },
           status: "ACTIVE",
         },
       }),
@@ -49,32 +51,32 @@ export async function getDashboardStats() {
       }),
       // Daily Revenue for Sparkline (Last 7 Days)
       prisma.payment.findMany({
-        where: { 
+        where: {
           status: "COMPLETED",
-          createdAt: { gte: last7Days }
+          createdAt: { gte: last7Days },
         },
-        select: { total: true, createdAt: true }
+        select: { total: true, createdAt: true },
       }),
       // Daily Members for Sparkline (Last 7 Days)
       prisma.member.findMany({
         where: { joinDate: { gte: last7Days } },
-        select: { joinDate: true }
+        select: { joinDate: true },
       }),
       // Previous Revenue for Trend
       prisma.payment.aggregate({
         _sum: { total: true },
-        where: { 
+        where: {
           status: "COMPLETED",
-          createdAt: { gte: prev7Days, lt: last7Days }
+          createdAt: { gte: prev7Days, lt: last7Days },
         },
       }),
       // Previous Members for Trend
       prisma.member.count({
-        where: { joinDate: { gte: prev7Days, lt: last7Days } }
+        where: { joinDate: { gte: prev7Days, lt: last7Days } },
       }),
       // Active Branches Count
       prisma.branch.count({
-        where: { status: "ACTIVE" }
+        where: { status: "ACTIVE" },
       }),
       // Branch Performance Comparison
       prisma.branch.findMany({
@@ -83,54 +85,59 @@ export async function getDashboardStats() {
           id: true,
           name: true,
           _count: {
-            select: { users: { where: { role: "MEMBER", status: "ACTIVE" } } }
-          }
-        }
+            select: { users: { where: { role: "MEMBER", status: "ACTIVE" } } },
+          },
+        },
       }),
       // Revenue by Branch
       prisma.payment.groupBy({
-        by: ['branchId'],
+        by: ["branchId"],
         where: { status: "COMPLETED" },
-        _sum: { total: true }
-      })
+        _sum: { total: true },
+      }),
     ]);
 
     // Map branch names to revenue and member counts
-    const branchComparison = activeBranchesList.map(b => {
-      const revenue = revenueByBranch.find(r => r.branchId === b.id)?._sum?.total || 0;
+    const branchComparison = activeBranchesList.map((b) => {
+      const revenue = revenueByBranch.find((r) => r.branchId === b.id)?._sum?.total || 0;
       return {
         name: b.name,
         members: b._count.users,
-        revenue: Number(revenue)
+        revenue: Number(revenue),
       };
     });
 
     const totalRevenue = Number(revenueResult._sum.total || 0);
     const previousRevenueValue = Number(prevRevenue._sum.total || 0);
 
-    
     // Process Sparklines (Group by day in JS for better control)
     const revenueSparkline = Array(7).fill(0);
     const membersSparkline = Array(7).fill(0);
 
-    dailyRevenue.forEach(p => {
-      const dayIdx = Math.floor((new Date(p.createdAt).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000));
+    dailyRevenue.forEach((p) => {
+      const dayIdx = Math.floor(
+        (new Date(p.createdAt).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000),
+      );
       if (dayIdx >= 0 && dayIdx < 7) revenueSparkline[dayIdx] += Number(p.total || 0);
     });
 
-    dailyMembers.forEach(m => {
-      const dayIdx = Math.floor((new Date(m.joinDate).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000));
+    dailyMembers.forEach((m) => {
+      const dayIdx = Math.floor(
+        (new Date(m.joinDate).getTime() - last7Days.getTime()) / (24 * 60 * 60 * 1000),
+      );
       if (dayIdx >= 0 && dayIdx < 7) membersSparkline[dayIdx] += 1;
     });
 
     // Calculate Trends
-    const revenueTrend = previousRevenueValue === 0 
-      ? "+0.0%" 
-      : `${(((totalRevenue - previousRevenueValue) / previousRevenueValue) * 100).toFixed(1)}%`;
-    
-    const membersTrend = prevMembers === 0
-      ? "New"
-      : `${(((activeMembersCount - prevMembers) / prevMembers) * 100).toFixed(1)}%`;
+    const revenueTrend =
+      previousRevenueValue === 0
+        ? "+0.0%"
+        : `${(((totalRevenue - previousRevenueValue) / previousRevenueValue) * 100).toFixed(1)}%`;
+
+    const membersTrend =
+      prevMembers === 0
+        ? "New"
+        : `${(((activeMembersCount - prevMembers) / prevMembers) * 100).toFixed(1)}%`;
 
     return {
       success: true,
@@ -143,7 +150,7 @@ export async function getDashboardStats() {
         membersTrend,
         revenueSparkline,
         membersSparkline,
-        branchComparison
+        branchComparison,
       },
       recentLogs,
     };
@@ -168,16 +175,16 @@ export async function getSystemHealth() {
     const failedPayments = await prisma.payment.count({
       where: {
         status: "FAILED",
-        createdAt: { gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) }
-      }
+        createdAt: { gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
+      },
     });
 
     // 3. Check Backup Health (Any FAILED backups recently)
     const failedBackups = await prisma.backup.count({
       where: {
         status: "FAILED",
-        createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) }
-      }
+        createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
+      },
     });
 
     return {
@@ -186,24 +193,24 @@ export async function getSystemHealth() {
         database: {
           status: dbLatency < 100 ? "Optimal" : "Degraded",
           latency: dbLatency,
-          health: Math.max(0, 100 - (dbLatency / 10))
+          health: Math.max(0, 100 - dbLatency / 10),
         },
         payments: {
           status: failedPayments === 0 ? "Active" : "Issues Detected",
           stuckCount: failedPayments,
-          health: Math.max(0, 100 - (failedPayments * 10))
+          health: Math.max(0, 100 - failedPayments * 10),
         },
         system: {
           status: failedBackups === 0 ? "Operational" : "Backup Failed",
           errorCount: failedBackups,
-          health: Math.max(0, 100 - (failedBackups * 20))
-        }
-      }
+          health: Math.max(0, 100 - failedBackups * 20),
+        },
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: "System health check failed"
+      error: "System health check failed",
     };
   }
 }

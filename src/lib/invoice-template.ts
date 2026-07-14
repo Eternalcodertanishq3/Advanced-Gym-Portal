@@ -7,4 +7,3 @@ export function generateInvoiceHTML(data: any): string {
     </div>
   `;
 }
-

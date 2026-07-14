@@ -148,9 +148,9 @@ const itemVariants = {
 
 export function QuickActions({ className }: { className?: string }) {
   return (
-    <div className={cn("flex flex-col h-full", className)}>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">
+    <div className={cn("flex h-full flex-col", className)}>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
           Quick Actions
         </h2>
       </div>
@@ -158,7 +158,7 @@ export function QuickActions({ className }: { className?: string }) {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 flex-1"
+        className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4"
       >
         {quickActions.map((action) => {
           const colors = colorMap[action.color as keyof typeof colorMap];
@@ -169,23 +169,23 @@ export function QuickActions({ className }: { className?: string }) {
               <Link
                 href={action.href}
                 className={cn(
-                  "group flex flex-col items-center justify-center gap-2.5 p-3.5 rounded-xl h-full",
+                  "group flex h-full flex-col items-center justify-center gap-2.5 rounded-xl p-3.5",
                   "surface-card border border-border/40",
-                  "hover:border-primary/40 hover:shadow-lg transition-all duration-300",
-                  "active:scale-95"
+                  "transition-all duration-300 hover:border-primary/40 hover:shadow-lg",
+                  "active:scale-95",
                 )}
               >
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300",
+                    "flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-300",
                     colors.bg,
-                    "group-hover:scale-105"
+                    "group-hover:scale-105",
                   )}
                 >
-                  <Icon className={cn("w-5 h-5", colors.icon)} />
+                  <Icon className={cn("h-5 w-5", colors.icon)} />
                 </div>
                 <div className="text-center">
-                  <p className="text-[10px] font-bold text-foreground/90 group-hover:text-primary transition-colors leading-tight">
+                  <p className="text-[10px] font-bold leading-tight text-foreground/90 transition-colors group-hover:text-primary">
                     {action.label}
                   </p>
                 </div>

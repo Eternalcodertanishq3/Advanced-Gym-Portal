@@ -8,14 +8,14 @@ import { redirect } from "next/navigation";
 /**
  * Subscribe a member to a plan
  */
-export async function subscribeToPlan({ 
-  planId, 
-  paymentMethod = "CASH", 
-  branchId 
-}: { 
-  planId: string, 
-  paymentMethod?: string, 
-  branchId?: string 
+export async function subscribeToPlan({
+  planId,
+  paymentMethod = "CASH",
+  branchId,
+}: {
+  planId: string;
+  paymentMethod?: string;
+  branchId?: string;
 }) {
   const session = await auth();
   if (!session?.user || session.user.role !== "MEMBER") {
@@ -30,7 +30,7 @@ export async function subscribeToPlan({
 
     const member = await prisma.member.findUnique({
       where: { userId: session.user.id },
-      include: { user: { select: { branchId: true } } }
+      include: { user: { select: { branchId: true } } },
     });
 
     if (!member) {
@@ -48,7 +48,7 @@ export async function subscribeToPlan({
     if (!member.user.branchId && branchId) {
       await prisma.user.update({
         where: { id: session.user.id },
-        data: { branchId: branchId }
+        data: { branchId: branchId },
       });
     }
 
@@ -102,8 +102,8 @@ export async function subscribeToPlan({
         action: "UPGRADE",
         entityType: "SUBSCRIPTION",
         entityId: member.id,
-        newValue: { plan: plan.name, amount: plan.price }
-      }
+        newValue: { plan: plan.name, amount: plan.price },
+      },
     });
 
     revalidatePath("/member");
@@ -124,22 +124,22 @@ export async function getMemberSubscriptionDetails() {
       where: { userId: session.user.id },
       include: {
         subscription: {
-          include: { plan: true }
+          include: { plan: true },
         },
         payments: {
-          orderBy: { createdAt: 'desc' }
-        }
-      }
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     if (!member) return { success: false, error: "Member profile not found" };
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         subscription: member.subscription,
-        payments: member.payments
-      }
+        payments: member.payments,
+      },
     };
   } catch (error: any) {
     console.error("Error fetching subscription details:", error);

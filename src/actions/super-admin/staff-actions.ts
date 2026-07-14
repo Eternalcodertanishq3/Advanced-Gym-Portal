@@ -14,18 +14,18 @@ export async function getStaff() {
     const staff = await prisma.user.findMany({
       where: {
         role: {
-          in: [Role.SUPER_ADMIN, Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER, Role.WORKER]
-        }
+          in: [Role.SUPER_ADMIN, Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER, Role.WORKER],
+        },
       },
       include: {
         branch: {
-          select: { name: true }
-        }
+          select: { name: true },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
 
-    const mappedStaff = staff.map(user => ({
+    const mappedStaff = staff.map((user) => ({
       id: user.id,
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
@@ -53,10 +53,10 @@ export async function inviteStaff(data: {
 }) {
   try {
     const superAdmin = await ensureSuperAdmin();
-    
+
     // Check if user exists
     const existing = await prisma.user.findFirst({
-      where: { OR: [{ email: data.email }, { phone: data.phone }] }
+      where: { OR: [{ email: data.email }, { phone: data.phone }] },
     });
 
     if (existing) {
@@ -64,7 +64,7 @@ export async function inviteStaff(data: {
     }
 
     // Generate a secure random temporary password
-    const tempPassword = crypto.randomBytes(6).toString('hex'); // 12 chars hex
+    const tempPassword = crypto.randomBytes(6).toString("hex"); // 12 chars hex
     const hashedPassword = await bcrypt.hash(tempPassword, SECURITY.BCRYPT_ROUNDS);
 
     const user = await prisma.user.create({
@@ -73,12 +73,12 @@ export async function inviteStaff(data: {
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
-        password: hashedPassword, 
+        password: hashedPassword,
         role: data.role,
         status: "ACTIVE",
         passwordResetRequired: true,
         branchId: data.branchId === "none" ? null : data.branchId,
-      } as any
+      } as any,
     });
 
     await recordAudit({
@@ -86,7 +86,7 @@ export async function inviteStaff(data: {
       action: "CREATE",
       entityType: "USER_STAFF",
       entityId: user.id,
-      newValue: user
+      newValue: user,
     });
 
     // Also create the specific role record
@@ -110,15 +110,18 @@ export async function inviteStaff(data: {
   }
 }
 
-export async function updateStaff(id: string, data: Partial<{
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  role: Role;
-  status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
-  branchId: string;
-}>) {
+export async function updateStaff(
+  id: string,
+  data: Partial<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    role: Role;
+    status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+    branchId: string;
+  }>,
+) {
   try {
     const superAdmin = await ensureSuperAdmin();
     const oldUser = await prisma.user.findUnique({ where: { id } });
@@ -127,7 +130,7 @@ export async function updateStaff(id: string, data: Partial<{
       where: { id },
       data: {
         ...data,
-        branchId: data.branchId === "none" ? null : data.branchId
+        branchId: data.branchId === "none" ? null : data.branchId,
       },
     });
 
@@ -137,7 +140,7 @@ export async function updateStaff(id: string, data: Partial<{
       entityType: "USER_STAFF",
       entityId: id,
       oldValue: oldUser,
-      newValue: user
+      newValue: user,
     });
     revalidatePath("/super-admin/admins");
     return { success: true, user };
@@ -164,7 +167,7 @@ export async function deleteStaff(id: string) {
       entityType: "USER_STAFF",
       entityId: id,
       oldValue: oldUser,
-      newValue: { status: "INACTIVE" }
+      newValue: { status: "INACTIVE" },
     });
     revalidatePath("/super-admin/admins");
     return { success: true };

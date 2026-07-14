@@ -21,9 +21,7 @@ export default function Error({
       <div className="mb-6 rounded-full bg-destructive/10 p-4 text-destructive">
         <AlertCircle size={48} />
       </div>
-      <h1 className="mb-2 text-3xl font-bold tracking-tight text-white">
-        Something went wrong!
-      </h1>
+      <h1 className="mb-2 text-3xl font-bold tracking-tight text-white">Something went wrong!</h1>
       <p className="mb-8 max-w-md text-white/60">
         An unexpected error occurred. We've been notified and are looking into it.
       </p>
@@ -36,7 +34,7 @@ export default function Error({
           <RefreshCcw className="mr-2 h-4 w-4" />
           Try again
         </Button>
-        <Button asChild className="bg-gold-500 text-black hover:bg-gold-600">
+        <Button asChild className="bg-gold-500 hover:bg-gold-600 text-black">
           <Link href="/">
             <Home className="mr-2 h-4 w-4" />
             Back to Home
@@ -44,9 +42,7 @@ export default function Error({
         </Button>
       </div>
       {error.digest && (
-        <p className="mt-8 font-mono text-xs text-white/30">
-          Error ID: {error.digest}
-        </p>
+        <p className="mt-8 font-mono text-xs text-white/30">Error ID: {error.digest}</p>
       )}
     </div>
   );

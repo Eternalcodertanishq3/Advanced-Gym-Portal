@@ -12,7 +12,7 @@ import { revalidatePath } from "next/cache";
 export async function triggerPaymentReminders() {
   try {
     const admin = await ensureSuperAdmin();
-    
+
     const now = new Date();
     const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
 
@@ -22,17 +22,17 @@ export async function triggerPaymentReminders() {
         status: "ACTIVE",
         endDate: {
           gte: now,
-          lte: threeDaysFromNow
-        }
+          lte: threeDaysFromNow,
+        },
       },
       include: {
         member: {
           include: {
-            user: true
-          }
+            user: true,
+          },
         },
-        plan: true
-      }
+        plan: true,
+      },
     });
 
     let sentCount = 0;
@@ -55,13 +55,13 @@ export async function triggerPaymentReminders() {
             <br/>
             <p>Stay Strong,<br/>The Eagle Gym Team</p>
           </div>
-        `
+        `,
       });
 
       // Send SMS (Mock/Placeholder)
       const smsRes = await NotificationService.sendSMS({
         to: user.phone || "",
-        message: `Eagle Gym: Hi ${user.firstName}, your ${plan.name} expires on ${sub.endDate.toLocaleDateString()}. Renew now to avoid interruption!`
+        message: `Eagle Gym: Hi ${user.firstName}, your ${plan.name} expires on ${sub.endDate.toLocaleDateString()}. Renew now to avoid interruption!`,
       });
 
       if (emailRes.success || smsRes.success) {
@@ -75,7 +75,7 @@ export async function triggerPaymentReminders() {
       action: "UPDATE",
       entityType: "NOTIFICATIONS",
       entityId: "BULK_REMINDER",
-      newValue: { sentCount, targetCount: dueSubscriptions.length }
+      newValue: { sentCount, targetCount: dueSubscriptions.length },
     });
 
     revalidatePath("/super-admin");

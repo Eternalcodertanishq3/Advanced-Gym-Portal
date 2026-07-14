@@ -9,11 +9,11 @@ export async function getClasses(page = 1, limit = 10, search = "") {
   if (!session?.user) return { success: false, error: "Unauthorized" };
   try {
     const skip = (page - 1) * limit;
-    
+
     let whereClause = {};
     if (search) {
       whereClause = {
-        name: { contains: search, mode: "insensitive" }
+        name: { contains: search, mode: "insensitive" },
       };
     }
 
@@ -22,36 +22,43 @@ export async function getClasses(page = 1, limit = 10, search = "") {
         where: whereClause,
         include: {
           trainer: {
-            include: { user: { select: { firstName: true, lastName: true } } }
+            include: { user: { select: { firstName: true, lastName: true } } },
           },
           schedules: {
             include: {
               _count: {
-                select: { bookings: true }
-              }
-            }
-          }
+                select: { bookings: true },
+              },
+            },
+          },
         },
-        orderBy: { name: 'asc' },
+        orderBy: { name: "asc" },
         skip,
         take: limit,
       }),
-      prisma.gymClass.count({ where: whereClause })
+      prisma.gymClass.count({ where: whereClause }),
     ]);
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         classes,
-        pagination: { total, pages: Math.ceil(total / limit), page, limit }
-      }
+        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+      },
     };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
 }
 
-export async function createClass(data: { name: string, description?: string, trainerId: string, category: any, capacity: number, duration: number }) {
+export async function createClass(data: {
+  name: string;
+  description?: string;
+  trainerId: string;
+  category: any;
+  capacity: number;
+  duration: number;
+}) {
   const session = await auth();
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
     return { success: false, error: "Unauthorized" };
@@ -65,7 +72,7 @@ export async function createClass(data: { name: string, description?: string, tr
         category: data.category,
         maxCapacity: data.capacity,
         duration: data.duration,
-      }
+      },
     });
 
     revalidatePath("/admin/classes");
@@ -83,8 +90,8 @@ export async function getClassById(id: string) {
       where: { id },
       include: {
         trainer: { include: { user: true } },
-        schedules: true
-      }
+        schedules: true,
+      },
     });
     if (!cls) return { success: false, error: "Class not found" };
     return { success: true, data: cls };
@@ -109,7 +116,7 @@ export async function updateClass(id: string, data: any) {
         maxCapacity: Number(data.capacity),
         duration: Number(data.duration),
         isActive: data.isActive,
-      }
+      },
     });
 
     revalidatePath("/admin/classes");
@@ -126,7 +133,7 @@ export async function deleteClass(id: string) {
   }
   try {
     await prisma.gymClass.delete({
-      where: { id }
+      where: { id },
     });
 
     revalidatePath("/admin/classes");
@@ -143,7 +150,7 @@ export async function bookClass(scheduleId: string) {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) return { success: false, error: "Member profile not found" };
@@ -153,8 +160,8 @@ export async function bookClass(scheduleId: string) {
       where: {
         scheduleId,
         memberId: member.id,
-        status: "CONFIRMED"
-      }
+        status: "CONFIRMED",
+      },
     });
 
     if (existing) return { success: false, error: "You have already booked this class session." };
@@ -165,9 +172,9 @@ export async function bookClass(scheduleId: string) {
       include: {
         class: true,
         _count: {
-          select: { bookings: { where: { status: "CONFIRMED" } } }
-        }
-      }
+          select: { bookings: { where: { status: "CONFIRMED" } } },
+        },
+      },
     });
 
     if (!schedule) return { success: false, error: "Class schedule not found" };
@@ -179,8 +186,8 @@ export async function bookClass(scheduleId: string) {
       data: {
         scheduleId,
         memberId: member.id,
-        status: "CONFIRMED"
-      }
+        status: "CONFIRMED",
+      },
     });
 
     revalidatePath("/member/classes");

@@ -36,9 +36,7 @@ export const useCartStore = create<CartState>()(
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.productId === item.productId
-                  ? { ...i, quantity: i.quantity + item.quantity }
-                  : i
+                i.productId === item.productId ? { ...i, quantity: i.quantity + item.quantity } : i,
               ),
             };
           }
@@ -55,16 +53,12 @@ export const useCartStore = create<CartState>()(
           items:
             quantity <= 0
               ? state.items.filter((i) => i.productId !== productId)
-              : state.items.map((i) =>
-                  i.productId === productId ? { ...i, quantity } : i
-                ),
+              : state.items.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
         })),
 
       updateDiscount: (productId, discount) =>
         set((state) => ({
-          items: state.items.map((i) =>
-            i.productId === productId ? { ...i, discount } : i
-          ),
+          items: state.items.map((i) => (i.productId === productId ? { ...i, discount } : i)),
         })),
 
       clearCart: () => set({ items: [] }),
@@ -75,9 +69,8 @@ export const useCartStore = create<CartState>()(
 
       getTotal: () => {
         return get().items.reduce(
-          (sum, item) =>
-            sum + (item.price * item.quantity - item.discount),
-          0
+          (sum, item) => sum + (item.price * item.quantity - item.discount),
+          0,
         );
       },
 
@@ -87,6 +80,6 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "eagle-gym-cart",
-    }
-  )
+    },
+  ),
 );

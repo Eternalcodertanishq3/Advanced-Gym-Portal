@@ -17,11 +17,11 @@ export function DashboardContainer({ children }: DashboardContainerProps) {
   }, []);
 
   return (
-    <div 
+    <div
       className={cn(
-        "transition-[padding-left] duration-300 ease-in-out min-h-screen",
+        "min-h-screen transition-[padding-left] duration-300 ease-in-out",
         // Only apply persistent state after hydration to avoid FOUC/gap
-        mounted && collapsed ? "lg:pl-20" : "lg:pl-[260px]"
+        mounted && collapsed ? "lg:pl-20" : "lg:pl-[260px]",
       )}
     >
       {children}

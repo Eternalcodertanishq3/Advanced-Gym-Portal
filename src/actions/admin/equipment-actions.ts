@@ -20,16 +20,16 @@ export async function getEquipment(page = 1, limit = 10, search = "") {
     const [equipment, total] = await Promise.all([
       prisma.equipment.findMany({
         where: whereClause,
-        orderBy: { name: 'asc' },
+        orderBy: { name: "asc" },
         skip,
         take: limit,
       }),
-      prisma.equipment.count({ where: whereClause })
+      prisma.equipment.count({ where: whereClause }),
     ]);
 
-    return { 
-      success: true, 
-      data: { equipment, pagination: { total, pages: Math.ceil(total / limit), page, limit } }
+    return {
+      success: true,
+      data: { equipment, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
     };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -44,10 +44,10 @@ export async function markEquipmentUnderMaintenance(id: string, notes?: string) 
   try {
     const item = await prisma.equipment.update({
       where: { id },
-      data: { 
+      data: {
         status: "UNDER_MAINTENANCE",
-        notes: notes ? `[MAINTENANCE] ${notes}` : undefined
-      }
+        notes: notes ? `[MAINTENANCE] ${notes}` : undefined,
+      },
     });
     revalidatePath("/admin/equipment");
     return { success: true, data: item };
@@ -55,4 +55,3 @@ export async function markEquipmentUnderMaintenance(id: string, notes?: string) 
     return { success: false, error: error.message };
   }
 }
-

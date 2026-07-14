@@ -8,14 +8,14 @@ async function main() {
       user: true,
       subscription: {
         include: {
-          plan: true
-        }
-      }
-    }
+          plan: true,
+        },
+      },
+    },
   });
 
   console.log("=== MEMBERS ===");
-  members.forEach(m => {
+  members.forEach((m) => {
     console.log(`Member: ${m.user.firstName} ${m.user.lastName}`);
     console.log(`- User BranchId: ${m.user.branchId}`);
     console.log(`- Status: ${m.status}`);
@@ -32,15 +32,15 @@ async function main() {
   });
 
   const admins = await prisma.user.findMany({
-    where: { role: "ADMIN" }
+    where: { role: "ADMIN" },
   });
 
   console.log("=== ADMINS ===");
-  admins.forEach(a => {
+  admins.forEach((a) => {
     console.log(`Admin: ${a.firstName} ${a.lastName} - BranchId: ${a.branchId}`);
   });
 }
 
 main()
-  .catch(e => console.error(e))
+  .catch((e) => console.error(e))
   .finally(() => prisma.$disconnect());

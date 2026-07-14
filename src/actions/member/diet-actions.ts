@@ -14,7 +14,7 @@ export async function getMemberDiets() {
     }
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) {
@@ -23,14 +23,11 @@ export async function getMemberDiets() {
 
     const plans = await prisma.dietPlan.findMany({
       where: {
-        OR: [
-          { memberId: member.id },
-          { isTemplate: true }
-        ]
+        OR: [{ memberId: member.id }, { isTemplate: true }],
       },
       include: {
         meals: {
-          orderBy: { sortOrder: 'asc' }
+          orderBy: { sortOrder: "asc" },
         },
         trainer: {
           select: {
@@ -38,16 +35,13 @@ export async function getMemberDiets() {
               select: {
                 firstName: true,
                 lastName: true,
-                avatar: true
-              }
-            }
-          }
-        }
+                avatar: true,
+              },
+            },
+          },
+        },
       },
-      orderBy: [
-        { memberId: 'desc' },
-        { createdAt: 'desc' }
-      ]
+      orderBy: [{ memberId: "desc" }, { createdAt: "desc" }],
     });
 
     return { success: true, data: plans };
@@ -66,7 +60,7 @@ export async function logWater(amount: number) {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) return { success: false, error: "Member not found" };
@@ -76,9 +70,9 @@ export async function logWater(amount: number) {
         memberId: member.id,
         amount,
         date: new Date(),
-      }
+      },
     });
-    
+
     return { success: true, data: newLog };
   } catch (error) {
     console.error("Error logging water:", error);
@@ -95,7 +89,7 @@ export async function getNutritionStats() {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) return { success: false, error: "Member not found" };
@@ -107,26 +101,29 @@ export async function getNutritionStats() {
       where: {
         memberId: member.id,
         date: {
-          gte: today
-        }
+          gte: today,
+        },
       },
-      orderBy: { date: 'desc' }
+      orderBy: { date: "desc" },
     });
 
     const mealLogs = await (prisma as any).dietLog.findMany({
       where: {
         memberId: member.id,
         createdAt: {
-          gte: today
-        }
+          gte: today,
+        },
       },
       include: {
-        meal: true
+        meal: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
-    const totalWater = waterLogs.reduce((sum: number, log: { amount: number }) => sum + log.amount, 0);
+    const totalWater = waterLogs.reduce(
+      (sum: number, log: { amount: number }) => sum + log.amount,
+      0,
+    );
 
     return {
       success: true,
@@ -139,9 +136,9 @@ export async function getNutritionStats() {
           id: log.id,
           name: log.meal?.name || "Custom Meal",
           calories: log.actualCalories || log.meal?.calories || 0,
-          createdAt: log.createdAt
-        }))
-      }
+          createdAt: log.createdAt,
+        })),
+      },
     };
   } catch (error) {
     console.error("Error fetching nutrition stats:", error);
@@ -152,11 +149,11 @@ export async function getNutritionStats() {
 /**
  * Logs a meal consumption.
  */
-export async function logMeal(data: { 
-  name: string; 
-  calories: number; 
-  protein?: number; 
-  carbs?: number; 
+export async function logMeal(data: {
+  name: string;
+  calories: number;
+  protein?: number;
+  carbs?: number;
   fats?: number;
   dietPlanId?: string;
   mealId?: string;
@@ -169,21 +166,22 @@ export async function logMeal(data: {
       where: { userId: session.user.id },
       include: {
         dietPlans: {
-          orderBy: { createdAt: 'desc' },
-          take: 1
-        }
-      }
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
     });
 
     if (!member) return { success: false, error: "Member not found" };
 
     const activePlanId = data.dietPlanId || member.dietPlans?.[0]?.id;
-    if (!activePlanId) return { success: false, error: "No active diet plan found to log against." };
+    if (!activePlanId)
+      return { success: false, error: "No active diet plan found to log against." };
 
     // If no mealId provided (ad-hoc meal), we create a "Custom" meal entry for this plan first
     // Or we just allow the log if the schema permitted null mealId. Since it doesn't, we'll find or create a "Custom Log" meal.
     let targetMealId = data.mealId;
-    
+
     if (!targetMealId) {
       const customMeal = await prisma.meal.create({
         data: {
@@ -193,10 +191,14 @@ export async function logMeal(data: {
           protein: data.protein,
           carbs: data.carbs,
           fats: data.fats,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
           sortOrder: 99,
-          items: [data.name]
-        }
+          items: [data.name],
+        },
       });
       targetMealId = customMeal.id;
     }
@@ -208,18 +210,18 @@ export async function logMeal(data: {
         mealId: targetMealId,
         consumed: true,
         actualCalories: data.calories,
-        notes: `Logged via dashboard: ${data.name}`
-      }
+        notes: `Logged via dashboard: ${data.name}`,
+      },
     });
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         id: log.id,
         name: data.name,
         calories: data.calories,
-        createdAt: log.createdAt
-      }
+        createdAt: log.createdAt,
+      },
     };
   } catch (error) {
     console.error("Error logging meal:", error);
@@ -236,7 +238,7 @@ export async function getRecipes() {
   try {
     const recipes = await (prisma as any).recipe.findMany({
       where: { isPublic: true },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
     return { success: true, data: recipes };
   } catch (error) {

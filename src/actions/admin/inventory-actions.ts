@@ -20,16 +20,16 @@ export async function getInventoryItems(page = 1, limit = 10, search = "") {
     const [items, total] = await Promise.all([
       prisma.product.findMany({
         where: whereClause,
-        orderBy: { name: 'asc' },
+        orderBy: { name: "asc" },
         skip,
         take: limit,
       }),
-      prisma.product.count({ where: whereClause })
+      prisma.product.count({ where: whereClause }),
     ]);
 
-    return { 
-      success: true, 
-      data: { items, pagination: { total, pages: Math.ceil(total / limit), page, limit } }
+    return {
+      success: true,
+      data: { items, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
     };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -44,7 +44,7 @@ export async function updateInventoryQuantity(id: string, newQuantity: number) {
   try {
     const item = await prisma.product.update({
       where: { id },
-      data: { stock: newQuantity }
+      data: { stock: newQuantity },
     });
     revalidatePath("/admin/inventory");
     return { success: true, data: item };
@@ -85,21 +85,21 @@ export async function processSale(data: {
           customerName: data.customerName,
           customerPhone: data.customerPhone,
           items: {
-            create: data.items.map(item => ({
+            create: data.items.map((item) => ({
               productId: item.productId,
               quantity: item.quantity,
               price: item.price,
-              total: item.price * item.quantity
-            }))
-          }
-        }
+              total: item.price * item.quantity,
+            })),
+          },
+        },
       });
 
       // 2. Update stock for each product
       for (const item of data.items) {
         await tx.product.update({
           where: { id: item.productId },
-          data: { stock: { decrement: item.quantity } }
+          data: { stock: { decrement: item.quantity } },
         });
       }
 
@@ -116,8 +116,8 @@ export async function processSale(data: {
           status: "COMPLETED",
           receiptNo: `REC-${Date.now()}`,
           saleId: newSale.id,
-          description: `Sale of ${data.items.length} product(s)`
-        }
+          description: `Sale of ${data.items.length} product(s)`,
+        },
       });
 
       return newSale;
@@ -139,7 +139,7 @@ export async function getProductById(id: string) {
   }
   try {
     const product = await prisma.product.findUnique({
-      where: { id }
+      where: { id },
     });
     if (!product) return { success: false, error: "Product not found" };
     return { success: true, data: product };
@@ -163,7 +163,7 @@ export async function createProduct(data: any) {
         stock: data.stock,
         barcode: data.sku,
         image: data.image,
-      }
+      },
     });
 
     revalidatePath("/admin/inventory");
@@ -189,7 +189,7 @@ export async function updateProduct(id: string, data: any) {
         stock: data.stock,
         barcode: data.sku,
         image: data.image,
-      }
+      },
     });
 
     revalidatePath("/admin/inventory");
@@ -206,7 +206,7 @@ export async function deleteProduct(id: string) {
   }
   try {
     await prisma.product.delete({
-      where: { id }
+      where: { id },
     });
 
     revalidatePath("/admin/inventory");
@@ -215,4 +215,3 @@ export async function deleteProduct(id: string) {
     return { success: false, error: error.message };
   }
 }
-

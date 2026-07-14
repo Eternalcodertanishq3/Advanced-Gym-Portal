@@ -14,20 +14,20 @@ export async function getAttendanceHeatmapData(year: number, month: number) {
     const endDate = new Date(year, month + 1, 0, 23, 59, 59);
 
     const attendances = await prisma.attendance.groupBy({
-      by: ['date'],
+      by: ["date"],
       where: {
         date: {
           gte: startDate,
-          lte: endDate
-        }
+          lte: endDate,
+        },
       },
       _count: {
-        _all: true
-      }
+        _all: true,
+      },
     });
 
     // Map to a format the heatmap understands
-    const data = attendances.map(a => {
+    const data = attendances.map((a) => {
       const count = a._count._all;
       let intensity = 0;
       if (count > 300) intensity = 4;
@@ -38,7 +38,7 @@ export async function getAttendanceHeatmapData(year: number, month: number) {
       return {
         date: a.date.toISOString(),
         count,
-        intensity
+        intensity,
       };
     });
 

@@ -14,7 +14,10 @@ export async function POST(req: Request) {
     const ip = req.headers.get("x-forwarded-for") || "anonymous";
     const limiter = await rateLimit(`api:import:${ip}`, 3, 60);
     if (!limiter.success) {
-      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 },
+      );
     }
 
     // 2. Auth Check
@@ -30,7 +33,7 @@ export async function POST(req: Request) {
     if (!file) {
       return NextResponse.json({ error: "Missing CSV file" }, { status: 400 });
     }
-    
+
     if (!branchId) {
       return NextResponse.json({ error: "Missing target branchId" }, { status: 400 });
     }
@@ -39,7 +42,10 @@ export async function POST(req: Request) {
     const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
 
     if (parsed.errors.length > 0) {
-      return NextResponse.json({ error: "CSV parsing error: " + parsed.errors[0].message }, { status: 400 });
+      return NextResponse.json(
+        { error: "CSV parsing error: " + parsed.errors[0].message },
+        { status: 400 },
+      );
     }
 
     const importData: ImportMemberData[] = parsed.data.map((row: any) => ({
@@ -57,7 +63,7 @@ export async function POST(req: Request) {
     }));
 
     const result = await bulkImportMembers(importData, branchId);
-    
+
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
@@ -65,6 +71,9 @@ export async function POST(req: Request) {
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("CSV import endpoint failure:", error);
-    return NextResponse.json({ error: error.message || "Failed to process import" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Failed to process import" },
+      { status: 500 },
+    );
   }
 }

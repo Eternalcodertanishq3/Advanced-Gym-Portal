@@ -49,13 +49,10 @@ export default function GlobalError({
             <AlertTriangle size={32} color="#ef4444" />
           </div>
 
-          <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>
-            Critical Error
-          </h1>
+          <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Critical Error</h1>
 
           <p style={{ color: "#9CA3AF", marginBottom: 24, lineHeight: 1.6 }}>
-            A critical error occurred. The application could not recover
-            gracefully.
+            A critical error occurred. The application could not recover gracefully.
           </p>
 
           {error.digest && (

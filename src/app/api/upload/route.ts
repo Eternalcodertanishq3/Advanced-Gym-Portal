@@ -16,7 +16,10 @@ export async function POST(req: Request) {
     const ip = req.headers.get("x-forwarded-for") || "anonymous";
     const limiter = await rateLimit(`api:upload:${ip}`, 10, 60);
     if (!limiter.success) {
-      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 },
+      );
     }
 
     // 2. Auth Check
@@ -27,7 +30,7 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
-    const rawType = formData.get("type") as string || "general";
+    const rawType = (formData.get("type") as string) || "general";
 
     // 3. Prevent path traversal & validate upload type
     const type = rawType.replace(/[^a-zA-Z0-9]/g, "");
@@ -52,11 +55,14 @@ export async function POST(req: Request) {
       "image/jpg",
       "application/pdf",
       "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ];
 
     if (!allowedMimeTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Invalid file type. Only JPG, PNG, WebP, PDF, or Word docs are allowed." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid file type. Only JPG, PNG, WebP, PDF, or Word docs are allowed." },
+        { status: 400 },
+      );
     }
 
     const bytes = await file.arrayBuffer();
@@ -68,7 +74,7 @@ export async function POST(req: Request) {
 
     // Target upload directory
     const uploadDir = join(process.cwd(), "public", "uploads", type);
-    
+
     // Ensure upload directory exists recursively
     await mkdir(uploadDir, { recursive: true });
 
@@ -82,7 +88,7 @@ export async function POST(req: Request) {
       url: relativeUrl,
       filename: filename,
       size: file.size,
-      mimeType: file.type
+      mimeType: file.type,
     });
   } catch (error: any) {
     console.error("File upload endpoint failure:", error);

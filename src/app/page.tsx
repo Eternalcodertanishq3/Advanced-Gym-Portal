@@ -7,7 +7,7 @@ export default async function LandingPage() {
   const [configRes, plansRes, testimonialsRes] = await Promise.all([
     getSystemConfig(),
     getPlans(),
-    getApprovedTestimonials()
+    getApprovedTestimonials(),
   ]);
 
   const config = configRes.success && configRes.config ? configRes.config : {};

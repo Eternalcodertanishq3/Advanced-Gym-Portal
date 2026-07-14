@@ -53,7 +53,7 @@ export function canAccessResource(
   userRole: Role,
   userId: string,
   resourceOwnerId: string,
-  requiredPermission: Permission
+  requiredPermission: Permission,
 ): boolean {
   // Own resource
   if (userId === resourceOwnerId) return true;
@@ -113,10 +113,7 @@ export function isAdminRestricted(permission: Permission): boolean {
  * Filter permissions — remove restricted ones for Admin
  * Super Admin passes all, Admin gets filtered
  */
-export function filterPermissionsByRole(
-  role: Role,
-  permissions: Permission[]
-): Permission[] {
+export function filterPermissionsByRole(role: Role, permissions: Permission[]): Permission[] {
   if (role === ROLES.SUPER_ADMIN) return permissions;
   if (role === ROLES.ADMIN) {
     const restricted = getAdminRestrictedPermissions();
@@ -229,7 +226,7 @@ export function getExportLimit(role: Role): number {
  */
 export function isValidRoleAssignment(
   assignerRole: Role,
-  targetRole: Role
+  targetRole: Role,
 ): { valid: boolean; reason?: string } {
   if (assignerRole === ROLES.SUPER_ADMIN) return { valid: true };
 
@@ -255,7 +252,7 @@ export function isValidRoleAssignment(
  */
 export function getAllowedNavItems<T extends { requiredPermission?: Permission }>(
   role: Role,
-  items: T[]
+  items: T[],
 ): T[] {
   return items.filter((item) => {
     if (!item.requiredPermission) return true;

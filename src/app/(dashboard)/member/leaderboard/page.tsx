@@ -20,70 +20,89 @@ export default async function LeaderboardPage() {
   const leaderboardData = leaderboard || [];
 
   return (
-    <div className="w-full h-full p-6 space-y-8 max-w-4xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="mx-auto h-full w-full max-w-4xl space-y-8 p-6">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground mb-1">
+          <h1 className="mb-1 font-display text-3xl font-bold text-foreground">
             Community <span className="text-brand-orange">Leaderboard</span>
           </h1>
-          <p className="text-sm text-txt-secondary font-medium">Top performers this month based on XP and consistency.</p>
+          <p className="text-sm font-medium text-txt-secondary">
+            Top performers this month based on XP and consistency.
+          </p>
         </div>
-        <div className="flex items-center gap-4 bg-surface-sunken p-2 rounded-2xl border border-border/50">
-          <div className="px-4 py-2 rounded-xl bg-surface-card text-xs font-bold text-brand-orange shadow-sm">Monthly</div>
+        <div className="flex items-center gap-4 rounded-2xl border border-border/50 bg-surface-sunken p-2">
+          <div className="rounded-xl bg-surface-card px-4 py-2 text-xs font-bold text-brand-orange shadow-sm">
+            Monthly
+          </div>
           <div className="px-4 py-2 text-xs font-bold text-txt-tertiary">All-Time</div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {leaderboardData.length === 0 ? (
-          <div className="py-20 text-center surface-card border-dashed border-2">
+          <div className="surface-card border-2 border-dashed py-20 text-center">
             <p className="text-txt-tertiary">Leaderboard data is currently being calculated.</p>
           </div>
         ) : (
           leaderboardData.map((entry: any, index: number) => (
-            <div 
-              key={entry.id} 
+            <div
+              key={entry.id}
               className={cn(
-                "surface-card p-4 flex items-center justify-between transition-all hover:scale-[1.01]",
-                entry.id === session.user.id && "ring-2 ring-brand-orange ring-inset bg-brand-orange/5 border-brand-orange/20"
+                "surface-card flex items-center justify-between p-4 transition-all hover:scale-[1.01]",
+                entry.id === session.user.id &&
+                  "border-brand-orange/20 bg-brand-orange/5 ring-2 ring-inset ring-brand-orange",
               )}
             >
               <div className="flex items-center gap-6">
-                <div className="w-8 flex justify-center">
+                <div className="flex w-8 justify-center">
                   {index === 0 ? (
-                    <Trophy className="w-6 h-6 text-yellow-500" />
+                    <Trophy className="h-6 w-6 text-yellow-500" />
                   ) : index === 1 ? (
-                    <Medal className="w-6 h-6 text-slate-400" />
+                    <Medal className="h-6 w-6 text-slate-400" />
                   ) : index === 2 ? (
-                    <Medal className="w-6 h-6 text-amber-700" />
+                    <Medal className="h-6 w-6 text-amber-700" />
                   ) : (
-                    <span className="text-lg font-display font-bold text-txt-tertiary">#{index + 1}</span>
+                    <span className="font-display text-lg font-bold text-txt-tertiary">
+                      #{index + 1}
+                    </span>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-surface-elevated flex items-center justify-center text-lg font-bold text-brand-navy overflow-hidden">
+                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-surface-elevated text-lg font-bold text-brand-navy">
                     {entry.avatar ? (
-                      <img src={entry.avatar} alt={entry.firstName} className="w-full h-full object-cover" />
+                      <img
+                        src={entry.avatar}
+                        alt={entry.firstName}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       `${entry.firstName?.[0]}${entry.lastName?.[0]}`
                     )}
                   </div>
                   <div>
-                    <p className="font-bold text-foreground flex items-center gap-2">
+                    <p className="flex items-center gap-2 font-bold text-foreground">
                       {entry.firstName} {entry.lastName}
                       {entry.id === session.user.id && (
-                        <span className="text-[10px] bg-brand-orange text-white px-1.5 py-0.5 rounded-md uppercase font-black">You</span>
+                        <span className="rounded-md bg-brand-orange px-1.5 py-0.5 text-[10px] font-black uppercase text-white">
+                          You
+                        </span>
                       )}
                     </p>
-                    <p className="text-xs text-txt-tertiary">Level {Math.floor(entry.xp / 1000) + 1} Warrior</p>
+                    <p className="text-xs text-txt-tertiary">
+                      Level {Math.floor(entry.xp / 1000) + 1} Warrior
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="text-right">
-                <p className="text-lg font-display font-bold text-foreground">{entry.xp.toLocaleString()}</p>
-                <p className="text-[10px] font-bold text-brand-orange uppercase tracking-widest">XP points</p>
+                <p className="font-display text-lg font-bold text-foreground">
+                  {entry.xp.toLocaleString()}
+                </p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-orange">
+                  XP points
+                </p>
               </div>
             </div>
           ))
@@ -91,7 +110,7 @@ export default async function LeaderboardPage() {
       </div>
 
       {leaderboardData.length > 0 && (
-        <p className="text-center text-xs text-txt-tertiary font-medium italic pt-4">
+        <p className="pt-4 text-center text-xs font-medium italic text-txt-tertiary">
           * Leaderboard resets on the 1st of every month. Keep training to stay on top!
         </p>
       )}

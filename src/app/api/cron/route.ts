@@ -21,11 +21,11 @@ export async function GET(req: Request) {
       const expiredSubs = await tx.subscription.updateMany({
         where: {
           status: "ACTIVE",
-          endDate: { lt: now }
+          endDate: { lt: now },
         },
         data: {
-          status: "EXPIRED"
-        }
+          status: "EXPIRED",
+        },
       });
 
       // Update corresponding members status to EXPIRED
@@ -33,38 +33,40 @@ export async function GET(req: Request) {
         where: {
           status: "ACTIVE",
           subscription: {
-            endDate: { lt: now }
-          }
+            endDate: { lt: now },
+          },
         },
         data: {
-          status: "EXPIRED"
-        }
+          status: "EXPIRED",
+        },
       });
 
       // 2. Expire B2B Tenants
       const expiredTenants = await tx.tenant.updateMany({
         where: {
           saasStatus: "ACTIVE",
-          saasExpiry: { lt: now }
+          saasExpiry: { lt: now },
         },
         data: {
-          saasStatus: "EXPIRED"
-        }
+          saasStatus: "EXPIRED",
+        },
       });
 
       return {
         expiredSubscriptionsCount: expiredSubs.count,
         expiredMembersCount: expiredMembers.count,
-        expiredTenantsCount: expiredTenants.count
+        expiredTenantsCount: expiredTenants.count,
       };
     });
 
-    console.log(`[Subscription Cron Executed]: Expired ${result.expiredSubscriptionsCount} subscriptions and ${result.expiredTenantsCount} tenants.`);
+    console.log(
+      `[Subscription Cron Executed]: Expired ${result.expiredSubscriptionsCount} subscriptions and ${result.expiredTenantsCount} tenants.`,
+    );
 
     return NextResponse.json({
       success: true,
       message: "Subscription status verification completed successfully.",
-      data: result
+      data: result,
     });
   } catch (error: any) {
     console.error("Scheduled cron verification job failed:", error);

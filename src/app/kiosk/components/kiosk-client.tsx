@@ -2,18 +2,18 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  QrCode, 
-  Search, 
-  Delete, 
-  CheckCircle2, 
-  XCircle, 
-  User, 
+import {
+  QrCode,
+  Search,
+  Delete,
+  CheckCircle2,
+  XCircle,
+  User,
   Clock,
   ShieldCheck,
   Zap,
   ArrowRight,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,63 +72,76 @@ export function KioskClient() {
   };
 
   const addDigit = (digit: string) => {
-    if (phone.length < 10) setPhone(prev => prev + digit);
+    if (phone.length < 10) setPhone((prev) => prev + digit);
   };
 
   const backspace = () => {
-    setPhone(prev => prev.slice(0, -1));
+    setPhone((prev) => prev.slice(0, -1));
   };
 
   if (success) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center min-h-screen bg-brand-navy p-10 text-center"
+        className="flex min-h-screen flex-col items-center justify-center bg-brand-navy p-10 text-center"
       >
-        <div className="w-48 h-48 rounded-full bg-success/20 flex items-center justify-center mb-8 border-4 border-success animate-pulse">
-           <CheckCircle2 className="w-24 h-24 text-success" />
+        <div className="mb-8 flex h-48 w-48 animate-pulse items-center justify-center rounded-full border-4 border-success bg-success/20">
+          <CheckCircle2 className="h-24 w-24 text-success" />
         </div>
-        <h1 className="text-6xl font-display font-bold text-white mb-4 uppercase tracking-tighter">Access Granted</h1>
-        <p className="text-2xl text-white/60 font-medium mb-12">Welcome, {member?.user?.firstName}! Enjoy your session.</p>
-        <Button onClick={reset} className="bg-white text-brand-navy hover:bg-white/90 text-xl px-12 py-8 rounded-2xl font-bold">
-           Back to Entry
+        <h1 className="mb-4 font-display text-6xl font-bold uppercase tracking-tighter text-white">
+          Access Granted
+        </h1>
+        <p className="mb-12 text-2xl font-medium text-white/60">
+          Welcome, {member?.user?.firstName}! Enjoy your session.
+        </p>
+        <Button
+          onClick={reset}
+          className="rounded-2xl bg-white px-12 py-8 text-xl font-bold text-brand-navy hover:bg-white/90"
+        >
+          Back to Entry
         </Button>
       </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background grid grid-cols-1 lg:grid-cols-2">
+    <div className="grid min-h-screen grid-cols-1 bg-background lg:grid-cols-2">
       {/* Left Side: Input & Branding */}
-      <div className="p-12 flex flex-col justify-between border-r border-border/50">
+      <div className="flex flex-col justify-between border-r border-border/50 p-12">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-brand-orange rounded-xl flex items-center justify-center shadow-brand-glow">
-            <Zap className="w-6 h-6 text-white" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange shadow-brand-glow">
+            <Zap className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-display font-bold text-foreground">Eagle Gym <span className="text-brand-orange">Entry</span></h2>
-            <p className="text-sm text-txt-tertiary font-bold uppercase tracking-widest">Self Check-in Portal</p>
+            <h2 className="font-display text-2xl font-bold text-foreground">
+              Eagle Gym <span className="text-brand-orange">Entry</span>
+            </h2>
+            <p className="text-sm font-bold uppercase tracking-widest text-txt-tertiary">
+              Self Check-in Portal
+            </p>
           </div>
         </div>
 
         <div className="space-y-10">
           <div className="space-y-4">
-            <label className="text-sm font-bold text-txt-tertiary uppercase tracking-widest block ml-2">Enter Phone or ID</label>
+            <label className="ml-2 block text-sm font-bold uppercase tracking-widest text-txt-tertiary">
+              Enter Phone or ID
+            </label>
             <div className="relative">
               <Input
                 ref={inputRef}
                 readOnly
                 placeholder="0000000000"
                 value={phone}
-                className="text-6xl font-display font-bold h-24 px-8 bg-surface-elevated border-none rounded-3xl text-brand-orange tracking-widest focus-visible:ring-2 focus-visible:ring-brand-orange/50 shadow-inner"
+                className="h-24 rounded-3xl border-none bg-surface-elevated px-8 font-display text-6xl font-bold tracking-widest text-brand-orange shadow-inner focus-visible:ring-2 focus-visible:ring-brand-orange/50"
               />
-              <Search className="absolute right-8 top-1/2 -translate-y-1/2 w-10 h-10 text-brand-orange/20" />
+              <Search className="absolute right-8 top-1/2 h-10 w-10 -translate-y-1/2 text-brand-orange/20" />
             </div>
           </div>
 
           {/* NumPad */}
-          <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto">
+          <div className="mx-auto grid max-w-sm grid-cols-3 gap-4">
             {["1", "2", "3", "4", "5", "6", "7", "8", "9", "CLR", "0", "DEL"].map((key) => (
               <Button
                 key={key}
@@ -139,8 +152,9 @@ export function KioskClient() {
                 }}
                 variant="outline"
                 className={cn(
-                  "h-20 text-2xl font-bold rounded-2xl border-border/50 hover:bg-brand-orange hover:text-white hover:border-brand-orange transition-all",
-                  (key === "CLR" || key === "DEL") && "text-danger hover:bg-danger hover:border-danger"
+                  "h-20 rounded-2xl border-border/50 text-2xl font-bold transition-all hover:border-brand-orange hover:bg-brand-orange hover:text-white",
+                  (key === "CLR" || key === "DEL") &&
+                    "text-danger hover:border-danger hover:bg-danger",
                 )}
               >
                 {key}
@@ -149,35 +163,39 @@ export function KioskClient() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-txt-tertiary font-bold text-xs">
-          <Clock className="w-4 h-4" />
-          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <div className="flex items-center gap-2 text-xs font-bold text-txt-tertiary">
+          <Clock className="h-4 w-4" />
+          {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           <span className="mx-2 opacity-30">|</span>
-          <ShieldCheck className="w-4 h-4" />
+          <ShieldCheck className="h-4 w-4" />
           Secure Entry Point
         </div>
       </div>
 
       {/* Right Side: Member Card Preview */}
-      <div className="bg-surface-sunken p-12 flex items-center justify-center relative overflow-hidden">
+      <div className="relative flex items-center justify-center overflow-hidden bg-surface-sunken p-12">
         {/* Background Gradients */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-brand-orange/10 blur-[100px] rounded-full -mr-48 -mt-48" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-navy/20 blur-[100px] rounded-full -ml-48 -mb-48" />
+        <div className="absolute right-0 top-0 -mr-48 -mt-48 h-96 w-96 rounded-full bg-brand-orange/10 blur-[100px]" />
+        <div className="absolute bottom-0 left-0 -mb-48 -ml-48 h-96 w-96 rounded-full bg-brand-navy/20 blur-[100px]" />
 
         <AnimatePresence mode="wait">
           {!member ? (
-            <motion.div 
+            <motion.div
               key="idle"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="text-center space-y-6"
+              className="space-y-6 text-center"
             >
-              <div className="w-32 h-32 bg-surface-elevated rounded-full flex items-center justify-center mx-auto border border-border">
-                <User className="w-16 h-16 text-txt-tertiary/20" />
+              <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full border border-border bg-surface-elevated">
+                <User className="h-16 w-16 text-txt-tertiary/20" />
               </div>
-              <h3 className="text-2xl font-display font-bold text-foreground">Waiting for input...</h3>
-              <p className="text-sm text-txt-tertiary max-w-xs mx-auto">Please enter your registered phone number or scan your member ID.</p>
+              <h3 className="font-display text-2xl font-bold text-foreground">
+                Waiting for input...
+              </h3>
+              <p className="mx-auto max-w-xs text-sm text-txt-tertiary">
+                Please enter your registered phone number or scan your member ID.
+              </p>
             </motion.div>
           ) : (
             <motion.div
@@ -185,63 +203,79 @@ export function KioskClient() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md surface-card p-10 rounded-[3rem] shadow-2xl relative z-10 border border-brand-orange/20"
+              className="surface-card relative z-10 w-full max-w-md rounded-[3rem] border border-brand-orange/20 p-10 shadow-2xl"
             >
-              <div className="flex flex-col items-center text-center space-y-6">
+              <div className="flex flex-col items-center space-y-6 text-center">
                 <div className="relative">
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-brand-orange">
+                  <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-brand-orange">
                     {member.user.avatar ? (
-                      <img src={member.user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                      <img
+                        src={member.user.avatar}
+                        alt="Avatar"
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
-                      <div className="w-full h-full bg-surface-sunken flex items-center justify-center">
-                        <User className="w-12 h-12 text-txt-tertiary" />
+                      <div className="flex h-full w-full items-center justify-center bg-surface-sunken">
+                        <User className="h-12 w-12 text-txt-tertiary" />
                       </div>
                     )}
                   </div>
-                  <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-success flex items-center justify-center border-4 border-background">
-                     <CheckCircle2 className="w-5 h-5 text-white" />
+                  <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full border-4 border-background bg-success">
+                    <CheckCircle2 className="h-5 w-5 text-white" />
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-3xl font-display font-bold text-foreground">{member.user.firstName} {member.user.lastName}</h3>
-                  <p className="text-brand-orange font-bold text-sm tracking-widest uppercase mt-1">{member.subscription?.plan?.name || "No Active Plan"}</p>
+                  <h3 className="font-display text-3xl font-bold text-foreground">
+                    {member.user.firstName} {member.user.lastName}
+                  </h3>
+                  <p className="mt-1 text-sm font-bold uppercase tracking-widest text-brand-orange">
+                    {member.subscription?.plan?.name || "No Active Plan"}
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 w-full">
-                  <div className="p-4 rounded-2xl bg-surface-sunken border border-border/50 text-left">
-                    <p className="text-[10px] font-bold text-txt-tertiary uppercase mb-1">Status</p>
-                    <p className={cn(
-                      "text-sm font-bold",
-                      member.status === 'ACTIVE' ? "text-success" : "text-danger"
-                    )}>{member.status}</p>
+                <div className="grid w-full grid-cols-2 gap-4">
+                  <div className="rounded-2xl border border-border/50 bg-surface-sunken p-4 text-left">
+                    <p className="mb-1 text-[10px] font-bold uppercase text-txt-tertiary">Status</p>
+                    <p
+                      className={cn(
+                        "text-sm font-bold",
+                        member.status === "ACTIVE" ? "text-success" : "text-danger",
+                      )}
+                    >
+                      {member.status}
+                    </p>
                   </div>
-                  <div className="p-4 rounded-2xl bg-surface-sunken border border-border/50 text-left">
-                    <p className="text-[10px] font-bold text-txt-tertiary uppercase mb-1">Valid Until</p>
+                  <div className="rounded-2xl border border-border/50 bg-surface-sunken p-4 text-left">
+                    <p className="mb-1 text-[10px] font-bold uppercase text-txt-tertiary">
+                      Valid Until
+                    </p>
                     <p className="text-sm font-bold text-foreground">
-                      {member.subscription?.endDate ? new Date(member.subscription.endDate).toLocaleDateString() : "N/A"}
+                      {member.subscription?.endDate
+                        ? new Date(member.subscription.endDate).toLocaleDateString()
+                        : "N/A"}
                     </p>
                   </div>
                 </div>
 
                 <Button
                   onClick={handleCheckIn}
-                  disabled={checkingIn || member.status !== 'ACTIVE'}
-                  className="w-full py-10 rounded-[2rem] bg-brand-orange hover:bg-brand-orange-dark text-white text-2xl font-bold shadow-lg shadow-brand-orange/30 group"
+                  disabled={checkingIn || member.status !== "ACTIVE"}
+                  className="hover:bg-brand-orange-dark group w-full rounded-[2rem] bg-brand-orange py-10 text-2xl font-bold text-white shadow-lg shadow-brand-orange/30"
                 >
                   {checkingIn ? (
-                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <Loader2 className="h-8 w-8 animate-spin" />
                   ) : (
                     <>
                       Confirm Entry
-                      <ArrowRight className="w-8 h-8 ml-4 group-hover:translate-x-2 transition-transform" />
+                      <ArrowRight className="ml-4 h-8 w-8 transition-transform group-hover:translate-x-2" />
                     </>
                   )}
                 </Button>
 
-                {member.status !== 'ACTIVE' && (
-                  <p className="text-danger text-sm font-bold flex items-center gap-2">
-                    <XCircle className="w-4 h-4" />
+                {member.status !== "ACTIVE" && (
+                  <p className="flex items-center gap-2 text-sm font-bold text-danger">
+                    <XCircle className="h-4 w-4" />
                     Subscription Inactive. Please see receptionist.
                   </p>
                 )}
@@ -253,4 +287,3 @@ export function KioskClient() {
     </div>
   );
 }
-

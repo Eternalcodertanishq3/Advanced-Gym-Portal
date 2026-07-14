@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { GENDER, BLOOD_GROUP, PAYMENT_METHOD, CLASS_CATEGORIES, EQUIPMENT_CATEGORIES } from "./constants";
+import {
+  GENDER,
+  BLOOD_GROUP,
+  PAYMENT_METHOD,
+  CLASS_CATEGORIES,
+  EQUIPMENT_CATEGORIES,
+} from "./constants";
 
 // ═══════════════════════════════════════════════════════════════
 // COMMON / SHARED SCHEMAS
@@ -51,9 +57,7 @@ export const AddressSchema = z.object({
   street: z.string().min(1, "Street is required").max(200),
   city: z.string().min(1, "City is required").max(50),
   state: z.string().min(1, "State is required").max(50),
-  pincode: z
-    .string()
-    .regex(/^\d{6}$/, "Please enter a valid 6-digit PIN code"),
+  pincode: z.string().regex(/^\d{6}$/, "Please enter a valid 6-digit PIN code"),
   country: z.string().default("India"),
 });
 
@@ -63,7 +67,7 @@ export const FileUploadSchema = z.object({
     .refine((file) => file.size <= 5 * 1024 * 1024, "File size must be less than 5MB")
     .refine(
       (file) => ["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type),
-      "Only JPG, PNG, and WebP images are allowed"
+      "Only JPG, PNG, and WebP images are allowed",
     ),
 });
 
@@ -189,7 +193,11 @@ export const CreateMemberSchema = z.object({
   address: z.string().max(500).optional(),
   city: z.string().max(50).optional(),
   state: z.string().max(50).optional(),
-  pincode: z.string().regex(/^\d{6}$/).optional().or(z.literal("")),
+  pincode: z
+    .string()
+    .regex(/^\d{6}$/)
+    .optional()
+    .or(z.literal("")),
   planId: z.string().cuid({ message: "Please select a subscription plan" }),
   startDate: z.string().min(1, "Start date is required"),
   amount: z.coerce.number().min(0, "Amount must be positive"),
@@ -215,7 +223,11 @@ export const UpdateMemberSchema = z.object({
   address: z.string().max(500).optional(),
   city: z.string().max(50).optional(),
   state: z.string().max(50).optional(),
-  pincode: z.string().regex(/^\d{6}$/).optional().or(z.literal("")),
+  pincode: z
+    .string()
+    .regex(/^\d{6}$/)
+    .optional()
+    .or(z.literal("")),
   trainerId: z.string().cuid().optional().or(z.literal("")),
   status: z.enum(["ACTIVE", "INACTIVE", "EXPIRED", "FROZEN", "PENDING"]).optional(),
   notes: z.string().max(1000).optional(),
@@ -229,7 +241,7 @@ export const MemberFilterSchema = PaginationSchema.merge(
     gender: z.enum(["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY", "ALL"]).optional(),
     dateRange: DateRangeSchema.optional(),
     hasDue: z.boolean().optional(),
-  })
+  }),
 );
 
 // ═══════════════════════════════════════════════════════════════
@@ -243,7 +255,10 @@ export const CreateTrainerSchema = z.object({
   phone: PhoneSchema,
   password: PasswordSchema.optional(),
   specialization: z.array(z.string()).min(1, "Select at least one specialization"),
-  experience: z.coerce.number().min(0, "Experience cannot be negative").max(50, "Too much experience"),
+  experience: z.coerce
+    .number()
+    .min(0, "Experience cannot be negative")
+    .max(50, "Too much experience"),
   salary: z.coerce.number().min(0).optional(),
   certifications: z.array(z.string()).optional(),
   bio: z.string().max(1000).optional(),
@@ -279,7 +294,10 @@ export const UpdateStaffSchema = CreateStaffSchema.partial().omit({ password: tr
 
 export const CreatePlanSchema = z.object({
   name: z.string().min(2, "Plan name is required").max(50),
-  duration: z.coerce.number().min(1, "Duration must be at least 1 day").max(3650, "Duration too long"),
+  duration: z.coerce
+    .number()
+    .min(1, "Duration must be at least 1 day")
+    .max(3650, "Duration too long"),
   price: z.coerce.number().min(0, "Price cannot be negative"),
   gstIncluded: z.boolean().default(true),
   features: z.array(z.string().min(1)).min(1, "Add at least one feature"),
@@ -339,11 +357,13 @@ export const CreatePaymentSchema = z.object({
 export const PaymentFilterSchema = PaginationSchema.merge(
   z.object({
     memberId: z.string().optional(),
-    method: z.enum(["CASH", "CARD", "UPI", "ONLINE", "CHEQUE", "BANK_TRANSFER", "EMI", "ALL"]).optional(),
+    method: z
+      .enum(["CASH", "CARD", "UPI", "ONLINE", "CHEQUE", "BANK_TRANSFER", "EMI", "ALL"])
+      .optional(),
     status: z.enum(["PENDING", "COMPLETED", "FAILED", "REFUNDED", "PARTIAL", "ALL"]).optional(),
     type: z.enum(["SUBSCRIPTION", "PT_SESSION", "PRODUCT", "OTHER", "ALL"]).optional(),
     dateRange: DateRangeSchema.optional(),
-  })
+  }),
 );
 
 // ═══════════════════════════════════════════════════════════════
@@ -365,7 +385,7 @@ export const AttendanceFilterSchema = PaginationSchema.merge(
     status: z.enum(["PRESENT", "ABSENT", "LATE", "EARLY_LEAVE", "ALL"]).optional(),
     date: z.string().optional(),
     dateRange: DateRangeSchema.optional(),
-  })
+  }),
 );
 
 // ═══════════════════════════════════════════════════════════════
@@ -375,7 +395,18 @@ export const AttendanceFilterSchema = PaginationSchema.merge(
 export const CreateClassSchema = z.object({
   name: z.string().min(2, "Class name is required").max(100),
   description: z.string().max(1000).optional(),
-  category: z.enum(["YOGA", "ZUMBA", "CROSSFIT", "PILATES", "SPINNING", "HIIT", "BOXING", "DANCE", "MEDITATION", "AEROBICS"]),
+  category: z.enum([
+    "YOGA",
+    "ZUMBA",
+    "CROSSFIT",
+    "PILATES",
+    "SPINNING",
+    "HIIT",
+    "BOXING",
+    "DANCE",
+    "MEDITATION",
+    "AEROBICS",
+  ]),
   trainerId: z.string().cuid(),
   maxCapacity: z.coerce.number().min(1, "Capacity must be at least 1").max(100),
   duration: z.coerce.number().min(15, "Minimum 15 minutes").max(180, "Maximum 3 hours"),
@@ -439,7 +470,7 @@ export const LogWorkoutSchema = z.object({
       repsCompleted: z.array(z.number()),
       weightUsed: z.array(z.number()).optional(),
       notes: z.string().optional(),
-    })
+    }),
   ),
   duration: z.coerce.number().min(1),
   caloriesBurned: z.coerce.number().optional(),
@@ -467,7 +498,9 @@ export const CreateDietPlanSchema = z.object({
   description: z.string().max(1000).optional(),
   meals: z.array(MealSchema).min(1, "Add at least one meal"),
   totalCalories: z.coerce.number().min(0).optional(),
-  type: z.enum(["WEIGHT_LOSS", "MUSCLE_GAIN", "MAINTENANCE", "KETO", "VEGAN", "CUSTOM"]).default("CUSTOM"),
+  type: z
+    .enum(["WEIGHT_LOSS", "MUSCLE_GAIN", "MAINTENANCE", "KETO", "VEGAN", "CUSTOM"])
+    .default("CUSTOM"),
   memberId: z.string().cuid().optional(),
   isTemplate: z.boolean().default(false),
 });
@@ -511,7 +544,7 @@ export const CreateProgressSchema = z.object({
       z.object({
         type: z.enum(["FRONT", "SIDE", "BACK"]),
         url: z.string().url(),
-      })
+      }),
     )
     .optional(),
 });
@@ -520,7 +553,15 @@ export const CreateGoalSchema = z.object({
   memberId: z.string().cuid(),
   title: z.string().min(2, "Goal title is required").max(100),
   description: z.string().max(500).optional(),
-  type: z.enum(["WEIGHT_LOSS", "WEIGHT_GAIN", "MUSCLE_GAIN", "ENDURANCE", "FLEXIBILITY", "STRENGTH", "CUSTOM"]),
+  type: z.enum([
+    "WEIGHT_LOSS",
+    "WEIGHT_GAIN",
+    "MUSCLE_GAIN",
+    "ENDURANCE",
+    "FLEXIBILITY",
+    "STRENGTH",
+    "CUSTOM",
+  ]),
   targetValue: z.coerce.number().min(0),
   currentValue: z.coerce.number().min(0).optional(),
   unit: z.string().min(1).max(20),

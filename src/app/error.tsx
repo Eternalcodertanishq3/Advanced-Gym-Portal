@@ -26,18 +26,14 @@ export default function Error({
           <AlertTriangle className="h-10 w-10 text-destructive" />
         </div>
 
-        <h2 className="mb-2 text-2xl font-bold tracking-tight">
-          Something went wrong
-        </h2>
+        <h2 className="mb-2 text-2xl font-bold tracking-tight">Something went wrong</h2>
 
         <p className="mb-6 text-muted-foreground">
           {error.message || "An unexpected error occurred. Please try again."}
         </p>
 
         {error.digest && (
-          <p className="mb-4 text-xs text-muted-foreground/60">
-            Error ID: {error.digest}
-          </p>
+          <p className="mb-4 text-xs text-muted-foreground/60">Error ID: {error.digest}</p>
         )}
 
         <div className="flex items-center justify-center gap-3">

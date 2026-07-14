@@ -70,27 +70,27 @@ export function ConfirmModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[420px] bg-card border-border rounded-2xl p-0 overflow-hidden shadow-2xl">
+      <DialogContent className="overflow-hidden rounded-2xl border-border bg-card p-0 shadow-2xl sm:max-w-[420px]">
         <div className="p-8">
-          <div className="flex flex-col items-center text-center space-y-6">
+          <div className="flex flex-col items-center space-y-6 text-center">
             {/* Warning Icon */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className={`w-16 h-16 rounded-2xl ${styles.bg} border ${styles.border} flex items-center justify-center`}
+              className={`h-16 w-16 rounded-2xl ${styles.bg} border ${styles.border} flex items-center justify-center`}
             >
               {variant === "danger" ? (
-                <Trash2 className={`w-8 h-8 ${styles.icon}`} />
+                <Trash2 className={`h-8 w-8 ${styles.icon}`} />
               ) : (
-                <AlertTriangle className={`w-8 h-8 ${styles.icon}`} />
+                <AlertTriangle className={`h-8 w-8 ${styles.icon}`} />
               )}
             </motion.div>
 
             <div className="space-y-2">
-              <DialogTitle className="text-xl font-display font-bold text-foreground uppercase tracking-widest">
+              <DialogTitle className="font-display text-xl font-bold uppercase tracking-widest text-foreground">
                 {title}
               </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground font-medium leading-relaxed">
+              <DialogDescription className="text-sm font-medium leading-relaxed text-muted-foreground">
                 {description}
               </DialogDescription>
             </div>
@@ -100,20 +100,22 @@ export function ConfirmModal({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="h-11 px-4 rounded-xl border border-border bg-transparent hover:bg-muted text-foreground text-xs font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+              className="h-11 rounded-xl border border-border bg-transparent px-4 text-xs font-bold uppercase tracking-widest text-foreground transition-all hover:bg-muted active:scale-95 disabled:opacity-50"
             >
               {cancelText}
             </button>
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className={`h-11 px-4 rounded-xl text-white text-xs font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 shadow-sm ${
-                variant === "danger" ? "bg-danger hover:bg-danger-dark" : "bg-brand-orange hover:bg-brand-orange-hover"
+              className={`h-11 rounded-xl px-4 text-xs font-bold uppercase tracking-widest text-white shadow-sm transition-all active:scale-95 disabled:opacity-50 ${
+                variant === "danger"
+                  ? "bg-danger hover:bg-danger-dark"
+                  : "bg-brand-orange hover:bg-brand-orange-hover"
               }`}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   Loading...
                 </div>
               ) : (

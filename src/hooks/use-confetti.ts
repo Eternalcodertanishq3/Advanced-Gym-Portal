@@ -23,7 +23,7 @@ export function useConfetti() {
   }, [fire]);
 
   const firePride = useCallback(() => {
-    const end = Date.now() + (3 * 1000);
+    const end = Date.now() + 3 * 1000;
     const colors = ["#FF6B00", "#0A1A2F"];
 
     (function frame() {
@@ -32,20 +32,20 @@ export function useConfetti() {
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: colors
+        colors: colors,
       });
       confetti({
         particleCount: 2,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: colors
+        colors: colors,
       });
 
       if (Date.now() < end) {
         requestAnimationFrame(frame);
       }
-    }());
+    })();
   }, []);
 
   return { fire, fireSuccess, firePride };

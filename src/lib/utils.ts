@@ -12,10 +12,7 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Format date to Indian standard
  */
-export function formatDate(
-  date: Date | string | number,
-  pattern: string = "dd MMM yyyy"
-): string {
+export function formatDate(date: Date | string | number, pattern: string = "dd MMM yyyy"): string {
   if (!date) return "-";
   const d = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
   if (isNaN(d.getTime())) return "-";
@@ -37,10 +34,10 @@ export function formatRelative(date: Date | string | number): string {
  */
 export function formatCurrency(
   amount: number | string | null | undefined,
-  options: { showSymbol?: boolean; decimals?: number; currency?: string; locale?: string } = {}
+  options: { showSymbol?: boolean; decimals?: number; currency?: string; locale?: string } = {},
 ): string {
   const { showSymbol = true, decimals = 2 } = options;
-  
+
   let currencyCode = options.currency || "INR";
   let locale = options.locale || (currencyCode === "INR" ? "en-IN" : "en-US");
 
@@ -50,7 +47,7 @@ export function formatCurrency(
       const stored = localStorage.getItem("gymflow-currency");
       if (stored) {
         currencyCode = stored;
-        locale = currencyCode === "INR" ? "en-IN" : (currencyCode === "EUR" ? "de-DE" : "en-US");
+        locale = currencyCode === "INR" ? "en-IN" : currencyCode === "EUR" ? "de-DE" : "en-US";
       }
     } catch {
       // safe fallback
@@ -68,7 +65,7 @@ export function formatCurrency(
   if (amount === null || amount === undefined || amount === "") {
     return showSymbol ? `${symbol}0.00` : "0.00";
   }
-  
+
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(num)) {
     return showSymbol ? `${symbol}0.00` : "0.00";
@@ -93,10 +90,10 @@ export function formatCurrency(
  */
 export function formatNumber(
   num: number | string | null | undefined,
-  decimals: number = 0
+  decimals: number = 0,
 ): string {
   if (num === null || num === undefined || num === "") return "0";
-  
+
   const number = typeof num === "string" ? parseFloat(num) : num;
   if (isNaN(number)) return "0";
 
@@ -147,7 +144,7 @@ export function delay(ms: number): Promise<void> {
  */
 export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
   return (...args: Parameters<T>) => {
@@ -201,12 +198,12 @@ export function getAvatarColor(name: string): string {
     "bg-indigo-500/10 text-indigo-500",
     "bg-cyan-500/10 text-cyan-500",
   ];
-  
+
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  
+
   return colors[Math.abs(hash) % colors.length];
 }
 
@@ -261,9 +258,7 @@ export function maskEmail(email: string): string {
  */
 export function isMobile(): boolean {
   if (typeof window === "undefined") return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 /**
@@ -297,7 +292,7 @@ export function parseCSV(text: string): string[][] {
     const result: string[] = [];
     let current = "";
     let inQuotes = false;
-    
+
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
       if (char === '"') {

@@ -75,10 +75,7 @@ function applyFilters(model: string, args: any) {
 
 function createPrismaClient() {
   const client = new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
 
   return client.$extends({

@@ -20,6 +20,6 @@ export const useThemeStore = create<ThemeState>()(
     }),
     {
       name: "eagle-gym-theme",
-    }
-  )
+    },
+  ),
 );

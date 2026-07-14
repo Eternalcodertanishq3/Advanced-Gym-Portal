@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
 export async function getSystemMetrics() {
   try {
     await ensureSuperAdmin();
-    
+
     const [membersCount, paymentsCount, attendanceCount, auditLogsCount] = await Promise.all([
       prisma.member.count(),
       prisma.payment.count(),
@@ -32,8 +32,8 @@ export async function getSystemMetrics() {
         databaseSize: `${currentSize} GB`,
         allocatedStorage: `${allocatedSize} GB`,
         usagePercentage,
-        totalRecords
-      }
+        totalRecords,
+      },
     };
   } catch (error: any) {
     console.error("Error fetching system metrics:", error);
@@ -47,10 +47,10 @@ export async function getSystemMetrics() {
 export async function getBackups() {
   try {
     await ensureSuperAdmin();
-    
+
     // Explicitly casting to any to handle cases where Prisma types haven't refreshed in IDE
     const backups = await (prisma as any).backup.findMany({
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     return {
@@ -58,12 +58,19 @@ export async function getBackups() {
       backups: backups.map((b: any) => ({
         id: b.fileName,
         dbId: b.id,
-        date: new Date(b.createdAt).toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' }),
-        time: new Date(b.createdAt).toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }),
+        date: new Date(b.createdAt).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        time: new Date(b.createdAt).toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         type: b.type,
         size: b.size,
-        status: b.status
-      }))
+        status: b.status,
+      })),
     };
   } catch (error: any) {
     console.error("Error fetching backups:", error);
@@ -77,13 +84,17 @@ export async function getBackups() {
 export async function triggerBackup() {
   try {
     const user = await ensureSuperAdmin();
-    
+
     // Simulate backup delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
     // Calculate random size between 1.0 and 1.5 GB for variety
     const randomSize = (1 + Math.random() * 0.5).toFixed(2);
-    const fileName = `BK-${new Date().toISOString().split('T')[0]}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    const fileName = `BK-${new Date().toISOString().split("T")[0]}-${Math.floor(
+      Math.random() * 1000,
+    )
+      .toString()
+      .padStart(3, "0")}`;
 
     const backup = await (prisma as any).backup.create({
       data: {
@@ -91,8 +102,8 @@ export async function triggerBackup() {
         size: `${randomSize} GB`,
         type: "FULL",
         status: "SUCCESS",
-        createdBy: user.id
-      }
+        createdBy: user.id,
+      },
     });
 
     await recordAudit({
@@ -100,7 +111,7 @@ export async function triggerBackup() {
       action: "EXPORT",
       entityType: "DATABASE",
       entityId: backup.id,
-      newValue: backup
+      newValue: backup,
     });
 
     revalidatePath("/super-admin/backups");
@@ -117,16 +128,16 @@ export async function triggerBackup() {
 export async function deleteBackup(id: string) {
   try {
     const user = await ensureSuperAdmin();
-    
+
     await (prisma as any).backup.delete({
-      where: { id }
+      where: { id },
     });
 
     await recordAudit({
       userId: user.id,
       action: "DELETE",
       entityType: "DATABASE_BACKUP",
-      entityId: id
+      entityId: id,
     });
 
     revalidatePath("/super-admin/backups");
@@ -143,9 +154,9 @@ export async function deleteBackup(id: string) {
 export async function restoreBackup(id: string) {
   try {
     const user = await ensureSuperAdmin();
-    
+
     const backup = await (prisma as any).backup.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!backup) {
@@ -153,7 +164,7 @@ export async function restoreBackup(id: string) {
     }
 
     // Simulate restoration delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     await recordAudit({
       userId: user.id,
@@ -161,7 +172,7 @@ export async function restoreBackup(id: string) {
       entityType: "DATABASE_RESTORE",
       entityId: id,
       oldValue: "LIVE_SYSTEM",
-      newValue: backup.fileName
+      newValue: backup.fileName,
     });
 
     revalidatePath("/super-admin");

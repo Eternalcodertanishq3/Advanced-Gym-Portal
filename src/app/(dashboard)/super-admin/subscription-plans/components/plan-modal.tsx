@@ -33,7 +33,7 @@ export function PlanModal({ open, onClose, plan }: Props) {
     duration: plan?.duration?.toString() || "30",
     price: plan?.price?.toString() || "",
     description: plan?.description || "",
-    features: plan?.features || [] as string[],
+    features: plan?.features || ([] as string[]),
     color: plan?.color || "#F26522",
     maxCheckIns: plan?.maxCheckIns?.toString() || "0",
     ptSessions: plan?.ptSessions?.toString() || "0",
@@ -43,11 +43,11 @@ export function PlanModal({ open, onClose, plan }: Props) {
   });
 
   const toggleFeature = (featureId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       features: prev.features.includes(featureId)
         ? prev.features.filter((id: string) => id !== featureId)
-        : [...prev.features, featureId]
+        : [...prev.features, featureId],
     }));
   };
 
@@ -60,9 +60,7 @@ export function PlanModal({ open, onClose, plan }: Props) {
 
     setLoading(true);
     try {
-      const res = plan 
-        ? await updatePlan(plan.id, formData)
-        : await createPlan(formData);
+      const res = plan ? await updatePlan(plan.id, formData) : await createPlan(formData);
 
       if (res.success) {
         toast.success(plan ? "Plan updated successfully" : "Plan created successfully");
@@ -79,9 +77,9 @@ export function PlanModal({ open, onClose, plan }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] bg-brand-navy border-white/10 text-white overflow-y-auto scrollbar-thin">
+      <DialogContent className="scrollbar-thin max-h-[90vh] max-w-3xl overflow-y-auto border-white/10 bg-brand-navy text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold font-display tracking-tight text-white">
+          <DialogTitle className="font-display text-xl font-bold tracking-tight text-white">
             {plan ? "Edit Subscription Plan" : "Create New Subscription Plan"}
           </DialogTitle>
           <DialogDescription className="text-white/50">
@@ -90,7 +88,7 @@ export function PlanModal({ open, onClose, plan }: Props) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Basic Info */}
             <div className="space-y-4">
               <div className="space-y-2">
@@ -98,9 +96,9 @@ export function PlanModal({ open, onClose, plan }: Props) {
                 <Input
                   id="name"
                   placeholder="Official Tier Identity"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="border-white/10 bg-white/5 text-white"
                   value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </div>
@@ -112,9 +110,9 @@ export function PlanModal({ open, onClose, plan }: Props) {
                     id="price"
                     type="number"
                     placeholder="999"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="border-white/10 bg-white/5 text-white"
                     value={formData.price}
-                    onChange={e => setFormData({ ...formData, price: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
                   />
                 </div>
@@ -124,9 +122,9 @@ export function PlanModal({ open, onClose, plan }: Props) {
                     id="duration"
                     type="number"
                     placeholder="30"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="border-white/10 bg-white/5 text-white"
                     value={formData.duration}
-                    onChange={e => setFormData({ ...formData, duration: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                     required
                   />
                 </div>
@@ -137,22 +135,22 @@ export function PlanModal({ open, onClose, plan }: Props) {
                 <Textarea
                   id="description"
                   placeholder="What makes this plan special?"
-                  className="bg-white/5 border-white/10 text-white min-h-[100px]"
+                  className="min-h-[100px] border-white/10 bg-white/5 text-white"
                   value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="color">Brand Color</Label>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex items-center gap-2">
                     <Input
                       id="color"
                       type="color"
-                      className="w-12 h-10 p-1 bg-white/5 border-white/10"
+                      className="h-10 w-12 border-white/10 bg-white/5 p-1"
                       value={formData.color}
-                      onChange={e => setFormData({ ...formData, color: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                     />
                     <span className="text-xs text-white/50">{formData.color}</span>
                   </div>
@@ -161,9 +159,13 @@ export function PlanModal({ open, onClose, plan }: Props) {
                   <Checkbox
                     id="gst"
                     checked={formData.gstIncluded}
-                    onCheckedChange={(checked) => setFormData({ ...formData, gstIncluded: !!checked })}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, gstIncluded: !!checked })
+                    }
                   />
-                  <Label htmlFor="gst" className="text-sm font-medium cursor-pointer">GST Included</Label>
+                  <Label htmlFor="gst" className="cursor-pointer text-sm font-medium">
+                    GST Included
+                  </Label>
                 </div>
               </div>
             </div>
@@ -171,15 +173,15 @@ export function PlanModal({ open, onClose, plan }: Props) {
             {/* Features & Limits */}
             <div className="space-y-4">
               <Label>Select Features</Label>
-              <div className="grid grid-cols-1 gap-2 p-3 rounded-xl bg-white/5 border border-white/10 max-h-[300px] overflow-y-auto scrollbar-thin">
+              <div className="scrollbar-thin grid max-h-[300px] grid-cols-1 gap-2 overflow-y-auto rounded-xl border border-white/10 bg-white/5 p-3">
                 {MEMBERSHIP_FEATURES.map((feature) => (
-                  <div 
-                    key={feature.id} 
+                  <div
+                    key={feature.id}
                     className={cn(
-                      "flex items-center justify-between p-2.5 rounded-lg border transition-all cursor-pointer group",
+                      "group flex cursor-pointer items-center justify-between rounded-lg border p-2.5 transition-all",
                       formData.features.includes(feature.id)
-                        ? "bg-brand-orange/10 border-brand-orange/30"
-                        : "bg-white/5 border-transparent hover:border-white/10"
+                        ? "border-brand-orange/30 bg-brand-orange/10"
+                        : "border-transparent bg-white/5 hover:border-white/10",
                     )}
                     onClick={() => toggleFeature(feature.id)}
                   >
@@ -191,7 +193,7 @@ export function PlanModal({ open, onClose, plan }: Props) {
                       checked={formData.features.includes(feature.id)}
                       onCheckedChange={() => toggleFeature(feature.id)}
                       onClick={(e) => e.stopPropagation()} // Prevent double trigger
-                      className="border-white/20 data-[state=checked]:bg-brand-orange data-[state=checked]:border-brand-orange"
+                      className="border-white/20 data-[state=checked]:border-brand-orange data-[state=checked]:bg-brand-orange"
                     />
                   </div>
                 ))}
@@ -199,33 +201,48 @@ export function PlanModal({ open, onClose, plan }: Props) {
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="checkins" className="text-[10px] uppercase tracking-wider text-white/50">Max Checkins</Label>
+                  <Label
+                    htmlFor="checkins"
+                    className="text-[10px] uppercase tracking-wider text-white/50"
+                  >
+                    Max Checkins
+                  </Label>
                   <Input
                     id="checkins"
                     type="number"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="border-white/10 bg-white/5 text-white"
                     value={formData.maxCheckIns}
-                    onChange={e => setFormData({ ...formData, maxCheckIns: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, maxCheckIns: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pt" className="text-[10px] uppercase tracking-wider text-white/50">PT Sessions</Label>
+                  <Label
+                    htmlFor="pt"
+                    className="text-[10px] uppercase tracking-wider text-white/50"
+                  >
+                    PT Sessions
+                  </Label>
                   <Input
                     id="pt"
                     type="number"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="border-white/10 bg-white/5 text-white"
                     value={formData.ptSessions}
-                    onChange={e => setFormData({ ...formData, ptSessions: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, ptSessions: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="guests" className="text-[10px] uppercase tracking-wider text-white/50">Guest Passes</Label>
+                  <Label
+                    htmlFor="guests"
+                    className="text-[10px] uppercase tracking-wider text-white/50"
+                  >
+                    Guest Passes
+                  </Label>
                   <Input
                     id="guests"
                     type="number"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="border-white/10 bg-white/5 text-white"
                     value={formData.guestPasses}
-                    onChange={e => setFormData({ ...formData, guestPasses: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, guestPasses: e.target.value })}
                   />
                 </div>
               </div>
@@ -245,15 +262,17 @@ export function PlanModal({ open, onClose, plan }: Props) {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-brand-orange hover:bg-brand-orange-dark text-white font-bold px-8 shadow-lg shadow-brand-orange/20"
+              className="hover:bg-brand-orange-dark bg-brand-orange px-8 font-bold text-white shadow-lg shadow-brand-orange/20"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
                 </>
+              ) : plan ? (
+                "Update Plan"
               ) : (
-                plan ? "Update Plan" : "Create Plan"
+                "Create Plan"
               )}
             </Button>
           </DialogFooter>

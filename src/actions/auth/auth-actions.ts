@@ -17,8 +17,8 @@ export async function getUserProfile(userId: string) {
         member: true,
         trainer: true,
         receptionist: true,
-        worker: true
-      }
+        worker: true,
+      },
     });
     return { success: true, data: user };
   } catch (error: any) {
@@ -26,7 +26,7 @@ export async function getUserProfile(userId: string) {
   }
 }
 
-export async function updateUserProfile(userId: string, data: { name?: string, phone?: string }) {
+export async function updateUserProfile(userId: string, data: { name?: string; phone?: string }) {
   const session = await auth();
   if (!session?.user || (session.user.id !== userId && session.user.role !== "SUPER_ADMIN")) {
     return { success: false, error: "Unauthorized" };
@@ -34,7 +34,7 @@ export async function updateUserProfile(userId: string, data: { name?: string, p
   try {
     const user = await prisma.user.update({
       where: { id: userId },
-      data
+      data,
     });
     revalidatePath("/");
     return { success: true, data: user };

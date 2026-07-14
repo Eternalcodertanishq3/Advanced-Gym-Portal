@@ -3,15 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  Dumbbell,
-  Search,
-  ChevronLeft,
-  CheckCircle2,
-  Clock,
-  Zap,
-  Info
-} from "lucide-react";
+import { Dumbbell, Search, ChevronLeft, CheckCircle2, Clock, Zap, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getWorkoutTemplates } from "@/actions/member/workout-management-actions";
 import { assignWorkoutPlan } from "@/actions/admin/trainer-actions";
@@ -56,7 +48,7 @@ function AssignWorkoutContent() {
 
   const handleAssign = async (planId: string) => {
     if (!memberId) return;
-    
+
     setIsAssigning(planId);
     try {
       const res = await assignWorkoutPlan(memberId, planId);
@@ -73,26 +65,26 @@ function AssignWorkoutContent() {
     }
   };
 
-  const filteredTemplates = templates.filter(t => 
-    t.name.toLowerCase().includes(search.toLowerCase())
+  const filteredTemplates = templates.filter((t) =>
+    t.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-12">
+    <div className="mx-auto max-w-5xl space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col gap-4">
-        <button 
+        <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-txt-tertiary hover:text-foreground transition-colors w-fit"
+          className="flex w-fit items-center gap-2 text-txt-tertiary transition-colors hover:text-foreground"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="h-4 w-4" />
           <span>Back to Members</span>
         </button>
         <div>
           <h1 className="font-display text-3xl font-bold text-foreground">
             Assign <span className="text-brand-orange">Workout Plan</span>
           </h1>
-          <p className="text-sm text-txt-secondary mt-1">
+          <p className="mt-1 text-sm text-txt-secondary">
             Choose a template to assign to your client.
           </p>
         </div>
@@ -101,24 +93,24 @@ function AssignWorkoutContent() {
       {/* Search */}
       <div className="surface-card p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-txt-tertiary" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-txt-tertiary" />
           <Input
             placeholder="Search templates..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-surface-sunken border-border h-11"
+            className="h-11 border-border bg-surface-sunken pl-9"
           />
         </div>
       </div>
 
       {/* Templates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-48 w-full rounded-2xl" />
           ))
         ) : filteredTemplates.length === 0 ? (
-          <div className="col-span-full py-12 text-center surface-card">
+          <div className="surface-card col-span-full py-12 text-center">
             <p className="text-txt-secondary">No templates found.</p>
           </div>
         ) : (
@@ -127,43 +119,47 @@ function AssignWorkoutContent() {
               key={template.id}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="surface-card p-6 flex flex-col justify-between hover:border-brand-orange/30 transition-all group"
+              className="surface-card group flex flex-col justify-between p-6 transition-all hover:border-brand-orange/30"
             >
               <div>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-brand-orange-soft flex items-center justify-center text-brand-orange group-hover:bg-brand-orange group-hover:text-white transition-all">
-                    <Dumbbell className="w-6 h-6" />
+                <div className="mb-4 flex items-start justify-between">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-soft text-brand-orange transition-all group-hover:bg-brand-orange group-hover:text-white">
+                    <Dumbbell className="h-6 w-6" />
                   </div>
-                  <Badge variant="outline" className="bg-surface-elevated text-txt-tertiary uppercase text-[10px] font-bold tracking-widest">
+                  <Badge
+                    variant="outline"
+                    className="bg-surface-elevated text-[10px] font-bold uppercase tracking-widest text-txt-tertiary"
+                  >
                     {template.difficulty || "ALL LEVELS"}
                   </Badge>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-brand-orange transition-colors">
+                <h3 className="mb-2 text-xl font-bold text-foreground transition-colors group-hover:text-brand-orange">
                   {template.name}
                 </h3>
-                <p className="text-sm text-txt-secondary line-clamp-2 mb-4">
-                  {template.description || "A professional workout routine designed for optimal results."}
+                <p className="mb-4 line-clamp-2 text-sm text-txt-secondary">
+                  {template.description ||
+                    "A professional workout routine designed for optimal results."}
                 </p>
-                <div className="flex items-center gap-4 mb-6">
+                <div className="mb-6 flex items-center gap-4">
                   <span className="flex items-center gap-1.5 text-xs font-bold text-txt-tertiary">
-                    <Clock className="w-3.5 h-3.5" />
+                    <Clock className="h-3.5 w-3.5" />
                     {template.estimatedDuration || "45"} MIN
                   </span>
                   <span className="flex items-center gap-1.5 text-xs font-bold text-txt-tertiary">
-                    <Zap className="w-3.5 h-3.5" />
+                    <Zap className="h-3.5 w-3.5" />
                     {template.exercises?.length || 0} EXERCISES
                   </span>
                 </div>
               </div>
 
-              <Button 
+              <Button
                 onClick={() => handleAssign(template.id)}
                 disabled={isAssigning !== null}
                 className={cn(
-                  "w-full h-11 rounded-xl font-bold transition-all",
-                  isAssigning === template.id 
-                    ? "bg-brand-orange/50 cursor-not-allowed" 
-                    : "bg-brand-navy hover:bg-brand-orange text-white shadow-sm"
+                  "h-11 w-full rounded-xl font-bold transition-all",
+                  isAssigning === template.id
+                    ? "cursor-not-allowed bg-brand-orange/50"
+                    : "bg-brand-navy text-white shadow-sm hover:bg-brand-orange",
                 )}
               >
                 {isAssigning === template.id ? "Assigning..." : "Assign to Member"}
@@ -174,10 +170,11 @@ function AssignWorkoutContent() {
       </div>
 
       {/* Info Card */}
-      <div className="p-4 rounded-xl bg-info-soft border border-info/20 flex gap-3">
-        <Info className="w-5 h-5 text-info shrink-0 mt-0.5" />
-        <p className="text-sm text-info/80 font-medium">
-          Assigning a template will update the member's current active plan. You can further customize the exercises in the member's profile after assignment.
+      <div className="flex gap-3 rounded-xl border border-info/20 bg-info-soft p-4">
+        <Info className="mt-0.5 h-5 w-5 shrink-0 text-info" />
+        <p className="text-sm font-medium text-info/80">
+          Assigning a template will update the member's current active plan. You can further
+          customize the exercises in the member's profile after assignment.
         </p>
       </div>
     </div>
@@ -191,4 +188,3 @@ export default function AssignWorkoutPage() {
     </Suspense>
   );
 }
-

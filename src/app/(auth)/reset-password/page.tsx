@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password.length < 8) {
       toast.error("Password must be at least 8 characters long");
       return;
@@ -50,26 +50,26 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
       {/* Premium Background Pattern (Consistent with Login) */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
+        <div className="bg-mesh-gradient absolute inset-0 opacity-30 dark:opacity-20" />
+        <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
       </div>
 
       <div className="relative z-10 w-full max-w-[440px] px-6">
         {/* Brand Identity */}
         <motion.div
-          className="text-center mb-6"
+          className="mb-6 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20 mb-3">
-            <Dumbbell className="w-7 h-7" />
+          <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange text-white shadow-lg shadow-brand-orange/20">
+            <Dumbbell className="h-7 w-7" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground uppercase">
+          <h1 className="text-2xl font-bold uppercase tracking-tight text-foreground">
             EAGLE <span className="text-brand-orange">GYM</span>
           </h1>
         </motion.div>
@@ -80,23 +80,29 @@ export default function ResetPasswordPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-brand-orange/10 flex items-center justify-center mx-auto mb-4 border border-brand-orange/20">
-              <ShieldCheck className="w-8 h-8 text-brand-orange" />
+          <div className="mb-8 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-orange/20 bg-brand-orange/10">
+              <ShieldCheck className="h-8 w-8 text-brand-orange" />
             </div>
             <h2 className="text-xl font-bold text-foreground">Secure Your Account</h2>
-            <p className="text-txt-tertiary text-xs mt-1">You are using a temporary password. Please set a new permanent password.</p>
+            <p className="mt-1 text-xs text-txt-tertiary">
+              You are using a temporary password. Please set a new permanent password.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="password" crude-label="true" className="label-text">New Password</label>
+                <label htmlFor="password" crude-label="true" className="label-text">
+                  New Password
+                </label>
                 <div className="relative">
-                  <Lock className={cn(
-                    "absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors z-10",
-                    focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary"
-                  )} />
+                  <Lock
+                    className={cn(
+                      "absolute left-4 top-1/2 z-10 h-4.5 w-4.5 -translate-y-1/2 transition-colors",
+                      focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary",
+                    )}
+                  />
                   <input
                     id="password"
                     type="password"
@@ -111,12 +117,18 @@ export default function ResetPasswordPage() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="confirmPassword" crude-label="true" className="label-text">Confirm Password</label>
+                <label htmlFor="confirmPassword" crude-label="true" className="label-text">
+                  Confirm Password
+                </label>
                 <div className="relative">
-                  <ShieldCheck className={cn(
-                    "absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors z-10",
-                    focusedField === "confirmPassword" ? "text-brand-orange" : "text-txt-tertiary"
-                  )} />
+                  <ShieldCheck
+                    className={cn(
+                      "absolute left-4 top-1/2 z-10 h-4.5 w-4.5 -translate-y-1/2 transition-colors",
+                      focusedField === "confirmPassword"
+                        ? "text-brand-orange"
+                        : "text-txt-tertiary",
+                    )}
+                  />
                   <input
                     id="confirmPassword"
                     type="password"
@@ -132,31 +144,32 @@ export default function ResetPasswordPage() {
               </div>
             </div>
 
-            <div className="bg-brand-orange/5 border border-brand-orange/10 rounded-xl p-4 flex gap-3">
-              <AlertTriangle className="w-5 h-5 text-brand-orange shrink-0" />
+            <div className="flex gap-3 rounded-xl border border-brand-orange/10 bg-brand-orange/5 p-4">
+              <AlertTriangle className="h-5 w-5 shrink-0 text-brand-orange" />
               <p className="text-[10px] leading-relaxed text-txt-secondary">
-                For your security, choose a password that you haven't used before and include a mix of letters, numbers, and symbols.
+                For your security, choose a password that you haven't used before and include a mix
+                of letters, numbers, and symbols.
               </p>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-primary w-full h-12 text-sm font-bold shadow-brand-glow group"
+              className="btn-primary group h-12 w-full text-sm font-bold shadow-brand-glow"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               ) : (
                 <>
                   Update Password
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </button>
           </form>
         </motion.div>
-        
-        <p className="text-center mt-8 text-[10px] text-txt-tertiary uppercase tracking-widest font-bold">
+
+        <p className="mt-8 text-center text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
           Eagle Gym Management System v2.0
         </p>
       </div>

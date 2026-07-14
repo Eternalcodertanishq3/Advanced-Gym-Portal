@@ -6,18 +6,18 @@ import { getTenantDetails } from "@/lib/tenant";
 
 export function formatCurrency(
   amount: number | string | null | undefined,
-  options: { showSymbol?: boolean; decimals?: number; currency?: string; locale?: string } = {}
+  options: { showSymbol?: boolean; decimals?: number; currency?: string; locale?: string } = {},
 ): string {
   // Dynamically resolve tenant settings from active headers
   const tenant = getTenantDetails();
-  
-  const { 
-    showSymbol = true, 
-    decimals = 2, 
+
+  const {
+    showSymbol = true,
+    decimals = 2,
     currency = tenant.currency,
-    locale = tenant.locale 
+    locale = tenant.locale,
   } = options;
-  
+
   if (amount === null || amount === undefined || amount === "") {
     if (!showSymbol) return "0.00";
     try {
@@ -31,7 +31,7 @@ export function formatCurrency(
       return `0.00`;
     }
   }
-  
+
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(num)) {
     if (!showSymbol) return "0.00";
@@ -77,11 +77,11 @@ export function parseCurrency(amountStr: string): number {
 export function formatNumber(
   num: number | string | null | undefined,
   decimals: number = 0,
-  options: { locale?: string } = {}
+  options: { locale?: string } = {},
 ): string {
   const tenant = getTenantDetails();
   const { locale = tenant.locale } = options;
-  
+
   if (num === null || num === undefined || num === "") return "0";
   const number = typeof num === "string" ? parseFloat(num) : num;
   if (isNaN(number)) return "0";

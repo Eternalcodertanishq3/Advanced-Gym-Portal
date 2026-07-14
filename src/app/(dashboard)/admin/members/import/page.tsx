@@ -18,9 +18,7 @@ export default async function MemberImportPage() {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
         <h1 className="text-2xl font-bold text-rose-500">No Branch Assigned</h1>
-        <p className="text-muted-foreground">
-          You must be assigned to a branch to import members.
-        </p>
+        <p className="text-muted-foreground">You must be assigned to a branch to import members.</p>
       </div>
     );
   }
@@ -29,7 +27,7 @@ export default async function MemberImportPage() {
   if (isSuperAdmin) {
     const res = await prisma.branch.findMany({
       where: { status: "ACTIVE" },
-      select: { id: true, name: true }
+      select: { id: true, name: true },
     });
     branches = res;
   }

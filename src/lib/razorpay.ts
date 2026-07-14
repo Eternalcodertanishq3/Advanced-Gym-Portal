@@ -8,7 +8,9 @@ const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
 if (!keyId || !keySecret) {
-  console.warn("WARNING: RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not set in environment variables.");
+  console.warn(
+    "WARNING: RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not set in environment variables.",
+  );
 }
 
 export const razorpay = new Razorpay({

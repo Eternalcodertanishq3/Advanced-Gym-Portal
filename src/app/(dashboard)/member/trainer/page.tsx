@@ -2,17 +2,17 @@ import React from "react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Award, 
-  Star, 
-  Calendar, 
+import {
+  User,
+  Mail,
+  Phone,
+  Award,
+  Star,
+  Calendar,
   MessageSquare,
   Instagram,
   Twitter,
-  Linkedin
+  Linkedin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -31,10 +31,12 @@ export default async function TrainerPage() {
     include: {
       trainer: {
         include: {
-          user: { select: { firstName: true, lastName: true, avatar: true, email: true, phone: true } }
-        }
-      }
-    }
+          user: {
+            select: { firstName: true, lastName: true, avatar: true, email: true, phone: true },
+          },
+        },
+      },
+    },
   });
 
   if (!member) redirect("/member");
@@ -42,160 +44,188 @@ export default async function TrainerPage() {
   const trainer = member.trainer;
 
   return (
-    <div className="w-full h-full p-6 space-y-8">
+    <div className="h-full w-full space-y-8 p-6">
       <div>
-        <h1 className="text-3xl font-display font-bold text-foreground mb-1">
+        <h1 className="mb-1 font-display text-3xl font-bold text-foreground">
           My <span className="text-brand-orange">Trainer</span>
         </h1>
-        <p className="text-sm text-txt-secondary font-medium">Your dedicated partner in achieving your fitness goals.</p>
+        <p className="text-sm font-medium text-txt-secondary">
+          Your dedicated partner in achieving your fitness goals.
+        </p>
       </div>
 
       {!trainer ? (
-        <div className="py-20 text-center surface-card border-dashed border-2">
-          <div className="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center mx-auto mb-4">
-            <User className="w-8 h-8 text-txt-tertiary" />
+        <div className="surface-card border-2 border-dashed py-20 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-elevated">
+            <User className="h-8 w-8 text-txt-tertiary" />
           </div>
-          <h3 className="text-xl font-bold text-foreground mb-2">No Trainer Assigned</h3>
-          <p className="text-sm text-txt-tertiary max-w-[300px] mx-auto mb-8">
+          <h3 className="mb-2 text-xl font-bold text-foreground">No Trainer Assigned</h3>
+          <p className="mx-auto mb-8 max-w-[300px] text-sm text-txt-tertiary">
             Upgrade to a Personal Training plan to get assigned a dedicated coach.
           </p>
-          <Button className="bg-brand-orange hover:bg-brand-orange-dark">Explore Plans</Button>
+          <Button className="hover:bg-brand-orange-dark bg-brand-orange">Explore Plans</Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Trainer Profile Card */}
-          <div className="lg:col-span-1 space-y-6">
-            <div className="surface-card p-8 text-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-brand-orange/20 to-transparent" />
-              
+          <div className="space-y-6 lg:col-span-1">
+            <div className="surface-card relative overflow-hidden p-8 text-center">
+              <div className="absolute left-0 top-0 h-24 w-full bg-gradient-to-br from-brand-orange/20 to-transparent" />
+
               <div className="relative z-10">
-                <div className="w-24 h-24 rounded-3xl bg-surface-elevated mx-auto mb-6 p-1 border-2 border-brand-orange/30">
-                  <div className="w-full h-full rounded-[1.25rem] bg-brand-navy flex items-center justify-center text-3xl font-display font-bold text-white overflow-hidden">
+                <div className="mx-auto mb-6 h-24 w-24 rounded-3xl border-2 border-brand-orange/30 bg-surface-elevated p-1">
+                  <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[1.25rem] bg-brand-navy font-display text-3xl font-bold text-white">
                     {trainer.user.avatar ? (
-                      <img src={trainer.user.avatar} alt={trainer.user.firstName} className="w-full h-full object-cover" />
+                      <img
+                        src={trainer.user.avatar}
+                        alt={trainer.user.firstName}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       `${trainer.user.firstName?.[0]}${trainer.user.lastName?.[0]}`
                     )}
                   </div>
                 </div>
-                
-                <h2 className="text-2xl font-display font-bold text-foreground mb-1">
+
+                <h2 className="mb-1 font-display text-2xl font-bold text-foreground">
                   {trainer.user.firstName} {trainer.user.lastName}
                 </h2>
-                <p className="text-sm font-bold text-brand-orange uppercase tracking-widest mb-6">
+                <p className="mb-6 text-sm font-bold uppercase tracking-widest text-brand-orange">
                   Certified Professional Trainer
                 </p>
 
-                <div className="flex items-center justify-center gap-4 mb-8">
+                <div className="mb-8 flex items-center justify-center gap-4">
                   <div className="text-center">
                     <p className="text-lg font-bold text-foreground">{trainer.rating || "4.9"}</p>
-                    <p className="text-[10px] font-bold text-txt-tertiary uppercase">Rating</p>
+                    <p className="text-[10px] font-bold uppercase text-txt-tertiary">Rating</p>
                   </div>
-                  <div className="w-px h-8 bg-border" />
+                  <div className="h-8 w-px bg-border" />
                   <div className="text-center">
-                    <p className="text-lg font-bold text-foreground">{trainer.experience || "5"}+</p>
-                    <p className="text-[10px] font-bold text-txt-tertiary uppercase">Exp (Yrs)</p>
+                    <p className="text-lg font-bold text-foreground">
+                      {trainer.experience || "5"}+
+                    </p>
+                    <p className="text-[10px] font-bold uppercase text-txt-tertiary">Exp (Yrs)</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <Button variant="outline" className="w-full gap-2 rounded-xl border-border/50">
-                    <MessageSquare className="w-4 h-4" /> Message
+                    <MessageSquare className="h-4 w-4" /> Message
                   </Button>
-                  <Button className="w-full gap-2 rounded-xl bg-brand-orange hover:bg-brand-orange-dark">
-                    <Calendar className="w-4 h-4" /> Book
+                  <Button className="hover:bg-brand-orange-dark w-full gap-2 rounded-xl bg-brand-orange">
+                    <Calendar className="h-4 w-4" /> Book
                   </Button>
                 </div>
               </div>
             </div>
 
             {/* Contact Info */}
-            <div className="surface-card p-6 space-y-4">
-              <h4 className="text-xs font-bold text-txt-tertiary uppercase tracking-widest mb-4">Contact Information</h4>
+            <div className="surface-card space-y-4 p-6">
+              <h4 className="mb-4 text-xs font-bold uppercase tracking-widest text-txt-tertiary">
+                Contact Information
+              </h4>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-surface-sunken flex items-center justify-center shrink-0">
-                  <Mail className="w-4 h-4 text-brand-orange" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-sunken">
+                  <Mail className="h-4 w-4 text-brand-orange" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs text-txt-tertiary font-medium">Email Address</p>
-                  <p className="text-sm font-bold text-foreground truncate">{trainer.user.email}</p>
+                  <p className="text-xs font-medium text-txt-tertiary">Email Address</p>
+                  <p className="truncate text-sm font-bold text-foreground">{trainer.user.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-surface-sunken flex items-center justify-center shrink-0">
-                  <Phone className="w-4 h-4 text-success" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-sunken">
+                  <Phone className="h-4 w-4 text-success" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs text-txt-tertiary font-medium">Phone Number</p>
-                  <p className="text-sm font-bold text-foreground truncate">{trainer.user.phone || "+91 98765 43210"}</p>
+                  <p className="text-xs font-medium text-txt-tertiary">Phone Number</p>
+                  <p className="truncate text-sm font-bold text-foreground">
+                    {trainer.user.phone || "+91 98765 43210"}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Social Links */}
             <div className="flex items-center justify-center gap-4 py-2">
-              <a href="#" className="w-10 h-10 rounded-xl bg-surface-card border border-border/50 flex items-center justify-center text-txt-tertiary hover:text-brand-orange hover:border-brand-orange/30 transition-all">
-                <Instagram className="w-5 h-5" />
+              <a
+                href="#"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-surface-card text-txt-tertiary transition-all hover:border-brand-orange/30 hover:text-brand-orange"
+              >
+                <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-surface-card border border-border/50 flex items-center justify-center text-txt-tertiary hover:text-info hover:border-info/30 transition-all">
-                <Twitter className="w-5 h-5" />
+              <a
+                href="#"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-surface-card text-txt-tertiary transition-all hover:border-info/30 hover:text-info"
+              >
+                <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-surface-card border border-border/50 flex items-center justify-center text-txt-tertiary hover:text-navy hover:border-navy/30 transition-all">
-                <Linkedin className="w-5 h-5" />
+              <a
+                href="#"
+                className="hover:text-navy hover:border-navy/30 flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-surface-card text-txt-tertiary transition-all"
+              >
+                <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
 
           {/* Details & Specializations */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8 lg:col-span-2">
             <div className="surface-card p-8">
-              <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-3">
-                <Award className="w-6 h-6 text-brand-orange" />
+              <h3 className="mb-6 flex items-center gap-3 text-xl font-bold text-foreground">
+                <Award className="h-6 w-6 text-brand-orange" />
                 About & Specializations
               </h3>
-              <p className="text-txt-secondary leading-relaxed mb-8">
-                {trainer.bio || "Your trainer is a dedicated fitness professional committed to helping you achieve your physical potential through science-based training and personalized nutrition guidance."}
+              <p className="mb-8 leading-relaxed text-txt-secondary">
+                {trainer.bio ||
+                  "Your trainer is a dedicated fitness professional committed to helping you achieve your physical potential through science-based training and personalized nutrition guidance."}
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {trainer.specialization?.length > 0 ? (
-                  trainer.specialization.map((spec: string, i: number) => (
-                    <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-surface-sunken border border-border/50">
-                      <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-                        <Star className="w-4 h-4 text-brand-orange" />
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {trainer.specialization?.length > 0
+                  ? trainer.specialization.map((spec: string, i: number) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 rounded-2xl border border-border/50 bg-surface-sunken p-4"
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-orange/10">
+                          <Star className="h-4 w-4 text-brand-orange" />
+                        </div>
+                        <span className="text-sm font-bold text-foreground">{spec}</span>
                       </div>
-                      <span className="text-sm font-bold text-foreground">{spec}</span>
-                    </div>
-                  ))
-                ) : (
-                  ["Weight Loss", "Muscle Gain", "Body Transformation", "HIIT Training"].map((spec, i) => (
-                    <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-surface-sunken border border-border/50">
-                      <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-                        <Star className="w-4 h-4 text-brand-orange" />
-                      </div>
-                      <span className="text-sm font-bold text-foreground">{spec}</span>
-                    </div>
-                  ))
-                )}
+                    ))
+                  : ["Weight Loss", "Muscle Gain", "Body Transformation", "HIIT Training"].map(
+                      (spec, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 rounded-2xl border border-border/50 bg-surface-sunken p-4"
+                        >
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-orange/10">
+                            <Star className="h-4 w-4 text-brand-orange" />
+                          </div>
+                          <span className="text-sm font-bold text-foreground">{spec}</span>
+                        </div>
+                      ),
+                    )}
               </div>
             </div>
 
             <div className="surface-card p-8">
-              <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-3">
-                <Calendar className="w-6 h-6 text-success" />
+              <h3 className="mb-6 flex items-center gap-3 text-xl font-bold text-foreground">
+                <Calendar className="h-6 w-6 text-success" />
                 Weekly Availability
               </h3>
               <div className="flex flex-wrap gap-3">
                 {["MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => {
                   const isAvailable = trainer.availableDays?.includes(day);
                   return (
-                    <div 
+                    <div
                       key={day}
                       className={cn(
-                        "px-4 py-3 rounded-xl border font-bold text-xs transition-all",
-                        isAvailable 
-                          ? "bg-success-soft text-success border-success/30" 
-                          : "bg-surface-sunken text-txt-tertiary border-border/50"
+                        "rounded-xl border px-4 py-3 text-xs font-bold transition-all",
+                        isAvailable
+                          ? "border-success/30 bg-success-soft text-success"
+                          : "border-border/50 bg-surface-sunken text-txt-tertiary",
                       )}
                     >
                       {day}
@@ -203,9 +233,9 @@ export default async function TrainerPage() {
                   );
                 })}
               </div>
-              <p className="text-xs text-txt-tertiary mt-6 font-medium italic">
-                * Regular hours: {trainer.availableFrom || "06:00"} to {trainer.availableTo || "22:00"}. 
-                Contact trainer for specific session requests.
+              <p className="mt-6 text-xs font-medium italic text-txt-tertiary">
+                * Regular hours: {trainer.availableFrom || "06:00"} to{" "}
+                {trainer.availableTo || "22:00"}. Contact trainer for specific session requests.
               </p>
             </div>
           </div>

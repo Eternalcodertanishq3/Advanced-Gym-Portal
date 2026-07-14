@@ -15,7 +15,7 @@ export default async function SupplementsPage() {
   if (!session?.user) redirect("/login");
 
   const member = await prisma.member.findUnique({
-    where: { userId: session.user.id }
+    where: { userId: session.user.id },
   });
 
   if (!member) redirect("/member");
@@ -24,87 +24,110 @@ export default async function SupplementsPage() {
   const userSales = await prisma.sale.findMany({
     where: { customerId: member.id },
     include: { items: { include: { product: true } } },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: "desc" },
   });
 
-  const boughtSupplements = Array.from(new Set(
-    userSales.flatMap(sale => 
-      sale.items
-        .filter(item => item.product.category === "SUPPLEMENT")
-        .map(item => item.product)
-    )
-  ));
+  const boughtSupplements = Array.from(
+    new Set(
+      userSales.flatMap((sale) =>
+        sale.items
+          .filter((item) => item.product.category === "SUPPLEMENT")
+          .map((item) => item.product),
+      ),
+    ),
+  );
 
-  const activeStack = boughtSupplements.length > 0 ? boughtSupplements.map(product => ({
-    id: product.id,
-    name: product.name,
-    dosage: "Per Label",
-    time: "Daily",
-    purpose: product.description || "Health & Recovery",
-    status: "In Use",
-    icon: <Zap className="w-5 h-5 text-brand-orange" />
-  })) : [];
+  const activeStack =
+    boughtSupplements.length > 0
+      ? boughtSupplements.map((product) => ({
+          id: product.id,
+          name: product.name,
+          dosage: "Per Label",
+          time: "Daily",
+          purpose: product.description || "Health & Recovery",
+          status: "In Use",
+          icon: <Zap className="h-5 w-5 text-brand-orange" />,
+        }))
+      : [];
 
   return (
-    <div className="w-full h-full p-6 space-y-10 max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="mx-auto h-full w-full max-w-5xl space-y-10 p-6">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground mb-1">
+          <h1 className="mb-1 font-display text-3xl font-bold text-foreground">
             Supplement <span className="text-brand-orange">Stack</span>
           </h1>
-          <p className="text-sm text-txt-secondary font-medium">Optimize your recovery and performance with a smart supplement routine.</p>
+          <p className="text-sm font-medium text-txt-secondary">
+            Optimize your recovery and performance with a smart supplement routine.
+          </p>
         </div>
-        <Button className="bg-brand-orange hover:bg-brand-orange-dark font-bold gap-2 px-6">
-          <Pill className="w-4 h-4" />
+        <Button className="hover:bg-brand-orange-dark gap-2 bg-brand-orange px-6 font-bold">
+          <Pill className="h-4 w-4" />
           Add Supplement
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Daily Stack */}
-        <div className="lg:col-span-2 space-y-6">
-          <h3 className="text-xl font-bold text-foreground flex items-center gap-3">
-            <Clock className="w-6 h-6 text-brand-orange" />
+        <div className="space-y-6 lg:col-span-2">
+          <h3 className="flex items-center gap-3 text-xl font-bold text-foreground">
+            <Clock className="h-6 w-6 text-brand-orange" />
             Daily Routine
           </h3>
           <div className="space-y-4">
             {activeStack.length === 0 ? (
-              <div className="py-20 text-center surface-card border-dashed border-2">
-                <div className="w-16 h-16 rounded-full bg-surface-sunken flex items-center justify-center mx-auto mb-4">
-                  <Pill className="w-8 h-8 text-txt-tertiary" />
+              <div className="surface-card border-2 border-dashed py-20 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-sunken">
+                  <Pill className="h-8 w-8 text-txt-tertiary" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Stack is Empty</h3>
-                <p className="text-sm text-txt-tertiary max-w-[300px] mx-auto mb-8">
-                  You haven't added any supplements to your routine yet. Visit the store to get started.
+                <h3 className="mb-2 text-xl font-bold text-foreground">Stack is Empty</h3>
+                <p className="mx-auto mb-8 max-w-[300px] text-sm text-txt-tertiary">
+                  You haven't added any supplements to your routine yet. Visit the store to get
+                  started.
                 </p>
-                <Button variant="outline" className="border-border/50">Browse Recommendations</Button>
+                <Button variant="outline" className="border-border/50">
+                  Browse Recommendations
+                </Button>
               </div>
             ) : (
               activeStack.map((sup) => (
-                <div key={sup.id} className="surface-card p-5 group hover:border-brand-orange/30 transition-all flex items-center justify-between">
+                <div
+                  key={sup.id}
+                  className="surface-card group flex items-center justify-between p-5 transition-all hover:border-brand-orange/30"
+                >
                   <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 rounded-xl bg-surface-sunken flex items-center justify-center border border-border/50">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border/50 bg-surface-sunken">
                       {sup.icon}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-foreground group-hover:text-brand-orange transition-colors">{sup.name}</h4>
-                        <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${
-                          sup.status === "Taken" ? "bg-success-soft text-success" : "bg-surface-elevated text-txt-tertiary"
-                        }`}>
+                        <h4 className="font-bold text-foreground transition-colors group-hover:text-brand-orange">
+                          {sup.name}
+                        </h4>
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-[8px] font-black uppercase ${
+                            sup.status === "Taken"
+                              ? "bg-success-soft text-success"
+                              : "bg-surface-elevated text-txt-tertiary"
+                          }`}
+                        >
                           {sup.status}
                         </span>
                       </div>
-                      <p className="text-xs text-txt-tertiary font-medium">{sup.dosage} • {sup.time}</p>
+                      <p className="text-xs font-medium text-txt-tertiary">
+                        {sup.dosage} • {sup.time}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest hidden sm:block truncate max-w-[150px]">{sup.purpose}</span>
-                    <button 
+                    <span className="hidden max-w-[150px] truncate text-[10px] font-bold uppercase tracking-widest text-txt-tertiary sm:block">
+                      {sup.purpose}
+                    </span>
+                    <button
                       aria-label={`View details for ${sup.name}`}
-                      className="p-2 rounded-lg bg-surface-elevated text-txt-tertiary hover:text-brand-orange"
+                      className="rounded-lg bg-surface-elevated p-2 text-txt-tertiary hover:text-brand-orange"
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -115,34 +138,40 @@ export default async function SupplementsPage() {
 
         {/* Shop Supplements */}
         <div className="space-y-6">
-          <h3 className="text-xl font-bold text-foreground flex items-center gap-3">
-            <ShoppingCart className="w-6 h-6 text-brand-orange" />
+          <h3 className="flex items-center gap-3 text-xl font-bold text-foreground">
+            <ShoppingCart className="h-6 w-6 text-brand-orange" />
             Gym Store
           </h3>
-          <div className="surface-card p-6 bg-brand-navy border-none relative overflow-hidden group cursor-pointer">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+          <div className="surface-card group relative cursor-pointer overflow-hidden border-none bg-brand-navy p-6">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
             <div className="relative z-10">
-              <h4 className="text-lg font-display font-bold text-white mb-2">Refill Your Stack</h4>
-              <p className="text-sm text-white/60 mb-6">Get 10% member discount on all premium supplements at the Eagle Gym Store.</p>
-              <Button className="w-full bg-brand-orange hover:bg-brand-orange-dark border-none shadow-lg shadow-brand-orange/20">
+              <h4 className="mb-2 font-display text-lg font-bold text-white">Refill Your Stack</h4>
+              <p className="mb-6 text-sm text-white/60">
+                Get 10% member discount on all premium supplements at the Eagle Gym Store.
+              </p>
+              <Button className="hover:bg-brand-orange-dark w-full border-none bg-brand-orange shadow-lg shadow-brand-orange/20">
                 Browse Shop
               </Button>
             </div>
           </div>
 
-          <div className="surface-card p-6 space-y-4">
-            <h4 className="text-xs font-bold text-txt-tertiary uppercase tracking-widest">Stack Insights</h4>
+          <div className="surface-card space-y-4 p-6">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-txt-tertiary">
+              Stack Insights
+            </h4>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-txt-secondary">Consistency</span>
-                <span className={`font-bold ${activeStack.length > 0 ? "text-success" : "text-txt-tertiary"}`}>
+                <span
+                  className={`font-bold ${activeStack.length > 0 ? "text-success" : "text-txt-tertiary"}`}
+                >
                   {activeStack.length > 0 ? "92%" : "N/A"}
                 </span>
               </div>
-              <div className="h-1.5 w-full bg-surface-sunken rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${activeStack.length > 0 ? "bg-success" : "bg-surface-elevated"} transition-all duration-1000`} 
-                  style={{ width: activeStack.length > 0 ? "92%" : "0%" }} 
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-sunken">
+                <div
+                  className={`h-full ${activeStack.length > 0 ? "bg-success" : "bg-surface-elevated"} transition-all duration-1000`}
+                  style={{ width: activeStack.length > 0 ? "92%" : "0%" }}
                 />
               </div>
             </div>

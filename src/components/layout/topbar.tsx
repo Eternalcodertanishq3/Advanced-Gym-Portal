@@ -86,45 +86,49 @@ export function Topbar({ user }: TopbarProps) {
 
   return (
     <>
-      <header 
+      <header
         className={cn(
-          "fixed top-0 right-0 left-0 z-[100] h-16 bg-white/70 dark:bg-[#1A1D27]/40 backdrop-blur-xl border-b border-white/40 dark:border-white/[0.08] shadow-sm transition-[left] duration-300 ease-in-out",
-          mounted && collapsed ? "lg:left-20" : "lg:left-[260px]"
+          "fixed left-0 right-0 top-0 z-[100] h-16 border-b border-white/40 bg-white/70 shadow-sm backdrop-blur-xl transition-[left] duration-300 ease-in-out dark:border-white/[0.08] dark:bg-[#1A1D27]/40",
+          mounted && collapsed ? "lg:left-20" : "lg:left-[260px]",
         )}
       >
-        <div className="h-full px-4 lg:px-8 flex items-center justify-between gap-4">
-          
+        <div className="flex h-full items-center justify-between gap-4 px-4 lg:px-8">
           {/* Left: Greeting & Mobile Toggle */}
           <div className="flex items-center gap-3">
-            <button 
+            <button
               aria-label="Toggle Menu"
-              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-surface-elevated text-txt-secondary transition-colors"
+              className="-ml-2 rounded-lg p-2 text-txt-secondary transition-colors hover:bg-surface-elevated lg:hidden"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="h-5 w-5" />
             </button>
             <div className="hidden md:block">
-              <p className="text-sm text-txt-secondary font-medium">
-                {greeting}, <span className="text-brand-orange font-bold">{user.firstName || "Admin"}</span>
+              <p className="text-sm font-medium text-txt-secondary">
+                {greeting},{" "}
+                <span className="font-bold text-brand-orange">{user.firstName || "Admin"}</span>
               </p>
               <p className="text-xs text-txt-tertiary">{currentDate}</p>
             </div>
           </div>
 
           {/* Center: Global Search */}
-          <div className="flex-1 max-w-[380px] hidden sm:block">
-            <div className="relative group">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-txt-tertiary group-focus-within:text-brand-orange transition-colors" />
+          <div className="hidden max-w-[380px] flex-1 sm:block">
+            <div className="group relative">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-txt-tertiary transition-colors group-focus-within:text-brand-orange" />
               <input
                 type="text"
                 placeholder="Search anything..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setSearchOpen(true)}
-                className="w-full h-10 pl-10 pr-4 bg-surface-sunken border border-surface-border-hover focus:border-brand-orange/50 focus:bg-surface-card focus:ring-2 focus:ring-brand-orange/15 rounded-full text-sm transition-all outline-none text-foreground placeholder:text-txt-tertiary"
+                className="h-10 w-full rounded-full border border-surface-border-hover bg-surface-sunken pl-10 pr-4 text-sm text-foreground outline-none transition-all placeholder:text-txt-tertiary focus:border-brand-orange/50 focus:bg-surface-card focus:ring-2 focus:ring-brand-orange/15"
               />
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-mono text-txt-tertiary opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="px-1.5 py-0.5 rounded bg-surface-elevated border border-surface-border shadow-sm">⌘</span>
-                <span className="px-1.5 py-0.5 rounded bg-surface-elevated border border-surface-border shadow-sm">K</span>
+              <div className="absolute right-3.5 top-1/2 flex -translate-y-1/2 items-center gap-1 font-mono text-[10px] text-txt-tertiary opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="rounded border border-surface-border bg-surface-elevated px-1.5 py-0.5 shadow-sm">
+                  ⌘
+                </span>
+                <span className="rounded border border-surface-border bg-surface-elevated px-1.5 py-0.5 shadow-sm">
+                  K
+                </span>
               </div>
 
               {/* Search Dropdown */}
@@ -134,7 +138,7 @@ export function Topbar({ user }: TopbarProps) {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 right-0 mt-2 surface-card rounded-xl overflow-hidden shadow-card-hover"
+                    className="surface-card absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-xl shadow-card-hover"
                   >
                     {searchSuggestions.length > 0 ? (
                       <div className="p-2">
@@ -147,9 +151,9 @@ export function Topbar({ user }: TopbarProps) {
                               setSearchOpen(false);
                               setSearchQuery("");
                             }}
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-elevated text-txt-secondary hover:text-foreground transition-colors"
+                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-txt-secondary transition-colors hover:bg-surface-elevated hover:text-foreground"
                           >
-                            <item.icon className="w-4 h-4 text-brand-orange" />
+                            <item.icon className="h-4 w-4 text-brand-orange" />
                             <span className="text-sm font-medium">{item.label}</span>
                           </Link>
                         ))}
@@ -171,18 +175,18 @@ export function Topbar({ user }: TopbarProps) {
             <button
               aria-label="Search"
               title="Search"
-              className="sm:hidden p-2 rounded-full hover:bg-surface-elevated text-txt-secondary transition-colors"
+              className="rounded-full p-2 text-txt-secondary transition-colors hover:bg-surface-elevated sm:hidden"
             >
-              <Search className="w-5 h-5" />
+              <Search className="h-5 w-5" />
             </button>
 
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle Theme"
-              className="p-2 rounded-full hover:bg-surface-elevated text-txt-secondary hover:text-brand-orange transition-colors"
+              className="rounded-full p-2 text-txt-secondary transition-colors hover:bg-surface-elevated hover:text-brand-orange"
             >
-              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
             {/* Notifications */}
@@ -190,11 +194,11 @@ export function Topbar({ user }: TopbarProps) {
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
                 aria-label="View Notifications"
-                className="relative p-2 rounded-full hover:bg-surface-elevated text-txt-secondary hover:text-brand-orange transition-colors"
+                className="relative rounded-full p-2 text-txt-secondary transition-colors hover:bg-surface-elevated hover:text-brand-orange"
               >
-                <Bell className="w-5 h-5" />
+                <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-brand-orange border-2 border-surface-card" />
+                  <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-surface-card bg-brand-orange" />
                 )}
               </button>
 
@@ -207,9 +211,9 @@ export function Topbar({ user }: TopbarProps) {
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="absolute right-0 top-full mt-2 w-80 surface-card rounded-xl overflow-hidden z-50 shadow-card-hover"
+                      className="surface-card absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl shadow-card-hover"
                     >
-                      <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated/50">
+                      <div className="flex items-center justify-between border-b border-surface-border bg-surface-elevated/50 p-4">
                         <h3 className="text-sm font-bold text-foreground">Notifications</h3>
                         {unreadCount > 0 && (
                           <button
@@ -223,9 +227,11 @@ export function Topbar({ user }: TopbarProps) {
                       <div className="max-h-80 overflow-y-auto">
                         {notifications.length === 0 ? (
                           <div className="p-8 text-center">
-                            <Bell className="w-8 h-8 text-txt-tertiary mx-auto mb-3 opacity-50" />
-                            <p className="text-sm text-txt-secondary font-medium">You're all caught up!</p>
-                            <p className="text-xs text-txt-tertiary mt-1">No new notifications</p>
+                            <Bell className="mx-auto mb-3 h-8 w-8 text-txt-tertiary opacity-50" />
+                            <p className="text-sm font-medium text-txt-secondary">
+                              You're all caught up!
+                            </p>
+                            <p className="mt-1 text-xs text-txt-tertiary">No new notifications</p>
                           </div>
                         ) : (
                           notifications.slice(0, 10).map((notif) => (
@@ -233,20 +239,29 @@ export function Topbar({ user }: TopbarProps) {
                               key={notif.id}
                               onClick={() => markAsRead(notif.id)}
                               className={cn(
-                                "p-4 border-b border-surface-border cursor-pointer hover:bg-surface-elevated transition-colors",
-                                !notif.isRead && "bg-brand-orange-soft/30 dark:bg-brand-orange/5"
+                                "cursor-pointer border-b border-surface-border p-4 transition-colors hover:bg-surface-elevated",
+                                !notif.isRead && "bg-brand-orange-soft/30 dark:bg-brand-orange/5",
                               )}
                             >
                               <div className="flex gap-3">
                                 <div className="mt-0.5">
-                                  {!notif.isRead && <span className="block w-2 h-2 rounded-full bg-brand-orange" />}
+                                  {!notif.isRead && (
+                                    <span className="block h-2 w-2 rounded-full bg-brand-orange" />
+                                  )}
                                 </div>
                                 <div>
-                                  <p className={cn("text-sm text-foreground", !notif.isRead ? "font-semibold" : "font-medium")}>
+                                  <p
+                                    className={cn(
+                                      "text-sm text-foreground",
+                                      !notif.isRead ? "font-semibold" : "font-medium",
+                                    )}
+                                  >
                                     {notif.title}
                                   </p>
-                                  <p className="text-xs text-txt-secondary mt-1 line-clamp-2 leading-relaxed">{notif.body}</p>
-                                  <p className="text-[10px] text-txt-tertiary mt-2 font-medium">
+                                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-txt-secondary">
+                                    {notif.body}
+                                  </p>
+                                  <p className="mt-2 text-[10px] font-medium text-txt-tertiary">
                                     {formatDate(notif.createdAt, "dd MMM, hh:mm a")}
                                   </p>
                                 </div>
@@ -261,25 +276,25 @@ export function Topbar({ user }: TopbarProps) {
               </AnimatePresence>
             </div>
 
-            <div className="w-[1px] h-6 bg-surface-border mx-1 hidden sm:block" />
+            <div className="mx-1 hidden h-6 w-[1px] bg-surface-border sm:block" />
 
             {/* User Menu */}
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 aria-label="User Menu"
-                className="flex items-center gap-2 pl-2 pr-2 py-1.5 rounded-full hover:bg-surface-elevated transition-colors"
+                className="flex items-center gap-2 rounded-full py-1.5 pl-2 pr-2 transition-colors hover:bg-surface-elevated"
               >
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm",
-                    getRoleBadgeClass(user.role)
+                    "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm",
+                    getRoleBadgeClass(user.role),
                   )}
                 >
                   {(user.firstName?.[0] || user.name?.[0] || "A").toUpperCase()}
                   {(user.lastName?.[0] || user.name?.[1] || "").toUpperCase()}
                 </div>
-                <ChevronDown className="w-4 h-4 text-txt-tertiary hidden sm:block" />
+                <ChevronDown className="hidden h-4 w-4 text-txt-tertiary sm:block" />
               </button>
 
               {/* User Dropdown */}
@@ -291,38 +306,38 @@ export function Topbar({ user }: TopbarProps) {
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="absolute right-0 top-full mt-2 w-64 surface-card rounded-xl overflow-hidden z-50 shadow-card-hover"
+                      className="surface-card absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl shadow-card-hover"
                     >
-                      <div className="p-4 border-b border-surface-border bg-surface-elevated/50">
-                        <p className="text-sm font-bold text-foreground truncate">{user.name}</p>
-                        <p className="text-xs text-txt-secondary truncate mt-0.5">{user.email}</p>
-                        <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-surface-sunken text-txt-secondary border border-surface-border">
+                      <div className="border-b border-surface-border bg-surface-elevated/50 p-4">
+                        <p className="truncate text-sm font-bold text-foreground">{user.name}</p>
+                        <p className="mt-0.5 truncate text-xs text-txt-secondary">{user.email}</p>
+                        <div className="mt-2 inline-flex items-center rounded border border-surface-border bg-surface-sunken px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-txt-secondary">
                           {getRoleLabel(user.role)}
                         </div>
                       </div>
-                      <div className="p-2 space-y-0.5">
+                      <div className="space-y-0.5 p-2">
                         <Link
                           href={`/${user.role.toLowerCase().replace("_", "-")}/profile`}
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-elevated text-txt-secondary hover:text-foreground transition-colors"
+                          className="flex items-center gap-3 rounded-lg px-3 py-2 text-txt-secondary transition-colors hover:bg-surface-elevated hover:text-foreground"
                         >
-                          <User className="w-4 h-4" />
+                          <User className="h-4 w-4" />
                           <span className="text-sm font-medium">My Profile</span>
                         </Link>
                         <Link
                           href={`/${user.role.toLowerCase().replace("_", "-")}/settings`}
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-elevated text-txt-secondary hover:text-foreground transition-colors"
+                          className="flex items-center gap-3 rounded-lg px-3 py-2 text-txt-secondary transition-colors hover:bg-surface-elevated hover:text-foreground"
                         >
-                          <Settings className="w-4 h-4" />
+                          <Settings className="h-4 w-4" />
                           <span className="text-sm font-medium">Account Settings</span>
                         </Link>
-                        <div className="border-t border-surface-border my-1" />
+                        <div className="my-1 border-t border-surface-border" />
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-danger-soft text-txt-secondary hover:text-danger transition-colors"
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-txt-secondary transition-colors hover:bg-danger-soft hover:text-danger"
                         >
-                          <LogOut className="w-4 h-4" />
+                          <LogOut className="h-4 w-4" />
                           <span className="text-sm font-medium">Log out</span>
                         </button>
                       </div>
@@ -336,9 +351,7 @@ export function Topbar({ user }: TopbarProps) {
       </header>
 
       {/* Click outside to close search */}
-      {searchOpen && (
-        <div className="fixed inset-0 z-30" onClick={() => setSearchOpen(false)} />
-      )}
+      {searchOpen && <div className="fixed inset-0 z-30" onClick={() => setSearchOpen(false)} />}
     </>
   );
 }

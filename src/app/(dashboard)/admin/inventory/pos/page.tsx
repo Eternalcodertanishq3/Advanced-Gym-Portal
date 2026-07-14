@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function POSPage() {
   const session = await auth();
-  
+
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
     redirect("/login");
   }
@@ -21,17 +21,16 @@ export default async function POSPage() {
 
   if (!res.success || !res.data) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+      <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
         <h2 className="text-xl font-bold text-foreground">Failed to load inventory</h2>
-        <p className="text-sm text-txt-secondary mt-2">{res.error || "No data available"}</p>
+        <p className="mt-2 text-sm text-txt-secondary">{res.error || "No data available"}</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <POSClient products={res.data.items} />
     </div>
   );
 }
-

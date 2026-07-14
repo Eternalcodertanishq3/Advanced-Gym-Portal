@@ -12,7 +12,7 @@ export default async function MemberLayout({ children }: { children: React.React
     const pathname = headersList.get("x-url") || "";
 
     const active = await hasActiveSubscription(session.user.id);
-    
+
     // Redirect to plan selection if no active subscription
     // AND not already on the select-plan page
     if (!active && !pathname.includes("/member/select-plan")) {

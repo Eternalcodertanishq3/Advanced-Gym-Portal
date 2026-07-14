@@ -44,8 +44,8 @@ export function PhotoComparison({
     <div
       ref={containerRef}
       className={cn(
-        "relative w-full max-w-2xl aspect-[4/5] sm:aspect-video rounded-2xl overflow-hidden cursor-ew-resize select-none border border-white/10 shadow-2xl group bg-obsidian-900",
-        className
+        "group relative aspect-[4/5] w-full max-w-2xl cursor-ew-resize select-none overflow-hidden rounded-2xl border border-white/10 bg-obsidian-900 shadow-2xl sm:aspect-video",
+        className,
       )}
       onMouseMove={handleMouseMove}
       onMouseUp={() => setIsDragging(false)}
@@ -58,13 +58,13 @@ export function PhotoComparison({
         <img
           src={beforeImage}
           alt="Before progress"
-          className="w-full h-full object-cover pointer-events-none"
+          className="pointer-events-none h-full w-full object-cover"
         />
         {/* Dark gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20 pointer-events-none" />
-        
-        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-xs text-white/90 font-mono border border-white/10 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-zinc-400" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20" />
+
+        <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-1.5 font-mono text-xs text-white/90 backdrop-blur-md">
+          <span className="h-2 w-2 rounded-full bg-zinc-400" />
           BEFORE: {beforeDate}
         </div>
       </div>
@@ -79,40 +79,42 @@ export function PhotoComparison({
         <img
           src={afterImage}
           alt="After progress"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-          style={{ width: '100%', maxWidth: 'none' }}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          style={{ width: "100%", maxWidth: "none" }}
         />
         {/* Dark gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20 pointer-events-none" />
-        
-        <div className="absolute top-4 right-4 bg-brand-orange/80 backdrop-blur-md px-3 py-1.5 rounded-full text-xs text-white font-mono font-bold shadow-lg shadow-brand-orange/20 flex items-center gap-2 whitespace-nowrap">
-          <span className="w-2 h-2 rounded-full bg-white shadow-sm" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20" />
+
+        <div className="absolute right-4 top-4 flex items-center gap-2 whitespace-nowrap rounded-full bg-brand-orange/80 px-3 py-1.5 font-mono text-xs font-bold text-white shadow-lg shadow-brand-orange/20 backdrop-blur-md">
+          <span className="h-2 w-2 rounded-full bg-white shadow-sm" />
           AFTER: {afterDate}
         </div>
       </div>
 
       {/* Slider Handle */}
       <div
-        className="absolute inset-y-0 w-1 bg-white/80 shadow-[0_0_10px_rgba(0,0,0,0.5)] cursor-ew-resize flex items-center justify-center"
+        className="absolute inset-y-0 flex w-1 cursor-ew-resize items-center justify-center bg-white/80 shadow-[0_0_10px_rgba(0,0,0,0.5)]"
         style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
         onMouseDown={() => setIsDragging(true)}
         onTouchStart={() => setIsDragging(true)}
       >
-        <motion.div 
-          className="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-gold-400 text-obsidian-900 absolute"
+        <motion.div
+          className="border-gold-400 absolute flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white text-obsidian-900 shadow-lg"
           whileHover={{ scale: 1.15 }}
           whileTap={{ scale: 0.95 }}
           animate={{ scale: isDragging ? 1.1 : 1 }}
         >
-          <MoveHorizontal className="w-4 h-4" />
+          <MoveHorizontal className="h-4 w-4" />
         </motion.div>
       </div>
-      
+
       {/* Instructional text (fades out on hover/drag) */}
-      <div className={cn(
-        "absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full text-xs text-white/80 border border-white/5 transition-opacity duration-300",
-        isDragging || "group-hover:opacity-0"
-      )}>
+      <div
+        className={cn(
+          "absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/5 bg-black/50 px-4 py-2 text-xs text-white/80 backdrop-blur-sm transition-opacity duration-300",
+          isDragging || "group-hover:opacity-0",
+        )}
+      >
         Drag to compare
       </div>
     </div>

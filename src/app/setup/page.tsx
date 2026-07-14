@@ -2,16 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ShieldCheck, 
-  Lock, 
-  Mail, 
-  User, 
-  ArrowRight, 
-  Loader2, 
+import {
+  ShieldCheck,
+  Lock,
+  Mail,
+  User,
+  ArrowRight,
+  Loader2,
   Dumbbell,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { createInitialSuperAdmin, isSetupRequired } from "@/actions/setup/setup-actions";
 import { useRouter } from "next/navigation";
@@ -61,85 +61,88 @@ export default function SetupPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-brand-navy flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-brand-orange animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-navy">
+        <Loader2 className="h-12 w-12 animate-spin text-brand-orange" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-brand-navy flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-brand-navy p-4">
       {/* Dynamic Background */}
       <div className="absolute inset-0">
-        <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-brand-orange/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] bg-brand-orange/5 rounded-full blur-[120px]" />
+        <div className="absolute left-[-20%] top-[-20%] h-[60%] w-[60%] animate-pulse rounded-full bg-brand-orange/10 blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-20%] h-[60%] w-[60%] rounded-full bg-brand-orange/5 blur-[120px]" />
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-xl bg-card border border-border rounded-[2.5rem] shadow-2xl relative z-10 overflow-hidden"
+        className="relative z-10 w-full max-w-xl overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-2xl"
       >
         <div className="h-2 bg-brand-orange" />
-        
+
         <div className="p-8 md:p-12">
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="w-20 h-20 rounded-3xl bg-brand-orange/10 flex items-center justify-center mb-6 border border-brand-orange/20">
-              <ShieldCheck className="w-10 h-10 text-brand-orange" />
+          <div className="mb-10 flex flex-col items-center text-center">
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-brand-orange/20 bg-brand-orange/10">
+              <ShieldCheck className="h-10 w-10 text-brand-orange" />
             </div>
-            <h1 className="text-3xl font-display font-black tracking-tight text-foreground mb-2">
+            <h1 className="mb-2 font-display text-3xl font-black tracking-tight text-foreground">
               SYSTEM <span className="text-brand-orange">IGNITION</span>
             </h1>
-            <p className="text-muted-foreground text-sm max-w-sm">
-              No administrator found. Please create the master Super Admin account to initialize the Eagle Gym Portal.
+            <p className="max-w-sm text-sm text-muted-foreground">
+              No administrator found. Please create the master Super Admin account to initialize the
+              Eagle Gym Portal.
             </p>
           </div>
 
           <AnimatePresence mode="wait">
             {success ? (
-              <motion.div 
+              <motion.div
                 key="success"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-10 space-y-6"
+                className="space-y-6 py-10 text-center"
               >
                 <div className="flex justify-center">
-                  <div className="w-24 h-24 rounded-full bg-success/20 flex items-center justify-center border border-success/30">
-                    <CheckCircle2 className="w-12 h-12 text-success" />
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full border border-success/30 bg-success/20">
+                    <CheckCircle2 className="h-12 w-12 text-success" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold text-foreground">Genesis Complete</h3>
-                  <p className="text-muted-foreground">The master account is now active. Redirecting you to login...</p>
+                  <p className="text-muted-foreground">
+                    The master account is now active. Redirecting you to login...
+                  </p>
                 </div>
               </motion.div>
             ) : (
-              <motion.form 
-                key="form"
-                onSubmit={handleSubmit} 
-                className="space-y-6"
-              >
+              <motion.form key="form" onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest font-black text-muted-foreground ml-1">First Name</label>
+                    <label className="ml-1 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                      First Name
+                    </label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
+                      <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/30" />
                       <input
                         required
                         name="firstName"
-                        className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-4 py-4 text-foreground focus:outline-none focus:border-brand-orange/50 transition-colors"
+                        className="w-full rounded-2xl border border-border bg-muted/30 py-4 pl-12 pr-4 text-foreground transition-colors focus:border-brand-orange/50 focus:outline-none"
                         placeholder="Master"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest font-black text-muted-foreground ml-1">Last Name</label>
+                    <label className="ml-1 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                      Last Name
+                    </label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
+                      <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/30" />
                       <input
                         required
                         name="lastName"
-                        className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-4 py-4 text-foreground focus:outline-none focus:border-brand-orange/50 transition-colors"
+                        className="w-full rounded-2xl border border-border bg-muted/30 py-4 pl-12 pr-4 text-foreground transition-colors focus:border-brand-orange/50 focus:outline-none"
                         placeholder="Admin"
                       />
                     </div>
@@ -147,14 +150,16 @@ export default function SetupPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest font-black text-muted-foreground ml-1">Email Address</label>
+                  <label className="ml-1 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                    Email Address
+                  </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
+                    <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/30" />
                     <input
                       required
                       type="email"
                       name="email"
-                      className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-4 py-4 text-foreground focus:outline-none focus:border-brand-orange/50 transition-colors"
+                      className="w-full rounded-2xl border border-border bg-muted/30 py-4 pl-12 pr-4 text-foreground transition-colors focus:border-brand-orange/50 focus:outline-none"
                       placeholder="admin@eaglegym.in"
                     />
                   </div>
@@ -162,54 +167,60 @@ export default function SetupPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest font-black text-muted-foreground ml-1">Master Password</label>
+                    <label className="ml-1 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                      Master Password
+                    </label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
+                      <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/30" />
                       <input
                         required
                         type="password"
                         name="password"
-                        className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-4 py-4 text-foreground focus:outline-none focus:border-brand-orange/50 transition-colors"
+                        className="w-full rounded-2xl border border-border bg-muted/30 py-4 pl-12 pr-4 text-foreground transition-colors focus:border-brand-orange/50 focus:outline-none"
                         placeholder="••••••••"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest font-black text-muted-foreground ml-1">Confirm</label>
+                    <label className="ml-1 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                      Confirm
+                    </label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
+                      <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/30" />
                       <input
                         required
                         type="password"
                         name="confirmPassword"
-                        className="w-full bg-muted/30 border border-border rounded-2xl pl-12 pr-4 py-4 text-foreground focus:outline-none focus:border-brand-orange/50 transition-colors"
+                        className="w-full rounded-2xl border border-border bg-muted/30 py-4 pl-12 pr-4 text-foreground transition-colors focus:border-brand-orange/50 focus:outline-none"
                         placeholder="••••••••"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-brand-orange/5 border border-brand-orange/10 rounded-2xl p-4 flex gap-3">
-                  <AlertTriangle className="w-5 h-5 text-brand-orange shrink-0" />
-                  <p className="text-[10px] text-brand-orange font-medium leading-relaxed">
-                    CRITICAL: This is the primary master account. It has absolute control over all branches, staff, and financial records. Ensure this password is kept strictly confidential.
+                <div className="flex gap-3 rounded-2xl border border-brand-orange/10 bg-brand-orange/5 p-4">
+                  <AlertTriangle className="h-5 w-5 shrink-0 text-brand-orange" />
+                  <p className="text-[10px] font-medium leading-relaxed text-brand-orange">
+                    CRITICAL: This is the primary master account. It has absolute control over all
+                    branches, staff, and financial records. Ensure this password is kept strictly
+                    confidential.
                   </p>
                 </div>
 
                 <button
                   disabled={isSubmitting}
                   type="submit"
-                  className="w-full py-5 bg-brand-orange text-white font-black rounded-2xl shadow-xl shadow-brand-orange/20 hover:shadow-brand-orange/40 hover:-translate-y-1 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="flex w-full items-center justify-center gap-3 rounded-2xl bg-brand-orange py-5 font-black text-white shadow-xl shadow-brand-orange/20 transition-all hover:-translate-y-1 hover:shadow-brand-orange/40 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <Loader2 className="h-6 w-6 animate-spin" />
                       <span>INITIALIZING...</span>
                     </>
                   ) : (
                     <>
                       <span>IGNITE PORTAL</span>
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="h-5 w-5" />
                     </>
                   )}
                 </button>

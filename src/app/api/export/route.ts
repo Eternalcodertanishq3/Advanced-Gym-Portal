@@ -14,7 +14,10 @@ export async function GET(req: Request) {
     const ip = req.headers.get("x-forwarded-for") || "anonymous";
     const limiter = await rateLimit(`api:export:${ip}`, 5, 60);
     if (!limiter.success) {
-      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 },
+      );
     }
 
     // 2. Auth Check
@@ -36,13 +39,13 @@ export async function GET(req: Request) {
       where: whereClause,
       include: {
         user: {
-          include: { branch: true }
+          include: { branch: true },
         },
         subscription: {
-          include: { plan: true }
-        }
+          include: { plan: true },
+        },
       },
-      orderBy: { joinDate: "desc" }
+      orderBy: { joinDate: "desc" },
     });
 
     // Formulate CSV dataset
@@ -52,14 +55,14 @@ export async function GET(req: Request) {
       "Last Name": m.user.lastName,
       "Email Address": m.user.email,
       "Phone Number": m.user.phone || "N/A",
-      "Branch": m.user.branch?.name || "N/A",
-      "Gender": m.gender || "N/A",
+      Branch: m.user.branch?.name || "N/A",
+      Gender: m.gender || "N/A",
       "Date of Birth": m.dateOfBirth ? m.dateOfBirth.toISOString().split("T")[0] : "N/A",
       "Blood Group": m.bloodGroup || "N/A",
       "Join Date": m.joinDate.toISOString().split("T")[0],
       "Subscription Status": m.subscription?.status || "NO_SUBSCRIPTION",
       "Active Plan": m.subscription?.plan?.name || "N/A",
-      "Status": m.status
+      Status: m.status,
     }));
 
     const csvContent = Papa.unparse(records);
@@ -67,11 +70,14 @@ export async function GET(req: Request) {
     return new NextResponse(csvContent, {
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition": `attachment; filename=gymflow_members_${Date.now()}.csv`
-      }
+        "Content-Disposition": `attachment; filename=gymflow_members_${Date.now()}.csv`,
+      },
     });
   } catch (error: any) {
     console.error("Member export failure:", error);
-    return NextResponse.json({ error: error.message || "Failed to generate CSV export" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Failed to generate CSV export" },
+      { status: 500 },
+    );
   }
 }

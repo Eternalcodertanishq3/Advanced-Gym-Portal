@@ -10,7 +10,8 @@ const RegisterSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters").max(50),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits").max(15),
-  password: z.string()
+  password: z
+    .string()
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
@@ -26,11 +27,8 @@ export async function registerUser(rawValues: z.infer<typeof RegisterSchema>) {
     // 2. Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [
-          { email: data.email },
-          { phone: data.phone }
-        ]
-      }
+        OR: [{ email: data.email }, { phone: data.phone }],
+      },
     });
 
     if (existingUser) {
@@ -54,27 +52,27 @@ export async function registerUser(rawValues: z.infer<typeof RegisterSchema>) {
           password: hashedPassword,
           role: "MEMBER",
           status: "ACTIVE", // Start as active member, pending plan payment
-        }
+        },
       });
 
       await tx.member.create({
         data: {
           userId: newUser.id,
           status: "PENDING", // Subscription is pending
-        }
+        },
       });
 
       return newUser;
     });
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       user: {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName
-      } 
+        lastName: user.lastName,
+      },
     };
   } catch (error: any) {
     console.error("User registration failed:", error);

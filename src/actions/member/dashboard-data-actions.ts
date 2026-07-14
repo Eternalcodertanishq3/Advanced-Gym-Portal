@@ -14,12 +14,12 @@ export async function getMemberDashboardStats(userId: string) {
       where: { userId },
       include: {
         subscription: {
-          include: { plan: true }
+          include: { plan: true },
         },
         _count: {
-          select: { attendance: true, classBookings: true }
-        }
-      }
+          select: { attendance: true, classBookings: true },
+        },
+      },
     });
 
     if (!member) throw new Error("Member not found");
@@ -34,35 +34,35 @@ export async function getMemberDashboardStats(userId: string) {
         include: {
           schedule: {
             include: {
-              class: { include: { trainer: { include: { user: true } } } }
-            }
-          }
-        }
+              class: { include: { trainer: { include: { user: true } } } },
+            },
+          },
+        },
       }),
       prisma.workoutLog.findMany({
         where: { memberId: member.id, createdAt: { gte: sevenDaysAgo } },
-        orderBy: { createdAt: 'asc' }
-      })
+        orderBy: { createdAt: "asc" },
+      }),
     ]);
 
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const weeklyProgress = days.map((day, i) => {
       const date = new Date();
       date.setDate(date.getDate() - (6 - i));
-      const log = weeklyLogs.find(l => l.createdAt.toDateString() === date.toDateString());
+      const log = weeklyLogs.find((l) => l.createdAt.toDateString() === date.toDateString());
       return {
         day,
         completed: !!log,
-        calories: log?.caloriesBurned || 0
+        calories: log?.caloriesBurned || 0,
       };
     });
 
-    const upcomingClasses = upcomingBookings.map(b => ({
+    const upcomingClasses = upcomingBookings.map((b) => ({
       id: b.id,
       name: b.schedule.class.name,
       time: `${b.schedule.startTime}, ${days[b.schedule.dayOfWeek]}`,
       trainer: b.schedule.class.trainer.user?.firstName || "Trainer",
-      booked: true
+      booked: true,
     }));
 
     // Get current workout and diet plans assigned by trainer
@@ -71,50 +71,54 @@ export async function getMemberDashboardStats(userId: string) {
       include: {
         workoutPlans: {
           where: { isTemplate: false }, // Only actual assigned plans
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 1,
-          include: { exercises: { orderBy: { sortOrder: 'asc' } } }
+          include: { exercises: { orderBy: { sortOrder: "asc" } } },
         },
         dietPlans: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 1,
-          include: { meals: { orderBy: { sortOrder: 'asc' } } }
-        }
-      }
+          include: { meals: { orderBy: { sortOrder: "asc" } } },
+        },
+      },
     });
 
     const activeWorkout = assignedPlans?.workoutPlans?.[0];
     const activeDiet = assignedPlans?.dietPlans?.[0];
 
-    const todayWorkout = activeWorkout ? {
-      name: activeWorkout.name,
-      exercises: activeWorkout.exercises.length,
-      estimatedTime: `${activeWorkout.estimatedDuration || 45} min`,
-      completed: 0,
-      total: activeWorkout.exercises.length,
-      exerciseList: activeWorkout.exercises.map((e: any) => ({
-        name: e.name,
-        sets: `${e.sets} x ${e.reps}`,
-        completed: false
-      }))
-    } : null;
+    const todayWorkout = activeWorkout
+      ? {
+          name: activeWorkout.name,
+          exercises: activeWorkout.exercises.length,
+          estimatedTime: `${activeWorkout.estimatedDuration || 45} min`,
+          completed: 0,
+          total: activeWorkout.exercises.length,
+          exerciseList: activeWorkout.exercises.map((e: any) => ({
+            name: e.name,
+            sets: `${e.sets} x ${e.reps}`,
+            completed: false,
+          })),
+        }
+      : null;
 
-    const todayDiet = activeDiet ? {
-      name: activeDiet.name,
-      totalCalories: activeDiet.totalCalories,
-      meals: activeDiet.meals.length,
-      mealList: activeDiet.meals.map((m: any) => ({
-        name: m.name,
-        time: m.time,
-        calories: m.calories
-      }))
-    } : null;
+    const todayDiet = activeDiet
+      ? {
+          name: activeDiet.name,
+          totalCalories: activeDiet.totalCalories,
+          meals: activeDiet.meals.length,
+          mealList: activeDiet.meals.map((m: any) => ({
+            name: m.name,
+            time: m.time,
+            calories: m.calories,
+          })),
+        }
+      : null;
 
     // Calculate real streak (existing logic...)
     const recentAttendance = await prisma.attendance.findMany({
       where: { memberId: member.id },
-      orderBy: { date: 'desc' },
-      take: 30
+      orderBy: { date: "desc" },
+      take: 30,
     });
 
     let streak = 0;
@@ -133,7 +137,9 @@ export async function getMemberDashboardStats(userId: string) {
           if (dayDiff === 1) {
             streak++;
             checkDate = nextDate;
-          } else { break; }
+          } else {
+            break;
+          }
         }
       }
     }
@@ -152,8 +158,8 @@ export async function getMemberDashboardStats(userId: string) {
         upcomingClasses,
         todayWorkout,
         todayDiet,
-        attendanceSparkline: recentAttendance.reverse().map(a => 1) // Simple count for now, or use real data if available
-      }
+        attendanceSparkline: recentAttendance.reverse().map((a) => 1), // Simple count for now, or use real data if available
+      },
     };
   } catch (error: any) {
     console.error("Error fetching member dashboard stats:", error);

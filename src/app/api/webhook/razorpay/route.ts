@@ -48,12 +48,12 @@ export async function POST(req: Request) {
     if (eventType === "payment.captured" || eventType === "order.paid") {
       const paymentEntity = payload.payload.payment.entity;
       const notes = paymentEntity.notes || {};
-      
+
       const { memberId, planId } = notes;
 
       if (memberId && planId) {
         const plan = await prisma.plan.findUnique({
-          where: { id: planId }
+          where: { id: planId },
         });
 
         if (plan) {
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
           await prisma.$transaction(async (tx) => {
             // Fetch member's user profile to get branch context
             const user = await tx.user.findFirst({
-              where: { member: { id: memberId } }
+              where: { member: { id: memberId } },
             });
             const branchId = user?.branchId || null;
 
@@ -84,13 +84,13 @@ export async function POST(req: Request) {
                 endDate: endDate,
                 amount: plan.price,
                 status: "ACTIVE",
-                branchId
-              }
+                branchId,
+              },
             });
 
             // 2. Check for duplicate logs (idempotency check)
             const duplicateCheck = await tx.payment.findFirst({
-              where: { transactionId: paymentEntity.id }
+              where: { transactionId: paymentEntity.id },
             });
 
             if (!duplicateCheck) {
@@ -105,14 +105,14 @@ export async function POST(req: Request) {
                   receiptNo: `REC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
                   transactionId: paymentEntity.id,
                   subscriptionId: sub.id,
-                  branchId
-                }
+                  branchId,
+                },
               });
 
               // 3. Mark member active
               await tx.member.update({
                 where: { id: memberId },
-                data: { status: "ACTIVE" }
+                data: { status: "ACTIVE" },
               });
 
               // 4. Award XP for subscribing (Gamification Integration!)
@@ -121,12 +121,12 @@ export async function POST(req: Request) {
                   data: {
                     userId: user.id,
                     amount: 150,
-                    reason: `Subscribed to ${plan.name} plan`
-                  }
+                    reason: `Subscribed to ${plan.name} plan`,
+                  },
                 });
                 await tx.user.update({
                   where: { id: user.id },
-                  data: { xp: { increment: 150 } }
+                  data: { xp: { increment: 150 } },
                 });
               }
             }

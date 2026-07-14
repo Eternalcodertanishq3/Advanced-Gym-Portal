@@ -8,12 +8,12 @@ import { addProgressPhoto } from "@/actions/member/progress-actions";
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/common/portal";
 import { cn } from "@/lib/utils";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 interface PhotoUploadModalProps {
@@ -71,73 +71,84 @@ export function PhotoUploadModal({ isOpen, onClose, latestWeight }: PhotoUploadM
   return (
     <Portal>
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
           className="absolute inset-0 bg-black/40"
         />
-        
-        <motion.div 
+
+        <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          className="relative w-full max-w-xl bg-surface-card rounded-[2.5rem] border border-border shadow-2xl overflow-hidden max-h-[95vh] flex flex-col"
+          className="relative flex max-h-[95vh] w-full max-w-xl flex-col overflow-hidden rounded-[2.5rem] border border-border bg-surface-card shadow-2xl"
         >
-          <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-display font-bold text-foreground">Upload <span className="text-brand-orange">Progress</span></h2>
-              <button 
+          <div className="custom-scrollbar overflow-y-auto p-6 md:p-8">
+            <div className="mb-8 flex items-center justify-between">
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                Upload <span className="text-brand-orange">Progress</span>
+              </h2>
+              <button
                 aria-label="Close"
-                onClick={onClose} 
-                className="p-2 rounded-xl bg-surface-elevated text-txt-tertiary hover:text-foreground transition-colors"
+                onClick={onClose}
+                className="rounded-xl bg-surface-elevated p-2 text-txt-tertiary transition-colors hover:text-foreground"
               >
-                <Plus className="w-6 h-6 rotate-45" />
+                <Plus className="h-6 w-6 rotate-45" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div 
+              <div
                 className={cn(
-                  "aspect-[3/4] max-h-[400px] mx-auto w-full rounded-3xl border-2 border-dashed transition-all relative overflow-hidden flex flex-col items-center justify-center gap-4 bg-surface-sunken group",
-                  preview ? "border-brand-orange/50" : "border-border hover:border-brand-orange/30"
+                  "group relative mx-auto flex aspect-[3/4] max-h-[400px] w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-3xl border-2 border-dashed bg-surface-sunken transition-all",
+                  preview ? "border-brand-orange/50" : "border-border hover:border-brand-orange/30",
                 )}
               >
                 {preview ? (
                   <>
-                    <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                       <label className="cursor-pointer bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-6 py-2 rounded-full text-xs font-bold transition-all border border-white/20">
-                         Change Image
-                         <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-                       </label>
+                    <img src={preview} alt="Preview" className="h-full w-full object-cover" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                      <label className="cursor-pointer rounded-full border border-white/20 bg-white/20 px-6 py-2 text-xs font-bold text-white backdrop-blur-md transition-all hover:bg-white/30">
+                        Change Image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
+                      </label>
                     </div>
                   </>
                 ) : (
-                  <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center">
-                      <Upload className="w-8 h-8 text-txt-tertiary" />
+                  <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-4">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-elevated">
+                      <Upload className="h-8 w-8 text-txt-tertiary" />
                     </div>
                     <div className="text-center">
                       <p className="font-bold text-foreground">Select Progress Photo</p>
                       <p className="text-xs text-txt-tertiary">PNG, JPG up to 10MB</p>
                     </div>
-                    <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
                   </label>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest ml-1">Photo Type</label>
-                  <Select 
-                    value={photoType}
-                    onValueChange={(val) => setPhotoType(val)}
-                  >
-                    <SelectTrigger className="w-full bg-surface-sunken border border-border rounded-xl px-4 py-3 text-foreground font-bold focus:border-brand-orange outline-none transition-colors h-[50px]">
+                  <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                    Photo Type
+                  </label>
+                  <Select value={photoType} onValueChange={(val) => setPhotoType(val)}>
+                    <SelectTrigger className="h-[50px] w-full rounded-xl border border-border bg-surface-sunken px-4 py-3 font-bold text-foreground outline-none transition-colors focus:border-brand-orange">
                       <SelectValue placeholder="Select View" />
                     </SelectTrigger>
-                    <SelectContent className="bg-surface-card border-border">
+                    <SelectContent className="border-border bg-surface-card">
                       <SelectItem value="FRONT">Front View</SelectItem>
                       <SelectItem value="SIDE">Side View</SelectItem>
                       <SelectItem value="BACK">Back View</SelectItem>
@@ -145,22 +156,24 @@ export function PhotoUploadModal({ isOpen, onClose, latestWeight }: PhotoUploadM
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-txt-tertiary uppercase tracking-widest ml-1">Current Weight (kg)</label>
-                  <input 
-                    type="number" 
+                  <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
+                    Current Weight (kg)
+                  </label>
+                  <input
+                    type="number"
                     step="0.1"
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="0.0"
-                    className="w-full bg-surface-sunken border border-border rounded-xl px-4 py-3 text-foreground font-bold focus:border-brand-orange outline-none transition-colors h-[50px]"
+                    className="h-[50px] w-full rounded-xl border border-border bg-surface-sunken px-4 py-3 font-bold text-foreground outline-none transition-colors focus:border-brand-orange"
                   />
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading || !file}
-                className="w-full bg-brand-orange hover:bg-brand-orange-dark h-14 rounded-2xl text-white font-bold text-lg shadow-lg shadow-brand-orange/20"
+                className="hover:bg-brand-orange-dark h-14 w-full rounded-2xl bg-brand-orange text-lg font-bold text-white shadow-lg shadow-brand-orange/20"
               >
                 {loading ? "Uploading..." : "Complete Upload"}
               </Button>

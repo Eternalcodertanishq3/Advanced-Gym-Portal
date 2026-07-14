@@ -25,32 +25,43 @@ export default async function ProfilePage() {
       email: true,
       phone: true,
       avatar: true,
-    }
+    },
   });
 
   if (!user) redirect("/login");
 
   return (
-    <div className="w-full h-full p-6 space-y-8 max-w-5xl mx-auto">
+    <div className="mx-auto h-full w-full max-w-5xl space-y-8 p-6">
       <div>
-        <h1 className="text-3xl font-display font-bold text-foreground mb-1">
+        <h1 className="mb-1 font-display text-3xl font-bold text-foreground">
           Account <span className="text-brand-orange">Settings</span>
         </h1>
-        <p className="text-sm text-txt-secondary font-medium">Manage your personal information, security, and preferences.</p>
+        <p className="text-sm font-medium text-txt-secondary">
+          Manage your personal information, security, and preferences.
+        </p>
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="bg-surface-sunken p-1 rounded-2xl mb-8 border border-border/50">
-          <TabsTrigger value="general" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-surface-card data-[state=active]:text-brand-orange data-[state=active]:shadow-sm transition-all">
-            <User className="w-4 h-4 mr-2" />
+        <TabsList className="mb-8 rounded-2xl border border-border/50 bg-surface-sunken p-1">
+          <TabsTrigger
+            value="general"
+            className="rounded-xl px-6 py-2.5 transition-all data-[state=active]:bg-surface-card data-[state=active]:text-brand-orange data-[state=active]:shadow-sm"
+          >
+            <User className="mr-2 h-4 w-4" />
             General
           </TabsTrigger>
-          <TabsTrigger value="security" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-surface-card data-[state=active]:text-brand-orange data-[state=active]:shadow-sm transition-all">
-            <Shield className="w-4 h-4 mr-2" />
+          <TabsTrigger
+            value="security"
+            className="rounded-xl px-6 py-2.5 transition-all data-[state=active]:bg-surface-card data-[state=active]:text-brand-orange data-[state=active]:shadow-sm"
+          >
+            <Shield className="mr-2 h-4 w-4" />
             Security
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-surface-card data-[state=active]:text-brand-orange data-[state=active]:shadow-sm transition-all">
-            <Bell className="w-4 h-4 mr-2" />
+          <TabsTrigger
+            value="notifications"
+            className="rounded-xl px-6 py-2.5 transition-all data-[state=active]:bg-surface-card data-[state=active]:text-brand-orange data-[state=active]:shadow-sm"
+          >
+            <Bell className="mr-2 h-4 w-4" />
             Notifications
           </TabsTrigger>
         </TabsList>

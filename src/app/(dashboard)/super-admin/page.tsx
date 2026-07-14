@@ -5,7 +5,7 @@ import { StatSkeleton, LogsSkeleton } from "./components/dashboard-skeletons";
 
 export default async function SuperAdminDashboard() {
   return (
-    <DashboardClient 
+    <DashboardClient
       statsChild={
         <Suspense fallback={<StatSkeleton />}>
           <StatsGrid />

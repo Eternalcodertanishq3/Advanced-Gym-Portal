@@ -23,9 +23,10 @@ export default async function SelectPlanPage() {
   }
 
   const configRes = await getSystemConfig();
-  const paymentMethods = (configRes.success && configRes.config?.paymentMethods)
-    ? JSON.parse(configRes.config.paymentMethods) 
-    : null;
+  const paymentMethods =
+    configRes.success && configRes.config?.paymentMethods
+      ? JSON.parse(configRes.config.paymentMethods)
+      : null;
 
   const rawPlans = await prisma.plan.findMany({
     where: { isActive: true },
@@ -33,22 +34,22 @@ export default async function SelectPlanPage() {
   });
 
   // Convert Decimal to numbers for serialization to client component
-  const plans = rawPlans.map(plan => ({
+  const plans = rawPlans.map((plan) => ({
     ...plan,
     price: Number(plan.price),
   }));
 
   const branches = await prisma.branch.findMany({
     where: { status: "ACTIVE" },
-    select: { id: true, name: true, location: true }
+    select: { id: true, name: true, location: true },
   });
 
   const userBranchId = (session.user as any).branchId;
 
   return (
     <div className="bg-brand-navy-dark min-h-screen">
-      <SelectPlanClient 
-        plans={plans} 
+      <SelectPlanClient
+        plans={plans}
         customPaymentMethods={paymentMethods}
         branches={branches}
         userBranchId={userBranchId}

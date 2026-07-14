@@ -13,7 +13,7 @@ export async function getGymSettings() {
       acc[setting.key] = setting.value;
       return acc;
     }, {});
-    
+
     return { success: true, data: settingsMap };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -30,7 +30,7 @@ export async function updateGymSetting(key: string, value: any) {
     const setting = await prisma.gymSetting.upsert({
       where: { key_tenantId: { key, tenantId: tenantId || "" } },
       update: { value, updatedBy: "ADMIN" },
-      create: { key, value, tenantId, updatedBy: "ADMIN" }
+      create: { key, value, tenantId, updatedBy: "ADMIN" },
     });
     revalidatePath("/admin/settings");
     return { success: true, data: setting };
@@ -38,4 +38,3 @@ export async function updateGymSetting(key: string, value: any) {
     return { success: false, error: error.message };
   }
 }
-

@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, type LucideIcon } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  type LucideIcon,
+} from "lucide-react";
 import { cn, formatNumber, formatCurrency } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
@@ -110,7 +116,11 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   if (!data || data.length < 2) return null;
 
   return (
-    <svg ref={svgRef} viewBox="0 0 120 40" className="w-full h-12 opacity-90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+    <svg
+      ref={svgRef}
+      viewBox="0 0 120 40"
+      className="h-12 w-full opacity-90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
+    >
       <defs>
         <linearGradient id={`sparklineGradient-${color}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -149,7 +159,7 @@ export function StatCard({
   // Default to navy if old color like "gold" is passed
   const colorKey = colorMap[color as keyof typeof colorMap] ? color : "navy";
   const colors = colorMap[colorKey as keyof typeof colorMap];
-  
+
   const [displayValue, setDisplayValue] = useState(0);
   const isNumeric = typeof value === "number";
 
@@ -187,33 +197,41 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "surface-card p-5 h-full group relative overflow-hidden transition-all duration-300",
-        className
+        "surface-card group relative h-full overflow-hidden p-5 transition-all duration-300",
+        className,
       )}
     >
-      <div className="relative z-10 flex flex-col h-full">
-        <div className="flex items-center justify-between mb-4">
-          <div className={cn(
-            "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110",
-            colors.bg,
-            colors.text
-          )}>
+      <div className="relative z-10 flex h-full flex-col">
+        <div className="mb-4 flex items-center justify-between">
+          <div
+            className={cn(
+              "flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110",
+              colors.bg,
+              colors.text,
+            )}
+          >
             {icon}
           </div>
-          
+
           {trend && (
-            <div className={cn(
-              "flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-tight",
-              trendUp ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
-            )}>
-              {trendUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+            <div
+              className={cn(
+                "flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-tight",
+                trendUp ? "bg-success-soft text-success" : "bg-danger-soft text-danger",
+              )}
+            >
+              {trendUp ? (
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              ) : (
+                <ArrowDownRight className="h-3.5 w-3.5" />
+              )}
               {trend}
             </div>
           )}
         </div>
 
         <div className="space-y-0.5">
-          <h3 className="stat-number text-3xl font-display font-bold text-foreground tracking-tight">
+          <h3 className="stat-number font-display text-3xl font-bold tracking-tight text-foreground">
             {formattedValue}
           </h3>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -221,10 +239,10 @@ export function StatCard({
           </p>
         </div>
 
-        {subtitle && <p className="text-xs text-txt-tertiary mt-auto">{subtitle}</p>}
+        {subtitle && <p className="mt-auto text-xs text-txt-tertiary">{subtitle}</p>}
 
         {sparklineData && (
-          <div className="mt-4 -mx-2">
+          <div className="-mx-2 mt-4">
             <Sparkline data={sparklineData} color={colors.sparkline} />
           </div>
         )}
@@ -233,8 +251,8 @@ export function StatCard({
       {/* Bottom accent line */}
       <div
         className={cn(
-          "absolute bottom-0 left-0 right-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-[calc(var(--radius)-1px)]",
-          colors.accent
+          "absolute bottom-0 left-0 right-0 h-[3px] rounded-b-[calc(var(--radius)-1px)] opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+          colors.accent,
         )}
       />
     </div>

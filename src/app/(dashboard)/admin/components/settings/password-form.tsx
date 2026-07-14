@@ -22,14 +22,16 @@ import { Input } from "@/components/ui/input";
 // 🦅 EAGLE GYM — Password Security Form (Themed)
 // ═══════════════════════════════════════════════════════════════
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(8, "New password must be at least 8 characters"),
-  confirmPassword: z.string().min(1, "Please confirm your new password"),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z.string().min(8, "New password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your new password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
@@ -64,14 +66,18 @@ export function PasswordForm() {
   }
 
   return (
-    <div className="glass-card p-6 sm:p-8 shadow-lg">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center">
-          <ShieldCheck className="w-5 h-5 text-brand-orange" />
+    <div className="glass-card p-6 shadow-lg sm:p-8">
+      <div className="mb-8 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-orange/20 bg-brand-orange/10">
+          <ShieldCheck className="h-5 w-5 text-brand-orange" />
         </div>
         <div>
-          <h3 className="text-lg font-black text-foreground uppercase tracking-tight">Security Settings</h3>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Change your account password</p>
+          <h3 className="text-lg font-black uppercase tracking-tight text-foreground">
+            Security Settings
+          </h3>
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+            Change your account password
+          </p>
         </div>
       </div>
 
@@ -82,14 +88,16 @@ export function PasswordForm() {
             name="currentPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Current Password</FormLabel>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Current Password
+                </FormLabel>
                 <FormControl>
-                  <div className="relative group">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-orange transition-colors" />
-                    <Input 
-                      {...field} 
+                  <div className="group relative">
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-orange" />
+                    <Input
+                      {...field}
                       type="password"
-                      className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
+                      className="rounded-xl border-border bg-muted/50 pl-10 transition-all focus:border-brand-orange/50"
                       placeholder="••••••••"
                     />
                   </div>
@@ -99,20 +107,22 @@ export function PasswordForm() {
             )}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="newPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">New Password</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    New Password
+                  </FormLabel>
                   <FormControl>
-                    <div className="relative group">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-orange transition-colors" />
-                      <Input 
-                        {...field} 
+                    <div className="group relative">
+                      <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-orange" />
+                      <Input
+                        {...field}
                         type="password"
-                        className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
+                        className="rounded-xl border-border bg-muted/50 pl-10 transition-all focus:border-brand-orange/50"
                         placeholder="••••••••"
                       />
                     </div>
@@ -126,14 +136,16 @@ export function PasswordForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Confirm New Password</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Confirm New Password
+                  </FormLabel>
                   <FormControl>
-                    <div className="relative group">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-orange transition-colors" />
-                      <Input 
-                        {...field} 
+                    <div className="group relative">
+                      <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-orange" />
+                      <Input
+                        {...field}
                         type="password"
-                        className="pl-10 bg-muted/50 border-border focus:border-brand-orange/50 transition-all rounded-xl"
+                        className="rounded-xl border-border bg-muted/50 pl-10 transition-all focus:border-brand-orange/50"
                         placeholder="••••••••"
                       />
                     </div>
@@ -144,20 +156,20 @@ export function PasswordForm() {
             />
           </div>
 
-          <div className="pt-4 flex justify-end">
-            <Button 
-              type="submit" 
+          <div className="flex justify-end pt-4">
+            <Button
+              type="submit"
               disabled={isPending}
-              className="bg-brand-orange hover:bg-brand-orange-hover text-white px-8 h-11 rounded-xl font-bold transition-all shadow-lg shadow-brand-orange/20"
+              className="h-11 rounded-xl bg-brand-orange px-8 font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:bg-brand-orange-hover"
             >
               {isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Updating...
                 </>
               ) : (
                 <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
+                  <RefreshCw className="mr-2 h-4 w-4" />
                   Update Password
                 </>
               )}

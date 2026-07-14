@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function MaintenancePage() {
   const session = await auth();
-  
+
   if (!session?.user || session.user.role !== "WORKER") {
     redirect("/login");
   }
@@ -20,17 +20,16 @@ export default async function MaintenancePage() {
 
   if (!res.success) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+      <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
         <h2 className="text-xl font-bold text-foreground">Failed to load logs</h2>
-        <p className="text-sm text-txt-secondary mt-2">{res.error}</p>
+        <p className="mt-2 text-sm text-txt-secondary">{res.error}</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <MaintenanceLogsClient logs={res.data ?? []} />
     </div>
   );
 }
-

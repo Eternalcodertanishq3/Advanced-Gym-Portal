@@ -11,34 +11,34 @@ export async function getBranches() {
       orderBy: { createdAt: "desc" },
       include: {
         users: {
-          where: { role: "MEMBER", status: "ACTIVE" }
-        }
-      }
+          where: { role: "MEMBER", status: "ACTIVE" },
+        },
+      },
     });
 
     // Fetch managers for these branches
-    const branchIds = branches.map(b => b.id);
+    const branchIds = branches.map((b) => b.id);
     const managers = await prisma.user.findMany({
       where: {
         branchId: { in: branchIds },
         role: "ADMIN",
-        status: "ACTIVE"
+        status: "ACTIVE",
       },
       select: {
         id: true,
         firstName: true,
         lastName: true,
-        branchId: true
-      }
+        branchId: true,
+      },
     });
 
     // Map to include activeMembers count and real manager name
-    const mappedBranches = branches.map(b => {
-      const manager = managers.find(m => m.branchId === b.id);
+    const mappedBranches = branches.map((b) => {
+      const manager = managers.find((m) => m.branchId === b.id);
       return {
         ...b,
         activeMembers: b.users.length,
-        manager: manager ? `${manager.firstName} ${manager.lastName}` : "Pending"
+        manager: manager ? `${manager.firstName} ${manager.lastName}` : "Pending",
       };
     });
 
@@ -60,7 +60,7 @@ export async function createBranch(data: {
     const branch = await prisma.branch.create({
       data: {
         ...data,
-        status: "ACTIVE"
+        status: "ACTIVE",
       },
     });
 
@@ -69,7 +69,7 @@ export async function createBranch(data: {
       action: "CREATE",
       entityType: "BRANCH",
       entityId: branch.id,
-      newValue: branch
+      newValue: branch,
     });
 
     revalidatePath("/super-admin/branches");
@@ -80,17 +80,20 @@ export async function createBranch(data: {
   }
 }
 
-export async function updateBranch(id: string, data: Partial<{
-  name: string;
-  location: string;
-  address: string;
-  phone: string;
-  status: "ACTIVE" | "MAINTENANCE" | "CLOSED";
-}>) {
+export async function updateBranch(
+  id: string,
+  data: Partial<{
+    name: string;
+    location: string;
+    address: string;
+    phone: string;
+    status: "ACTIVE" | "MAINTENANCE" | "CLOSED";
+  }>,
+) {
   try {
     const user = await ensureSuperAdmin();
     const oldBranch = await prisma.branch.findUnique({ where: { id } });
-    
+
     const branch = await prisma.branch.update({
       where: { id },
       data,
@@ -102,7 +105,7 @@ export async function updateBranch(id: string, data: Partial<{
       entityType: "BRANCH",
       entityId: branch.id,
       oldValue: oldBranch,
-      newValue: branch
+      newValue: branch,
     });
     revalidatePath("/super-admin/branches");
     return { success: true, branch };
@@ -129,7 +132,7 @@ export async function deleteBranch(id: string) {
       entityType: "BRANCH",
       entityId: id,
       oldValue: oldBranch,
-      newValue: { status: "CLOSED" }
+      newValue: { status: "CLOSED" },
     });
     revalidatePath("/super-admin/branches");
     return { success: true };

@@ -47,7 +47,7 @@ const formSchema = z.object({
 export default function NewProductPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -79,25 +79,28 @@ export default function NewProductPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto pb-12">
+    <div className="mx-auto max-w-3xl space-y-6 pb-12">
       <div className="flex items-center justify-between">
-        <Link href="/admin/inventory" className="flex items-center text-sm text-obsidian-500 hover:text-obsidian-900 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+        <Link
+          href="/admin/inventory"
+          className="flex items-center text-sm text-obsidian-500 transition-colors hover:text-obsidian-900"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Inventory
         </Link>
       </div>
 
-      <Card className="bg-surface-card border-surface-sunken shadow-sm">
+      <Card className="border-surface-sunken bg-surface-card shadow-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-display text-obsidian-950 flex items-center">
-            <Package className="w-6 h-6 mr-3 text-brand-orange" />
+          <CardTitle className="flex items-center font-display text-2xl text-obsidian-950">
+            <Package className="mr-3 h-6 w-6 text-brand-orange" />
             Add New Product
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="name"
@@ -105,7 +108,12 @@ export default function NewProductPage() {
                     <FormItem className="md:col-span-2">
                       <FormLabel>Product Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Whey Protein Isolate 2kg" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          placeholder="e.g. Whey Protein Isolate 2kg"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -119,7 +127,12 @@ export default function NewProductPage() {
                     <FormItem>
                       <FormLabel>SKU / Barcode</FormLabel>
                       <FormControl>
-                        <Input placeholder="EG-WPI-001" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          placeholder="EG-WPI-001"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -132,22 +145,24 @@ export default function NewProductPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <Select 
-                        disabled={isPending} 
-                        onValueChange={field.onChange} 
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-surface-base border-surface-sunken focus:ring-brand-orange">
+                          <SelectTrigger className="border-surface-sunken bg-surface-base focus:ring-brand-orange">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-surface-card border-surface-sunken">
-                          {["SUPPLEMENT", "MERCHANDISE", "BEVERAGE", "EQUIPMENT", "OTHER"].map((cat) => (
-                            <SelectItem key={cat} value={cat}>
-                              {cat}
-                            </SelectItem>
-                          ))}
+                        <SelectContent className="border-surface-sunken bg-surface-card">
+                          {["SUPPLEMENT", "MERCHANDISE", "BEVERAGE", "EQUIPMENT", "OTHER"].map(
+                            (cat) => (
+                              <SelectItem key={cat} value={cat}>
+                                {cat}
+                              </SelectItem>
+                            ),
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -162,7 +177,12 @@ export default function NewProductPage() {
                     <FormItem>
                       <FormLabel>Selling Price (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          type="number"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -176,7 +196,12 @@ export default function NewProductPage() {
                     <FormItem>
                       <FormLabel>Initial Stock Level</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          type="number"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -190,11 +215,11 @@ export default function NewProductPage() {
                     <FormItem className="md:col-span-2">
                       <FormLabel>Description (Optional)</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Product details, ingredients, or sizing info..." 
-                          {...field} 
-                          disabled={isPending} 
-                          className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange min-h-[100px]" 
+                        <Textarea
+                          placeholder="Product details, ingredients, or sizing info..."
+                          {...field}
+                          disabled={isPending}
+                          className="min-h-[100px] border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
                         />
                       </FormControl>
                       <FormMessage />
@@ -203,11 +228,21 @@ export default function NewProductPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-4 pt-4 border-t border-surface-sunken">
-                <Button variant="outline" type="button" onClick={() => router.back()} disabled={isPending} className="bg-surface-base border-surface-sunken">
+              <div className="flex justify-end gap-4 border-t border-surface-sunken pt-4">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => router.back()}
+                  disabled={isPending}
+                  className="border-surface-sunken bg-surface-base"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isPending} className="bg-brand-orange text-white hover:bg-brand-orange/90 min-w-[140px]">
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="min-w-[140px] bg-brand-orange text-white hover:bg-brand-orange/90"
+                >
                   {isPending ? "Adding..." : "Add Product"}
                 </Button>
               </div>
@@ -218,4 +253,3 @@ export default function NewProductPage() {
     </div>
   );
 }
-

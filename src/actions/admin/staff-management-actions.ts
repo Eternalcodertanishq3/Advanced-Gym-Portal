@@ -13,7 +13,7 @@ export async function getStaff(page = 1, limit = 10, search = "") {
   }
   try {
     const skip = (page - 1) * limit;
-    
+
     let whereClause = {};
     if (search) {
       whereClause = {
@@ -22,8 +22,8 @@ export async function getStaff(page = 1, limit = 10, search = "") {
             { firstName: { contains: search, mode: "insensitive" } },
             { lastName: { contains: search, mode: "insensitive" } },
             { email: { contains: search, mode: "insensitive" } },
-          ]
-        }
+          ],
+        },
       };
     }
 
@@ -32,18 +32,20 @@ export async function getStaff(page = 1, limit = 10, search = "") {
         where: whereClause,
         include: {
           user: {
-            select: { firstName: true, lastName: true, email: true, avatar: true, phone: true }
-          }
+            select: { firstName: true, lastName: true, email: true, avatar: true, phone: true },
+          },
         },
-        orderBy: { joiningDate: 'desc' },
+        orderBy: { joiningDate: "desc" },
         skip,
         take: limit,
       }),
-      prisma.worker.count({ where: whereClause })
+      prisma.worker.count({ where: whereClause }),
     ]);
 
-
-    return { success: true, data: { staff: workers, pagination: { total, pages: Math.ceil(total / limit), page, limit } } };
+    return {
+      success: true,
+      data: { staff: workers, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
+    };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
@@ -60,13 +62,13 @@ export async function getStaffAttendance(limit = 20) {
   try {
     const attendance = await prisma.attendance.findMany({
       where: {
-        user: { role: { not: "MEMBER" } }
+        user: { role: { not: "MEMBER" } },
       },
       include: {
-        user: { select: { firstName: true, lastName: true, role: true, avatar: true } }
+        user: { select: { firstName: true, lastName: true, role: true, avatar: true } },
       },
-      orderBy: { date: 'desc' },
-      take: limit
+      orderBy: { date: "desc" },
+      take: limit,
     });
 
     return { success: true, data: attendance };
@@ -83,7 +85,7 @@ export async function getStaffById(id: string) {
   try {
     const worker = await prisma.worker.findUnique({
       where: { id },
-      include: { user: true }
+      include: { user: true },
     });
     if (!worker) return { success: false, error: "Staff member not found" };
     return { success: true, data: worker };
@@ -99,7 +101,10 @@ export async function createStaff(data: any) {
   }
   try {
     const bcrypt = require("bcryptjs");
-    const hashedPassword = await bcrypt.hash(SECURITY.DEFAULT_TEMP_PASSWORD(), SECURITY.BCRYPT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(
+      SECURITY.DEFAULT_TEMP_PASSWORD(),
+      SECURITY.BCRYPT_ROUNDS,
+    );
 
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -132,7 +137,7 @@ export async function createStaff(data: any) {
     return { success: true, data: result };
   } catch (error: any) {
     console.error("Error creating staff:", error);
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       return { success: false, error: "Email or phone number already exists." };
     }
     return { success: false, error: error.message || "Failed to onboard staff" };
@@ -160,10 +165,10 @@ export async function updateStaff(id: string, data: any) {
               lastName: data.lastName,
               email: data.email,
               phone: data.phone,
-            }
-          }
+            },
+          },
         },
-        include: { user: true }
+        include: { user: true },
       });
       return worker;
     });

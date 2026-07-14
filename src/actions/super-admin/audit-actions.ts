@@ -10,12 +10,12 @@ export async function getAuditLogs() {
     const logs = await prisma.auditLog.findMany({
       orderBy: { createdAt: "desc" },
       include: {
-        user: true
+        user: true,
       },
-      take: 500 // Limit to last 500 for performance
+      take: 500, // Limit to last 500 for performance
     });
 
-    const mappedLogs = logs.map(log => ({
+    const mappedLogs = logs.map((log) => ({
       id: log.id,
       timestamp: log.createdAt.toLocaleString(),
       user: log.user ? `${log.user.firstName} ${log.user.lastName}` : "System / Unknown",

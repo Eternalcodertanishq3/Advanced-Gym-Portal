@@ -8,4 +8,3 @@ export function generateReceiptHTML(data: any): string {
     </div>
   `;
 }
-

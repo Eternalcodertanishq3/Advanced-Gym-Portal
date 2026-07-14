@@ -22,24 +22,38 @@ export function StatCard({ label, value, trend, unit, icon, color }: StatCardPro
   };
 
   return (
-    <div className="surface-card p-6 rounded-3xl border border-border/50 hover:border-brand-orange/30 transition-all group">
-      <div className="flex justify-between items-start mb-4">
-        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110", colorMap[color])}>
+    <div className="surface-card group rounded-3xl border border-border/50 p-6 transition-all hover:border-brand-orange/30">
+      <div className="mb-4 flex items-start justify-between">
+        <div
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-2xl border transition-transform group-hover:scale-110",
+            colorMap[color],
+          )}
+        >
           {icon}
         </div>
         {trend !== 0 && (
-          <div className={cn(
-            "flex items-center gap-0.5 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider",
-            trend > 0 ? "text-danger bg-danger/10" : "text-success bg-success/10"
-          )}>
-            {trend > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-            {Math.abs(trend)}{unit}
+          <div
+            className={cn(
+              "flex items-center gap-0.5 rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider",
+              trend > 0 ? "bg-danger/10 text-danger" : "bg-success/10 text-success",
+            )}
+          >
+            {trend > 0 ? (
+              <ArrowUpRight className="h-3 w-3" />
+            ) : (
+              <ArrowDownRight className="h-3 w-3" />
+            )}
+            {Math.abs(trend)}
+            {unit}
           </div>
         )}
       </div>
       <div>
-        <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-[0.2em] mb-1">{label}</p>
-        <p className="text-2xl font-display font-bold text-foreground">{value}</p>
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-txt-tertiary">
+          {label}
+        </p>
+        <p className="font-display text-2xl font-bold text-foreground">{value}</p>
       </div>
     </div>
   );

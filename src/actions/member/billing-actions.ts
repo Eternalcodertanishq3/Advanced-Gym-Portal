@@ -29,27 +29,27 @@ export async function getBillingInfo() {
       where: { userId: session.user.id },
       include: {
         subscription: {
-          include: { plan: true }
+          include: { plan: true },
         },
         payments: {
           orderBy: { createdAt: "desc" },
-          take: 10
-        }
-      }
+          take: 10,
+        },
+      },
     });
 
     if (!member) return { success: false, error: "Member not found" };
 
     // Standard checkout cards mapping for UI
     const paymentMethods = [
-      { 
-        id: "pm_online", 
-        brand: "razorpay", 
-        last4: "Online NetBanking/UPI", 
-        expMonth: 12, 
-        expYear: 2030, 
-        isDefault: true 
-      }
+      {
+        id: "pm_online",
+        brand: "razorpay",
+        last4: "Online NetBanking/UPI",
+        expMonth: 12,
+        expYear: 2030,
+        isDefault: true,
+      },
     ];
 
     const invoices = member.payments.map((p) => ({
@@ -57,16 +57,16 @@ export async function getBillingInfo() {
       amount: Number(p.total),
       date: p.createdAt,
       status: p.status.toLowerCase(),
-      receiptNo: p.receiptNo
+      receiptNo: p.receiptNo,
     }));
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: {
         subscription: member.subscription,
         paymentMethods,
-        invoices
-      }
+        invoices,
+      },
     };
   } catch (error) {
     console.error("Error fetching billing info:", error);
@@ -83,13 +83,13 @@ export async function createCheckoutSession(planId: string) {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) return { success: false, error: "Member profile not found" };
 
     const plan = await prisma.plan.findUnique({
-      where: { id: planId }
+      where: { id: planId },
     });
 
     if (!plan || !plan.isActive) return { success: false, error: "Plan is active or not found" };
@@ -103,8 +103,8 @@ export async function createCheckoutSession(planId: string) {
       notes: {
         memberId: member.id,
         planId: plan.id,
-        userId: session.user.id
-      }
+        userId: session.user.id,
+      },
     });
 
     const keyId = process.env.RAZORPAY_KEY_ID;
@@ -124,9 +124,9 @@ export async function createCheckoutSession(planId: string) {
         member: {
           name: session.user.name || `${session.user.firstName} ${session.user.lastName}`,
           email: session.user.email,
-          phone: (session.user as any).phone || ""
-        }
-      }
+          phone: (session.user as any).phone || "",
+        },
+      },
     };
   } catch (error: any) {
     console.error("Razorpay order creation failed:", error);
@@ -148,13 +148,13 @@ export async function verifyPaymentSignature(data: {
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     const member = await prisma.member.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     });
 
     if (!member) return { success: false, error: "Member profile not found" };
 
     const plan = await prisma.plan.findUnique({
-      where: { id: data.planId }
+      where: { id: data.planId },
     });
 
     if (!plan) return { success: false, error: "Plan not found" };
@@ -195,8 +195,8 @@ export async function verifyPaymentSignature(data: {
           endDate: endDate,
           amount: plan.price,
           status: "ACTIVE",
-          branchId: (session.user as any).branchId
-        }
+          branchId: (session.user as any).branchId,
+        },
       });
 
       // 2. Create Payment log
@@ -211,14 +211,14 @@ export async function verifyPaymentSignature(data: {
           receiptNo: `REC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
           transactionId: data.razorpay_payment_id,
           subscriptionId: sub.id,
-          branchId: (session.user as any).branchId
-        }
+          branchId: (session.user as any).branchId,
+        },
       });
 
       // 3. Activate member
       await tx.member.update({
         where: { id: member.id },
-        data: { status: "ACTIVE" }
+        data: { status: "ACTIVE" },
       });
 
       return { sub, payment };

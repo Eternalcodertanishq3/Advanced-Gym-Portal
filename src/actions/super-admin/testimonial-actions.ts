@@ -28,7 +28,7 @@ export async function approveTestimonial(id: string) {
       action: "UPDATE",
       entityType: "TESTIMONIAL",
       entityId: id,
-      newValue: { isApproved: true }
+      newValue: { isApproved: true },
     });
     revalidatePath("/super-admin/testimonials");
     revalidatePath("/");
@@ -52,7 +52,7 @@ export async function deleteTestimonial(id: string) {
       action: "DELETE",
       entityType: "TESTIMONIAL",
       entityId: id,
-      oldValue: oldTestimonial
+      oldValue: oldTestimonial,
     });
     revalidatePath("/super-admin/testimonials");
     revalidatePath("/");

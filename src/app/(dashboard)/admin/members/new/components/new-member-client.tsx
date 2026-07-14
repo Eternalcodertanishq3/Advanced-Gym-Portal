@@ -44,31 +44,27 @@ export function AddMemberClient({ userRole }: { userRole: string }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-12">
+    <div className="mx-auto max-w-4xl space-y-8 pb-12">
       <div className="flex items-center gap-4">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="rounded-full bg-surface-card border-surface-sunken"
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full border-surface-sunken bg-surface-card"
           onClick={() => router.back()}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
             Add New <span className="text-brand-orange">Member</span>
           </h1>
-          <p className="text-sm text-muted-foreground">Register a new member to the Eagle Gym community.</p>
+          <p className="text-sm text-muted-foreground">
+            Register a new member to the Eagle Gym community.
+          </p>
         </div>
       </div>
 
-      <MemberForm 
-        onSubmit={handleSubmit}
-        loading={loading}
-        mode="create"
-        branches={branches}
-      />
+      <MemberForm onSubmit={handleSubmit} loading={loading} mode="create" branches={branches} />
     </div>
   );
 }
-

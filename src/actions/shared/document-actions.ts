@@ -13,7 +13,7 @@ export async function getUserDocuments(memberId: string) {
   try {
     const documents = await prisma.document.findMany({
       where: { memberId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
     return { success: true, data: documents };
   } catch (error: any) {
@@ -31,11 +31,11 @@ export async function getAllDocuments() {
       include: {
         member: {
           include: {
-            user: { select: { firstName: true, lastName: true, email: true } }
-          }
-        }
+            user: { select: { firstName: true, lastName: true, email: true } },
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
     return { success: true, data: documents };
   } catch (error: any) {
@@ -56,5 +56,3 @@ export async function deleteDocument(id: string) {
     return { success: false, error: error.message };
   }
 }
-
-

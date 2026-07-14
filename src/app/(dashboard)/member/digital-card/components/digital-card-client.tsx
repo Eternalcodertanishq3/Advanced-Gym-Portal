@@ -2,19 +2,19 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  QrCode, 
-  Download, 
-  Share2, 
-  ShieldCheck, 
-  Calendar, 
-  MapPin, 
+import {
+  QrCode,
+  Download,
+  Share2,
+  ShieldCheck,
+  Calendar,
+  MapPin,
   Rotate3d,
   CreditCard,
   Zap,
   Info,
   ArrowLeft,
-  Dumbbell
+  Dumbbell,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
@@ -51,144 +51,158 @@ export function DigitalCardClient({ member }: Props) {
   const planColor = member.subscription?.plan?.color || "#F26522";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] py-12 px-4 space-y-12">
+    <div className="flex min-h-[70vh] flex-col items-center justify-center space-y-12 px-4 py-12">
       {/* Back Button */}
-      <div className="w-full max-w-[400px] flex justify-start">
-        <Link 
+      <div className="flex w-full max-w-[400px] justify-start">
+        <Link
           href="/member"
-          className="flex items-center gap-2 text-txt-tertiary hover:text-brand-orange transition-colors text-sm font-bold uppercase tracking-widest group"
+          className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-txt-tertiary transition-colors hover:text-brand-orange"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Back to Dashboard
         </Link>
       </div>
 
       {/* Header Info */}
-      <div className="text-center space-y-3">
-        <h1 className="text-4xl font-display font-bold text-foreground tracking-tight">
+      <div className="space-y-3 text-center">
+        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
           Digital <span className="text-brand-orange">Access Pass</span>
         </h1>
-        <p className="text-txt-secondary text-sm max-w-xs mx-auto">
+        <p className="mx-auto max-w-xs text-sm text-txt-secondary">
           Scan this at the reception desk to record your attendance.
         </p>
       </div>
 
       {/* Card Container */}
-      <div className="relative perspective-1000 w-full max-w-[400px] h-[240px]">
+      <div className="perspective-1000 relative h-[240px] w-full max-w-[400px]">
         <motion.div
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={{ duration: 0.8, ease: "circOut" }}
-          className="w-full h-full relative preserve-3d cursor-pointer"
+          className="preserve-3d relative h-full w-full cursor-pointer"
           onClick={() => setIsFlipped(!isFlipped)}
         >
           {/* FRONT SIDE */}
-          <div 
-            className="absolute inset-0 backface-hidden w-full h-full p-8 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-between"
-            style={{ 
+          <div
+            className="backface-hidden absolute inset-0 flex h-full w-full flex-col justify-between overflow-hidden rounded-[2rem] border border-white/10 p-8 shadow-2xl"
+            style={{
               background: `linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%)`,
-              transform: 'translateZ(1px)'
+              transform: "translateZ(1px)",
             }}
           >
             {/* Holographic Overlays */}
-            <div className="absolute inset-0 bg-[url('/mesh-gradient.png')] opacity-20 mix-blend-overlay pointer-events-none" />
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-orange/20 blur-[80px] rounded-full" />
-            
+            <div className="pointer-events-none absolute inset-0 bg-[url('/mesh-gradient.png')] opacity-20 mix-blend-overlay" />
+            <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-brand-orange/20 blur-[80px]" />
+
             {/* Top Row: Logo & Status */}
-            <div className="flex justify-between items-start relative z-10">
+            <div className="relative z-10 flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center">
-                  <Dumbbell className="w-6 h-6 text-brand-orange" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-orange/20 bg-brand-orange/10">
+                  <Dumbbell className="h-6 w-6 text-brand-orange" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase">Eagle Gym</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                    Eagle Gym
+                  </p>
                   <p className="text-xs font-bold text-white">{planName} Member</p>
                 </div>
               </div>
-              <div className={cn(
-                "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5",
-                isActive ? "bg-success-soft text-success shadow-[0_0_15px_rgba(34,197,94,0.2)]" : "bg-danger-soft text-danger"
-              )}>
-                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isActive ? "bg-success" : "bg-danger")} />
+              <div
+                className={cn(
+                  "flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest",
+                  isActive
+                    ? "bg-success-soft text-success shadow-[0_0_15px_rgba(34,197,94,0.2)]"
+                    : "bg-danger-soft text-danger",
+                )}
+              >
+                <div
+                  className={cn(
+                    "h-1.5 w-1.5 animate-pulse rounded-full",
+                    isActive ? "bg-success" : "bg-danger",
+                  )}
+                />
                 {isActive ? "Active" : "Expired"}
               </div>
             </div>
 
             {/* Middle: Member Name */}
             <div className="relative z-10">
-              <h3 className="text-2xl font-display font-bold text-white tracking-tight uppercase leading-tight">
+              <h3 className="font-display text-2xl font-bold uppercase leading-tight tracking-tight text-white">
                 {member.user.firstName} <br />
                 <span className="text-brand-orange">{member.user.lastName}</span>
               </h3>
             </div>
 
             {/* Bottom Row: ID & Branch */}
-            <div className="flex justify-between items-end relative z-10">
+            <div className="relative z-10 flex items-end justify-between">
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Member ID</p>
-                <p className="text-xs font-mono font-bold text-white/80">{member.id.slice(-8).toUpperCase()}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">
+                  Member ID
+                </p>
+                <p className="font-mono text-xs font-bold text-white/80">
+                  {member.id.slice(-8).toUpperCase()}
+                </p>
               </div>
-              <div className="text-right space-y-1">
-                <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Branch</p>
-                <p className="text-xs font-bold text-white/80">{member.user.branch?.name || "Global"}</p>
+              <div className="space-y-1 text-right">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">
+                  Branch
+                </p>
+                <p className="text-xs font-bold text-white/80">
+                  {member.user.branch?.name || "Global"}
+                </p>
               </div>
             </div>
 
             {/* Card Chip Decoration */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-8 h-8 opacity-10">
-               <Zap className="w-full h-full text-white" />
+            <div className="absolute bottom-8 left-1/2 h-8 w-8 -translate-x-1/2 opacity-10">
+              <Zap className="h-full w-full text-white" />
             </div>
           </div>
 
           {/* BACK SIDE */}
-          <div 
-            className="absolute inset-0 backface-hidden w-full h-full p-8 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
-            style={{ 
+          <div
+            className="backface-hidden absolute inset-0 h-full w-full overflow-hidden rounded-[2rem] border border-white/10 p-8 shadow-2xl"
+            style={{
               background: `linear-gradient(135deg, #1A1A1A 0%, #0A0A0A 100%)`,
-              transform: 'rotateY(180deg) translateZ(1px)'
+              transform: "rotateY(180deg) translateZ(1px)",
             }}
           >
-             <div className="flex flex-col items-center justify-center gap-4 w-full h-full">
-               <div className="absolute inset-0 bg-brand-orange/5 mix-blend-overlay opacity-30" />
-               
-               <div className="bg-white p-4 rounded-3xl shadow-xl relative z-10 group-hover:scale-105 transition-transform duration-500">
-                 <QRCodeSVG 
-                   value={member.userId} 
-                   size={120} 
-                   level="H" 
-                   includeMargin={false}
-                 />
-               </div>
-               <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] relative z-10">
-                 Scan to Verify
-               </p>
-             </div>
+            <div className="flex h-full w-full flex-col items-center justify-center gap-4">
+              <div className="absolute inset-0 bg-brand-orange/5 opacity-30 mix-blend-overlay" />
+
+              <div className="relative z-10 rounded-3xl bg-white p-4 shadow-xl transition-transform duration-500 group-hover:scale-105">
+                <QRCodeSVG value={member.userId} size={120} level="H" includeMargin={false} />
+              </div>
+              <p className="relative z-10 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
+                Scan to Verify
+              </p>
+            </div>
           </div>
         </motion.div>
 
         {/* Flip Instruction Overlay */}
-        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 text-txt-tertiary animate-bounce">
-          <Rotate3d className="w-4 h-4" />
+        <div className="absolute -bottom-10 left-1/2 flex -translate-x-1/2 animate-bounce items-center gap-2 text-txt-tertiary">
+          <Rotate3d className="h-4 w-4" />
           <span className="text-[10px] font-bold uppercase tracking-widest">Tap to flip</span>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-4 w-full max-w-[400px]">
-        <button 
+      <div className="grid w-full max-w-[400px] grid-cols-2 gap-4">
+        <button
           onClick={downloadCard}
-          className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-surface-elevated border border-border hover:border-brand-orange/30 text-foreground transition-all group"
+          className="group flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface-elevated p-4 text-foreground transition-all hover:border-brand-orange/30"
         >
-          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-brand-orange/10 transition-colors">
-            <Download className="w-5 h-5 group-hover:text-brand-orange" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors group-hover:bg-brand-orange/10">
+            <Download className="h-5 w-5 group-hover:text-brand-orange" />
           </div>
           <div className="text-left">
             <p className="text-xs font-bold">Download</p>
             <p className="text-[10px] text-txt-tertiary">Save to Device</p>
           </div>
         </button>
-        <button className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-surface-elevated border border-border hover:border-brand-orange/30 text-foreground transition-all group">
-          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-brand-orange/10 transition-colors">
-            <Share2 className="w-5 h-5 group-hover:text-brand-orange" />
+        <button className="group flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface-elevated p-4 text-foreground transition-all hover:border-brand-orange/30">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors group-hover:bg-brand-orange/10">
+            <Share2 className="h-5 w-5 group-hover:text-brand-orange" />
           </div>
           <div className="text-left">
             <p className="text-xs font-bold">Share Pass</p>
@@ -198,55 +212,63 @@ export function DigitalCardClient({ member }: Props) {
       </div>
 
       {/* Membership Info Footer */}
-      <div className="w-full max-w-[400px] grid grid-cols-2 gap-4">
-         <div className="surface-card p-5 rounded-2xl space-y-1">
-            <div className="flex items-center gap-2 text-txt-tertiary mb-2">
-              <ShieldCheck className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Plan Type</span>
-            </div>
-            <p className="text-lg font-bold text-foreground">{planName}</p>
-            <p className="text-xs text-txt-secondary font-medium">
-              Valid until {mounted && member.subscription?.endDate 
-                ? (() => {
-                    const d = new Date(member.subscription.endDate);
-                    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-                  })()
-                : "--/--/----"}
-            </p>
-         </div>
-         <div className="surface-card p-5 rounded-2xl space-y-1">
-            <div className="flex items-center gap-2 text-txt-tertiary mb-2">
-              <MapPin className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Check-ins</span>
-            </div>
-            <p className="text-lg font-bold text-foreground">{member._count?.attendance || 0} / 30</p>
-            <p className="text-xs text-txt-secondary font-medium">This month</p>
-         </div>
+      <div className="grid w-full max-w-[400px] grid-cols-2 gap-4">
+        <div className="surface-card space-y-1 rounded-2xl p-5">
+          <div className="mb-2 flex items-center gap-2 text-txt-tertiary">
+            <ShieldCheck className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Plan Type</span>
+          </div>
+          <p className="text-lg font-bold text-foreground">{planName}</p>
+          <p className="text-xs font-medium text-txt-secondary">
+            Valid until{" "}
+            {mounted && member.subscription?.endDate
+              ? (() => {
+                  const d = new Date(member.subscription.endDate);
+                  return `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getFullYear()}`;
+                })()
+              : "--/--/----"}
+          </p>
+        </div>
+        <div className="surface-card space-y-1 rounded-2xl p-5">
+          <div className="mb-2 flex items-center gap-2 text-txt-tertiary">
+            <MapPin className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Check-ins</span>
+          </div>
+          <p className="text-lg font-bold text-foreground">{member._count?.attendance || 0} / 30</p>
+          <p className="text-xs font-medium text-txt-secondary">This month</p>
+        </div>
       </div>
 
       {/* Hidden container for HTML2Canvas to render the high-res version */}
       <div className="sr-only">
-        <div ref={cardRef} className="w-[800px] h-[500px] p-16 rounded-[4rem] bg-[#0A0A0A] border-4 border-white/20 flex flex-col justify-between text-white">
-             {/* High res rendering of the card for download */}
-             <div className="flex justify-between">
-                <h1 className="text-5xl font-display font-bold">EAGLE GYM</h1>
-                <div className="px-6 py-2 rounded-full border-2 border-success text-success text-2xl font-bold uppercase">Active</div>
-             </div>
-             <div className="space-y-2">
-                <h2 className="text-6xl font-display font-bold uppercase">{member.user.firstName} {member.user.lastName}</h2>
-                <p className="text-3xl text-white/50 tracking-[0.2em]">{planName} MEMBER</p>
-             </div>
-             <div className="flex justify-between items-end">
-                <div className="space-y-4">
-                   <div>
-                      <p className="text-xl text-white/30 uppercase tracking-[0.3em]">Member ID</p>
-                      <p className="text-3xl font-mono">{member.memberId}</p>
-                   </div>
-                </div>
-                <div className="bg-white p-6 rounded-[2rem]">
-                   <QRCodeSVG value={member.userId} size={150} />
-                </div>
-             </div>
+        <div
+          ref={cardRef}
+          className="flex h-[500px] w-[800px] flex-col justify-between rounded-[4rem] border-4 border-white/20 bg-[#0A0A0A] p-16 text-white"
+        >
+          {/* High res rendering of the card for download */}
+          <div className="flex justify-between">
+            <h1 className="font-display text-5xl font-bold">EAGLE GYM</h1>
+            <div className="rounded-full border-2 border-success px-6 py-2 text-2xl font-bold uppercase text-success">
+              Active
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h2 className="font-display text-6xl font-bold uppercase">
+              {member.user.firstName} {member.user.lastName}
+            </h2>
+            <p className="text-3xl tracking-[0.2em] text-white/50">{planName} MEMBER</p>
+          </div>
+          <div className="flex items-end justify-between">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xl uppercase tracking-[0.3em] text-white/30">Member ID</p>
+                <p className="font-mono text-3xl">{member.memberId}</p>
+              </div>
+            </div>
+            <div className="rounded-[2rem] bg-white p-6">
+              <QRCodeSVG value={member.userId} size={150} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

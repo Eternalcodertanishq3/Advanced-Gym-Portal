@@ -18,35 +18,36 @@ export default async function NutritionPage() {
     where: { userId: session.user.id },
     include: {
       dietPlans: {
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 1,
-        include: { meals: { orderBy: { sortOrder: 'asc' } } }
-      }
-    }
+        include: { meals: { orderBy: { sortOrder: "asc" } } },
+      },
+    },
   });
 
   if (!member) redirect("/member");
 
   const activePlan = member.dietPlans?.[0];
   const statsRes = await getNutritionStats();
-  const stats = statsRes.success ? statsRes.data : { todayWater: 0, waterGoal: 3500, recipesCount: 0 };
+  const stats = statsRes.success
+    ? statsRes.data
+    : { todayWater: 0, waterGoal: 3500, recipesCount: 0 };
 
   // Calculate totals from meals
-  const totals = activePlan?.meals.reduce((acc: any, meal: any) => {
-    acc.calories += meal.calories || 0;
-    acc.protein += Number(meal.protein) || 0;
-    acc.carbs += Number(meal.carbs) || 0;
-    acc.fats += Number(meal.fats) || 0;
-    return acc;
-  }, { calories: 0, protein: 0, carbs: 0, fats: 0 });
+  const totals = activePlan?.meals.reduce(
+    (acc: any, meal: any) => {
+      acc.calories += meal.calories || 0;
+      acc.protein += Number(meal.protein) || 0;
+      acc.carbs += Number(meal.carbs) || 0;
+      acc.fats += Number(meal.fats) || 0;
+      return acc;
+    },
+    { calories: 0, protein: 0, carbs: 0, fats: 0 },
+  );
 
   return (
-    <div className="w-full h-full p-2 md:p-6 max-w-6xl mx-auto">
-      <NutritionClient 
-        stats={stats as any} 
-        activePlan={activePlan} 
-        totals={totals} 
-      />
+    <div className="mx-auto h-full w-full max-w-6xl p-2 md:p-6">
+      <NutritionClient stats={stats as any} activePlan={activePlan} totals={totals} />
     </div>
   );
 }

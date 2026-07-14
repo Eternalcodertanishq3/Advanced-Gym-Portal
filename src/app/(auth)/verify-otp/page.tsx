@@ -56,24 +56,24 @@ export default function VerifyOTPPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
       {/* Premium Background Pattern */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-mesh-gradient opacity-30 dark:opacity-20" />
+        <div className="bg-mesh-gradient absolute inset-0 opacity-30 dark:opacity-20" />
       </div>
 
       <div className="relative z-10 w-full max-w-[480px] px-6">
         <motion.div
-          className="surface-card p-8 sm:p-10 text-center"
+          className="surface-card p-8 text-center sm:p-10"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="w-16 h-16 rounded-2xl bg-brand-orange/10 flex items-center justify-center mx-auto mb-6 border border-brand-orange/20">
-            <ShieldCheck className="w-8 h-8 text-brand-orange" />
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-orange/20 bg-brand-orange/10">
+            <ShieldCheck className="h-8 w-8 text-brand-orange" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Verify Identity</h1>
-          <p className="text-txt-secondary text-sm mb-10 font-medium">
+          <h1 className="mb-2 text-2xl font-bold text-foreground">Verify Identity</h1>
+          <p className="mb-10 text-sm font-medium text-txt-secondary">
             We've sent a secure 6-digit code to your email. <br className="hidden sm:block" />
             Please enter it below to confirm access.
           </p>
@@ -92,7 +92,7 @@ export default function VerifyOTPPage() {
                   aria-label={`Digit ${i + 1}`}
                   onChange={(e) => handleChange(i, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(i, e)}
-                  className="w-11 h-14 sm:w-14 sm:h-16 rounded-xl border-2 border-surface-border bg-surface-sunken text-center text-2xl font-bold text-foreground focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 outline-none transition-all"
+                  className="h-14 w-11 rounded-xl border-2 border-surface-border bg-surface-sunken text-center text-2xl font-bold text-foreground outline-none transition-all focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 sm:h-16 sm:w-14"
                 />
               ))}
             </div>
@@ -101,34 +101,34 @@ export default function VerifyOTPPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full h-12 text-base font-bold shadow-brand-glow"
+                className="btn-primary h-12 w-full text-base font-bold shadow-brand-glow"
               >
                 {isLoading ? (
-                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                 ) : (
                   <>
                     Verify & Continue
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight className="h-5 w-5" />
                   </>
                 )}
               </button>
-              
+
               <button
                 type="button"
-                className="inline-flex items-center gap-2 text-xs font-bold text-txt-tertiary hover:text-brand-orange transition-colors"
+                className="inline-flex items-center gap-2 text-xs font-bold text-txt-tertiary transition-colors hover:text-brand-orange"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
+                <RefreshCw className="h-3.5 w-3.5" />
                 Resend code in 0:59
               </button>
             </div>
           </form>
 
-          <div className="mt-10 pt-6 border-t border-surface-border">
+          <div className="mt-10 border-t border-surface-border pt-6">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 text-sm font-bold text-txt-tertiary hover:text-foreground transition-all group"
+              className="group inline-flex items-center gap-2 text-sm font-bold text-txt-tertiary transition-all hover:text-foreground"
             >
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
               Back to Sign In
             </Link>
           </div>

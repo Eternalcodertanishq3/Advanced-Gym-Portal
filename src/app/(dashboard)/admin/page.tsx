@@ -20,11 +20,11 @@ import { RevenueChart } from "@/app/(dashboard)/admin/components/revenue-chart";
 import { AttendanceHeatmap } from "@/app/(dashboard)/admin/components/attendance-heatmap";
 import { UpcomingSchedule } from "@/app/(dashboard)/admin/components/upcoming-schedule";
 import { SkeletonStatGrid, SkeletonChart } from "@/components/loaders/eagle-loader";
-import { 
-  getDashboardStats, 
-  getAnalyticsChartsData, 
-  getDashboardActivity, 
-  getDashboardSchedules 
+import {
+  getDashboardStats,
+  getAnalyticsChartsData,
+  getDashboardActivity,
+  getDashboardSchedules,
 } from "@/actions/admin/analytics-actions";
 import { toast } from "sonner";
 
@@ -101,7 +101,7 @@ export default function AdminDashboardPage() {
           getDashboardStats(),
           getAnalyticsChartsData(),
           getDashboardActivity(),
-          getDashboardSchedules()
+          getDashboardSchedules(),
         ]);
 
         if (statsRes.success && statsRes.data) {
@@ -112,8 +112,8 @@ export default function AdminDashboardPage() {
           setChartData({
             revenueData: chartsRes.data.revenueData.map((d: any) => ({
               name: d.month,
-              revenue: d.revenue
-            }))
+              revenue: d.revenue,
+            })),
           });
         }
 
@@ -135,9 +135,9 @@ export default function AdminDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 animate-pulse-fade">
+      <div className="animate-pulse-fade space-y-8">
         <SkeletonStatGrid count={4} />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <SkeletonChart />
           </div>
@@ -155,23 +155,33 @@ export default function AdminDashboardPage() {
       className="space-y-8"
     >
       {/* Page Header */}
-      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div
+        variants={itemVariants}
+        className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
+      >
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground tracking-tight mb-1">
+          <h1 className="mb-1 font-display text-3xl font-bold tracking-tight text-foreground">
             Admin <span className="text-brand-orange">Overview</span>
           </h1>
-          <p className="text-sm text-muted-foreground font-medium">Welcome back! Here's what's happening at Eagle Gym.</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            Welcome back! Here's what's happening at Eagle Gym.
+          </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
-          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          <span className="text-xs text-success font-bold tracking-wide uppercase">System Online</span>
+        <div className="hidden items-center gap-2 rounded-full border border-success/20 bg-success/10 px-3 py-1.5 sm:flex">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-success" />
+          <span className="text-xs font-bold uppercase tracking-wide text-success">
+            System Online
+          </span>
         </div>
       </motion.div>
 
       {/* Primary Stats Grid */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div
+        variants={itemVariants}
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+      >
         <StatCard
-          icon={<Users className="w-6 h-6" />}
+          icon={<Users className="h-6 w-6" />}
           label="Total Members"
           value={stats.totalMembers}
           trend="+12%"
@@ -180,7 +190,7 @@ export default function AdminDashboardPage() {
           color="navy"
         />
         <StatCard
-          icon={<CreditCard className="w-6 h-6" />}
+          icon={<CreditCard className="h-6 w-6" />}
           label="Monthly Revenue"
           value={stats.monthlyRevenue}
           trend={`+${stats.revenueGrowth}%`}
@@ -190,7 +200,7 @@ export default function AdminDashboardPage() {
           subtitle={`₹${formatNumber(stats.todayRevenue)} today`}
         />
         <StatCard
-          icon={<Activity className="w-6 h-6" />}
+          icon={<Activity className="h-6 w-6" />}
           label="Checked In Today"
           value={stats.todayAttendance}
           trendUp
@@ -199,7 +209,7 @@ export default function AdminDashboardPage() {
           subtitle="Peak: 6:00 PM - 8:00 PM"
         />
         <StatCard
-          icon={<AlertTriangle className="w-6 h-6" />}
+          icon={<AlertTriangle className="h-6 w-6" />}
           label="Pending Dues"
           value={stats.pendingPayments}
           trendUp={false}
@@ -209,27 +219,30 @@ export default function AdminDashboardPage() {
       </motion.div>
 
       {/* Secondary Summary Grid */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div
+        variants={itemVariants}
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+      >
         <SummaryCard
-          icon={<Calendar className="w-6 h-6" />}
+          icon={<Calendar className="h-6 w-6" />}
           label="New This Month"
           value={stats.newMembersThisMonth}
           color="orange"
         />
         <SummaryCard
-          icon={<Clock className="w-6 h-6" />}
+          icon={<Clock className="h-6 w-6" />}
           label="Expiring Soon"
           value={stats.expiringSoon}
           color="warning"
         />
         <SummaryCard
-          icon={<CheckCircle2 className="w-6 h-6" />}
+          icon={<CheckCircle2 className="h-6 w-6" />}
           label="Active Subscriptions"
           value={stats.activeMembers}
           color="success"
         />
         <SummaryCard
-          icon={<XCircle className="w-6 h-6" />}
+          icon={<XCircle className="h-6 w-6" />}
           label="Inactive Members"
           value={stats.totalMembers - stats.activeMembers}
           color="danger"
@@ -237,7 +250,7 @@ export default function AdminDashboardPage() {
       </motion.div>
 
       {/* Main Content Row 1: Charts & Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Revenue Chart */}
         <motion.div variants={itemVariants} className="lg:col-span-8">
           <RevenueChart data={chartData.revenueData} />
@@ -250,7 +263,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Main Content Row 2: Schedule & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Upcoming Schedule */}
         <motion.div variants={itemVariants} className="lg:col-span-4">
           <UpcomingSchedule data={schedules} />
@@ -263,7 +276,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Tertiary Grid: Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Attendance Heatmap */}
         <motion.div variants={itemVariants} className="lg:col-span-12">
           <AttendanceHeatmap />
@@ -297,15 +310,22 @@ function SummaryCard({
   };
 
   return (
-    <div className="surface-card p-5 flex items-center gap-4 transition-all hover:shadow-md hover:-translate-y-1 duration-300">
-      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", colorMap[color])}>
+    <div className="surface-card flex items-center gap-4 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+      <div
+        className={cn(
+          "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl",
+          colorMap[color],
+        )}
+      >
         {icon}
       </div>
       <div>
-        <p className="text-2xl font-display font-bold text-foreground tracking-tight leading-none mb-1">
-          {typeof value === 'number' ? formatNumber(value) : value}
+        <p className="mb-1 font-display text-2xl font-bold leading-none tracking-tight text-foreground">
+          {typeof value === "number" ? formatNumber(value) : value}
         </p>
-        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </p>
       </div>
     </div>
   );

@@ -12,10 +12,10 @@ export async function getSystemConfig() {
   }
   try {
     const settings = await prisma.gymSetting.findMany();
-    
+
     // Map settings array to a more useful object
     const config: Record<string, any> = {};
-    settings.forEach(s => {
+    settings.forEach((s) => {
       config[s.key] = s.value;
     });
 
@@ -33,18 +33,18 @@ export async function updateSystemConfig(data: Record<string, any>) {
 
     // Fetch old values for audit logging
     const oldSettings = await prisma.gymSetting.findMany({
-      where: { key: { in: Object.keys(data) } }
+      where: { key: { in: Object.keys(data) } },
     });
     const oldValue: Record<string, any> = {};
-    oldSettings.forEach(s => oldValue[s.key] = s.value);
+    oldSettings.forEach((s) => (oldValue[s.key] = s.value));
 
     const tenantId = resolveTenantId() || null;
-    const operations = Object.entries(data).map(([key, value]) => 
+    const operations = Object.entries(data).map(([key, value]) =>
       prisma.gymSetting.upsert({
         where: { key_tenantId: { key, tenantId: tenantId || "" } },
         update: { value, updatedBy },
-        create: { key, value, tenantId, updatedBy }
-      })
+        create: { key, value, tenantId, updatedBy },
+      }),
     );
 
     await Promise.all(operations);
@@ -55,7 +55,7 @@ export async function updateSystemConfig(data: Record<string, any>) {
       entityType: "SYSTEM_CONFIG",
       entityId: "GLOBAL",
       oldValue,
-      newValue: data
+      newValue: data,
     });
 
     revalidatePath("/super-admin/system-config");

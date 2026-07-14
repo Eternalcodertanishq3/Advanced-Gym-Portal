@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export async function StatsGrid() {
   const { stats } = await getDashboardStats();
-  
+
   const defaultStats = {
     totalRevenue: 0,
     activeMembersCount: 0,
@@ -14,33 +14,33 @@ export async function StatsGrid() {
     revenueTrend: "+0.0%",
     membersTrend: "Live",
     revenueSparkline: [0, 0, 0, 0, 0, 0, 0],
-    membersSparkline: [0, 0, 0, 0, 0, 0, 0]
+    membersSparkline: [0, 0, 0, 0, 0, 0, 0],
   };
 
   const currentStats = stats || defaultStats;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        icon={<IndianRupee className="w-6 h-6" />}
+        icon={<IndianRupee className="h-6 w-6" />}
         label="Total System Revenue"
         value={currentStats.totalRevenue}
         trend={currentStats.revenueTrend}
-        trendUp={!currentStats.revenueTrend.startsWith('-')}
+        trendUp={!currentStats.revenueTrend.startsWith("-")}
         color="orange"
         sparklineData={currentStats.revenueSparkline}
       />
       <StatCard
-        icon={<Users className="w-6 h-6" />}
+        icon={<Users className="h-6 w-6" />}
         label="Active Gym Members"
         value={currentStats.activeMembersCount}
         trend={currentStats.membersTrend}
-        trendUp={!currentStats.membersTrend.startsWith('-')}
+        trendUp={!currentStats.membersTrend.startsWith("-")}
         color="info"
         sparklineData={currentStats.membersSparkline}
       />
       <StatCard
-        icon={<Shield className="w-6 h-6" />}
+        icon={<Shield className="h-6 w-6" />}
         label="Active Staff / Admins"
         value={currentStats.activeStaffCount}
         trend="Live"
@@ -49,7 +49,7 @@ export async function StatsGrid() {
         sparklineData={[0, 0, currentStats.activeStaffCount]}
       />
       <StatCard
-        icon={<Activity className="w-6 h-6" />}
+        icon={<Activity className="h-6 w-6" />}
         label="System Health (API)"
         value="100%"
         trend="Stable"
@@ -67,8 +67,8 @@ export async function RecentLogsList() {
 
   if (logs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 relative z-10">
-        <Activity className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
+      <div className="relative z-10 flex h-48 flex-col items-center justify-center">
+        <Activity className="mx-auto mb-3 h-8 w-8 text-muted-foreground/30" />
         <p className="text-sm text-muted-foreground">No audit logs found yet.</p>
       </div>
     );
@@ -77,13 +77,18 @@ export async function RecentLogsList() {
   return (
     <div className="relative z-10 space-y-3">
       {logs.map((log: any) => (
-        <div key={log.id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/30 border border-border">
-          <div className="w-8 h-8 rounded-full bg-electric-cyan/20 flex items-center justify-center shrink-0">
-            <Activity className="w-4 h-4 text-electric-cyan" />
+        <div
+          key={log.id}
+          className="flex items-center gap-4 rounded-xl border border-border bg-muted/30 p-3"
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-electric-cyan/20">
+            <Activity className="h-4 w-4 text-electric-cyan" />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">{log.action}</p>
-            <p className="text-xs text-muted-foreground">{log.user?.firstName || "System"} • {new Date(log.createdAt).toLocaleString()}</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-foreground">{log.action}</p>
+            <p className="text-xs text-muted-foreground">
+              {log.user?.firstName || "System"} • {new Date(log.createdAt).toLocaleString()}
+            </p>
           </div>
         </div>
       ))}

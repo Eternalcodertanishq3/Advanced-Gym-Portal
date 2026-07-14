@@ -25,6 +25,6 @@ export const useSidebarStore = create<SidebarState>()(
     {
       name: "eagle-gym-sidebar",
       partialize: (state) => ({ collapsed: state.collapsed }),
-    }
-  )
+    },
+  ),
 );

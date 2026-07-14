@@ -1,16 +1,17 @@
 import { Redis } from "@upstash/redis";
 
-const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  ? new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    })
-  : null;
+const redis =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      })
+    : null;
 
 export async function rateLimit(
   identifier: string,
   limit: number = 60,
-  windowSeconds: number = 60
+  windowSeconds: number = 60,
 ): Promise<{ success: boolean; remaining: number }> {
   if (!redis) {
     // If Redis is not configured, fall back to allowing requests (fail-open for local dev)

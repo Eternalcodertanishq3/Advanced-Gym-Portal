@@ -36,7 +36,7 @@ const formSchema = z.object({
 export default function AddTrainerPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,22 +68,27 @@ export default function AddTrainerPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
-        <Link href="/admin/trainers" className="flex items-center text-sm text-obsidian-500 hover:text-obsidian-900 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+        <Link
+          href="/admin/trainers"
+          className="flex items-center text-sm text-obsidian-500 transition-colors hover:text-obsidian-900"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Trainers
         </Link>
       </div>
 
-      <Card className="bg-surface-card border-surface-sunken shadow-sm">
+      <Card className="border-surface-sunken bg-surface-card shadow-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-display text-obsidian-950">Onboard New Trainer</CardTitle>
+          <CardTitle className="font-display text-2xl text-obsidian-950">
+            Onboard New Trainer
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="firstName"
@@ -91,7 +96,12 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          placeholder="John"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -104,7 +114,12 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          placeholder="Doe"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -117,7 +132,13 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john.doe@example.com" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          type="email"
+                          placeholder="john.doe@example.com"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -130,7 +151,12 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="+91 9876543210" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          placeholder="+91 9876543210"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -143,7 +169,12 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Specialization</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Bodybuilding, Yoga" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          placeholder="e.g. Bodybuilding, Yoga"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -156,7 +187,12 @@ export default function AddTrainerPage() {
                     <FormItem>
                       <FormLabel>Experience (Years)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          type="number"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -169,21 +205,34 @@ export default function AddTrainerPage() {
                     <FormItem className="col-span-1 md:col-span-2">
                       <FormLabel>Monthly Salary (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={isPending} className="bg-surface-base border-surface-sunken focus-visible:ring-brand-orange" />
+                        <Input
+                          type="number"
+                          {...field}
+                          disabled={isPending}
+                          className="border-surface-sunken bg-surface-base focus-visible:ring-brand-orange"
+                        />
                       </FormControl>
-                      <FormDescription>
-                        Base salary before commissions.
-                      </FormDescription>
+                      <FormDescription>Base salary before commissions.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <div className="flex justify-end gap-4 pt-4 border-t border-surface-sunken">
-                <Button variant="outline" type="button" onClick={() => router.back()} disabled={isPending} className="bg-surface-base border-surface-sunken">
+              <div className="flex justify-end gap-4 border-t border-surface-sunken pt-4">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => router.back()}
+                  disabled={isPending}
+                  className="border-surface-sunken bg-surface-base"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isPending} className="bg-brand-orange text-white hover:bg-brand-orange/90 min-w-[140px]">
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="min-w-[140px] bg-brand-orange text-white hover:bg-brand-orange/90"
+                >
                   {isPending ? "Onboarding..." : "Onboard Trainer"}
                 </Button>
               </div>
@@ -194,4 +243,3 @@ export default function AddTrainerPage() {
     </div>
   );
 }
-

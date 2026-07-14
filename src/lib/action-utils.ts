@@ -11,11 +11,11 @@ import { headers } from "next/headers";
  */
 export async function ensureSuperAdmin() {
   const session = await auth();
-  
+
   if (!session?.user || session.user.role !== "SUPER_ADMIN") {
     throw new Error("Unauthorized: Super Admin access required.");
   }
-  
+
   return session.user;
 }
 
@@ -25,13 +25,13 @@ export async function ensureSuperAdmin() {
  */
 export async function getBranchContext() {
   const session = await auth();
-  
+
   if (!session?.user) {
     throw new Error("Unauthorized: Authentication required.");
   }
 
   const user = session.user as any;
-  
+
   // Super Admin sees everything
   if (user.role === "SUPER_ADMIN") {
     return { branchId: null, role: user.role };
@@ -59,7 +59,7 @@ export async function recordAudit({
   entityType,
   entityId,
   oldValue,
-  newValue
+  newValue,
 }: {
   userId: string;
   action: LogAction;
@@ -82,8 +82,8 @@ export async function recordAudit({
         oldValue: oldValue ? JSON.parse(JSON.stringify(oldValue)) : undefined,
         newValue: newValue ? JSON.parse(JSON.stringify(newValue)) : undefined,
         ipAddress,
-        userAgent
-      }
+        userAgent,
+      },
     });
   } catch (error) {
     console.error("Failed to record audit log:", error);
