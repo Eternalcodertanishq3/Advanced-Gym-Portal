@@ -12,7 +12,7 @@ export async function getInventoryItems(page = 1, limit = 10, search = "") {
   }
   try {
     const skip = (page - 1) * limit;
-    let whereClause = {};
+    let whereClause: any = {};
     if (search) {
       whereClause = { name: { contains: search, mode: "insensitive" } };
     }
@@ -31,8 +31,8 @@ export async function getInventoryItems(page = 1, limit = 10, search = "") {
       success: true,
       data: { items, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -48,8 +48,8 @@ export async function updateInventoryQuantity(id: string, newQuantity: number) {
     });
     revalidatePath("/admin/inventory");
     return { success: true, data: item };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -126,9 +126,12 @@ export async function processSale(data: {
     revalidatePath("/admin/inventory");
     revalidatePath("/admin/payments");
     return { success: true, data: sale };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sale processing failed:", error);
-    return { success: false, error: error.message || "Failed to process sale" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to process sale",
+    };
   }
 }
 
@@ -143,8 +146,8 @@ export async function getProductById(id: string) {
     });
     if (!product) return { success: false, error: "Product not found" };
     return { success: true, data: product };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -168,8 +171,8 @@ export async function createProduct(data: any) {
 
     revalidatePath("/admin/inventory");
     return { success: true, data: product };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -194,8 +197,8 @@ export async function updateProduct(id: string, data: any) {
 
     revalidatePath("/admin/inventory");
     return { success: true, data: product };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -211,7 +214,7 @@ export async function deleteProduct(id: string) {
 
     revalidatePath("/admin/inventory");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

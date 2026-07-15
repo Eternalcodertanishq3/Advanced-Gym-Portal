@@ -323,7 +323,7 @@ export function ChatClient({ initialConversations, currentUser }: Props) {
                   </p>
                 </div>
               ) : (
-                messages.map((msg, idx) => {
+                messages.map((msg, _idx) => {
                   const isMine = msg.senderId === currentUser.id;
                   return (
                     <motion.div

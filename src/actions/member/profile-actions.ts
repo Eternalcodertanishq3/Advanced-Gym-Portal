@@ -39,7 +39,7 @@ export async function updatePassword(data: { current: string; new: string }) {
 /**
  * Updates notification preferences.
  */
-export async function updateNotificationPreferences(prefs: any) {
+export async function updateNotificationPreferences(_prefs: any) {
   try {
     const session = await auth();
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };

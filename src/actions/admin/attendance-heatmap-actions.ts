@@ -43,8 +43,12 @@ export async function getAttendanceHeatmapData(year: number, month: number) {
     });
 
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching heatmap data:", error);
-    return { success: false, error: error.message || "Failed to fetch heatmap data" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Failed to fetch heatmap data",
+    };
   }
 }

@@ -65,8 +65,9 @@ export default function ClassesPage() {
       !confirm(
         "Are you sure you want to delete this class? This will also remove all associated schedules.",
       )
-    )
+    ) {
       return;
+    }
 
     setIsDeleting(id);
     try {

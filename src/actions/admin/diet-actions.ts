@@ -13,7 +13,7 @@ export async function getDietPlans(page = 1, limit = 10, search = "") {
   try {
     const skip = (page - 1) * limit;
 
-    let whereClause: any = {};
+    const whereClause: any = {};
     if (search) {
       whereClause.name = { contains: search, mode: "insensitive" };
     }
@@ -41,8 +41,8 @@ export async function getDietPlans(page = 1, limit = 10, search = "") {
         pagination: { total, pages: Math.ceil(total / limit), page, limit },
       },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -58,8 +58,8 @@ export async function getDietTemplates() {
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: templates };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -88,7 +88,7 @@ export async function createDietPlan(data: {
 
     revalidatePath("/trainer/diet");
     return { success: true, data: plan };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

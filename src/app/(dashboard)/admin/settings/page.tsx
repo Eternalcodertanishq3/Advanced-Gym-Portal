@@ -35,7 +35,7 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
-    let promises = [];
+    const promises = [];
     for (const [key, value] of Object.entries(formValues)) {
       if (settings && settings[key] !== value) {
         promises.push(updateSetting.mutateAsync({ key, value }));
@@ -49,7 +49,7 @@ export default function SettingsPage() {
 
     Promise.all(promises)
       .then(() => toast.success("Settings updated successfully!"))
-      .catch((err) => toast.error("Failed to update settings"));
+      .catch((_err) => toast.error("Failed to update settings"));
   };
 
   const tabs = [

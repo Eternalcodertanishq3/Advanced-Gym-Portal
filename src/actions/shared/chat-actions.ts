@@ -13,7 +13,7 @@ export async function getUserChats(userId: string) {
     // A simple query to get chats involving the user
     // Assuming our schema might have a direct chat or message model, let's just return a placeholder for now since the schema might be complex for chats
     return { success: true, data: [] };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

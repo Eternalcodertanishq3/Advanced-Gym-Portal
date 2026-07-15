@@ -37,7 +37,7 @@ export async function getStaff() {
     }));
 
     return { success: true, staff: mappedStaff };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch staff:", error);
     return { success: false, error: "Failed to load staff members" };
   }
@@ -104,7 +104,7 @@ export async function inviteStaff(data: {
 
     revalidatePath("/super-admin/admins");
     return { success: true, user, tempPassword };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to invite staff:", error);
     return { success: false, error: "Failed to invite staff member" };
   }
@@ -144,7 +144,7 @@ export async function updateStaff(
     });
     revalidatePath("/super-admin/admins");
     return { success: true, user };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to update staff:", error);
     return { success: false, error: "Failed to update staff member" };
   }
@@ -171,7 +171,7 @@ export async function deleteStaff(id: string) {
     });
     revalidatePath("/super-admin/admins");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to delete staff:", error);
     return { success: false, error: "Failed to delete staff member" };
   }

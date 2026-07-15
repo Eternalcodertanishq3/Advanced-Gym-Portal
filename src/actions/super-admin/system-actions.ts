@@ -35,7 +35,7 @@ export async function getSystemMetrics() {
         totalRecords,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching system metrics:", error);
     return { success: false, error: "Failed to fetch system metrics" };
   }
@@ -49,7 +49,7 @@ export async function getBackups() {
     await ensureSuperAdmin();
 
     // Explicitly casting to any to handle cases where Prisma types haven't refreshed in IDE
-    const backups = await (prisma as any).backup.findMany({
+    const backups = await prisma.backup.findMany({
       orderBy: { createdAt: "desc" },
     });
 
@@ -72,7 +72,7 @@ export async function getBackups() {
         status: b.status,
       })),
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching backups:", error);
     return { success: false, error: "Failed to fetch backups" };
   }
@@ -96,7 +96,7 @@ export async function triggerBackup() {
       .toString()
       .padStart(3, "0")}`;
 
-    const backup = await (prisma as any).backup.create({
+    const backup = await prisma.backup.create({
       data: {
         fileName,
         size: `${randomSize} GB`,
@@ -116,7 +116,7 @@ export async function triggerBackup() {
 
     revalidatePath("/super-admin/backups");
     return { success: true, message: "Backup snapshot created successfully" };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Backup trigger failed:", error);
     return { success: false, error: "Failed to initiate backup" };
   }
@@ -129,7 +129,7 @@ export async function deleteBackup(id: string) {
   try {
     const user = await ensureSuperAdmin();
 
-    await (prisma as any).backup.delete({
+    await prisma.backup.delete({
       where: { id },
     });
 
@@ -142,7 +142,7 @@ export async function deleteBackup(id: string) {
 
     revalidatePath("/super-admin/backups");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return { success: false, error: "Failed to delete backup" };
   }
 }
@@ -155,7 +155,7 @@ export async function restoreBackup(id: string) {
   try {
     const user = await ensureSuperAdmin();
 
-    const backup = await (prisma as any).backup.findUnique({
+    const backup = await prisma.backup.findUnique({
       where: { id },
     });
 
@@ -177,8 +177,12 @@ export async function restoreBackup(id: string) {
 
     revalidatePath("/super-admin");
     return { success: true, message: `System successfully restored to ${backup.fileName}` };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Restore failed:", error);
-    return { success: false, error: error.message || "Restoration process failed" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Restoration process failed",
+    };
   }
 }

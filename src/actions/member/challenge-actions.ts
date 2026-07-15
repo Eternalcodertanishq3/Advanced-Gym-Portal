@@ -18,7 +18,7 @@ export async function getChallenges() {
 
     if (!member) return { success: false, error: "Member not found" };
 
-    const challenges = await (prisma as any).challenge.findMany({
+    const challenges = await prisma.challenge.findMany({
       where: { isActive: true },
       include: {
         participants: {
@@ -51,7 +51,7 @@ export async function joinChallenge(challengeId: string) {
 
     if (!member) return { success: false, error: "Member not found" };
 
-    await (prisma as any).challengeParticipant.create({
+    await prisma.challengeParticipant.create({
       data: {
         challengeId,
         memberId: member.id,

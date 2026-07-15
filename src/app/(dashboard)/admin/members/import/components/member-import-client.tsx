@@ -80,7 +80,9 @@ export function MemberImportClient({
           processData(results.data);
         },
         error: (error) => {
-          toast.error("Failed to parse CSV: " + error.message);
+          toast.error(
+            "Failed to parse CSV: " + (error instanceof Error ? error.message : String(error)),
+          );
           setIsProcessing(false);
         },
       });

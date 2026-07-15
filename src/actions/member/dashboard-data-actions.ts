@@ -158,11 +158,14 @@ export async function getMemberDashboardStats(userId: string) {
         upcomingClasses,
         todayWorkout,
         todayDiet,
-        attendanceSparkline: recentAttendance.reverse().map((a) => 1), // Simple count for now, or use real data if available
+        attendanceSparkline: recentAttendance.reverse().map((_a) => 1), // Simple count for now, or use real data if available
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching member dashboard stats:", error);
-    return { success: false, error: error.message || "Failed to fetch stats" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to fetch stats",
+    };
   }
 }

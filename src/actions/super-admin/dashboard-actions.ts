@@ -154,7 +154,7 @@ export async function getDashboardStats() {
       },
       recentLogs,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch dashboard stats:", error);
     return { success: false, error: "Failed to load dashboard metrics" };
   }

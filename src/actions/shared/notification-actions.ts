@@ -17,8 +17,8 @@ export async function getNotifications(userId: string) {
       take: 20,
     });
     return { success: true, data: notifications };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -34,8 +34,8 @@ export async function getAllSentNotifications() {
       take: 50,
     });
     return { success: true, data: notifications };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -59,8 +59,8 @@ export async function sendBroadcast(title: string, message: string, type: string
 
     revalidatePath("/admin/notifications");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -76,7 +76,7 @@ export async function markAsRead(notificationId: string) {
     });
     revalidatePath("/");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

@@ -74,11 +74,16 @@ export async function registerUser(rawValues: z.infer<typeof RegisterSchema>) {
         lastName: user.lastName,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("User registration failed:", error);
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }
-    return { success: false, error: error.message || "Failed to create user account." };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) ||
+        "Failed to create user account.",
+    };
   }
 }

@@ -48,7 +48,7 @@ export async function getWorkerDashboardStats() {
         recentTasks,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching worker stats:", error);
     return { success: false, error: "Failed to load dashboard data" };
   }

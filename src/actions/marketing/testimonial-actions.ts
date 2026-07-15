@@ -12,7 +12,7 @@ const testimonialSchema = z.object({
 });
 
 export async function submitTestimonial(formData: FormData) {
-  console.log("Submit testimonial action called");
+  console.debug("Submit testimonial action called");
   try {
     const data = {
       author: formData.get("author") as string,
@@ -21,10 +21,10 @@ export async function submitTestimonial(formData: FormData) {
       rating: Number(formData.get("rating")) || 5,
     };
 
-    console.log("Received data:", data);
+    console.debug("Received data:", data);
 
     const validated = testimonialSchema.parse(data);
-    console.log("Data validated successfully");
+    console.debug("Data validated successfully");
 
     const result = await prisma.testimonial.create({
       data: {
@@ -33,10 +33,10 @@ export async function submitTestimonial(formData: FormData) {
       },
     });
 
-    console.log("Testimonial created in DB:", result.id);
+    console.debug("Testimonial created in DB:", result.id);
 
     return { success: true, message: "Thank you! Your feedback has been submitted for review." };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Testimonial submission error:", error);
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };

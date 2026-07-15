@@ -151,10 +151,10 @@ export default auth(async (req) => {
   if (isAuthRoute) {
     if (isLoggedIn) {
       if (role === "SUPER_ADMIN")
-        return NextResponse.redirect(new URL(ROUTES.SUPER_ADMIN, nextUrl));
+        {return NextResponse.redirect(new URL(ROUTES.SUPER_ADMIN, nextUrl));}
       if (role === "ADMIN") return NextResponse.redirect(new URL(ROUTES.ADMIN, nextUrl));
       if (role === "RECEPTIONIST")
-        return NextResponse.redirect(new URL(ROUTES.RECEPTIONIST, nextUrl));
+        {return NextResponse.redirect(new URL(ROUTES.RECEPTIONIST, nextUrl));}
       if (role === "TRAINER") return NextResponse.redirect(new URL(ROUTES.TRAINER, nextUrl));
       if (role === "MEMBER") return NextResponse.redirect(new URL(ROUTES.MEMBER, nextUrl));
       if (role === "WORKER") return NextResponse.redirect(new URL(ROUTES.WORKER, nextUrl));

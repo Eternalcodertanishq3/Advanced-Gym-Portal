@@ -155,8 +155,8 @@ export async function bulkImportMembers(data: ImportMemberData[], branchId: stri
     }
 
     return { success: true, results };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Bulk import failed:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

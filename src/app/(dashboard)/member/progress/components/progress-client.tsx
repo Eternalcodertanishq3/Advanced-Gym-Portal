@@ -247,7 +247,7 @@ export function ProgressClient({ data }: Props) {
                   {data.measurements
                     .slice()
                     .reverse()
-                    .map((m, i) => (
+                    .map((m, _i) => (
                       <div
                         key={m.id}
                         className="group flex items-center justify-between rounded-2xl border border-border/50 bg-surface-sunken/50 p-4 transition-all hover:border-brand-orange/30"
@@ -315,7 +315,7 @@ export function ProgressClient({ data }: Props) {
                   <p className="text-xs text-txt-tertiary">Keep visual track of gains</p>
                 </div>
               </div>
-              {data.photos.map((photo, idx) => (
+              {data.photos.map((photo, _idx) => (
                 <div
                   key={photo.id}
                   className="group relative aspect-[3/4] overflow-hidden rounded-[2.5rem] bg-surface-sunken shadow-xl"
@@ -349,7 +349,7 @@ export function ProgressClient({ data }: Props) {
             exit={{ opacity: 0, y: -10 }}
             className="grid grid-cols-1 gap-8 md:grid-cols-2"
           >
-            {data.goals.map((goal, idx) => {
+            {data.goals.map((goal, _idx) => {
               const progress = Math.min(
                 (Number(goal.currentValue) / Number(goal.targetValue)) * 100,
                 100,

@@ -25,7 +25,7 @@ export async function resetInitialPassword(newPassword: string) {
 
     revalidatePath("/");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Password reset error:", error);
     return { success: false, error: "Failed to reset password" };
   }

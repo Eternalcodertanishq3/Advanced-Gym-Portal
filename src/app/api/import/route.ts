@@ -69,10 +69,13 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("CSV import endpoint failure:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to process import" },
+      {
+        error:
+          (error instanceof Error ? error.message : String(error)) || "Failed to process import",
+      },
       { status: 500 },
     );
   }

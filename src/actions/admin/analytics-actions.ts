@@ -141,9 +141,14 @@ export async function getDashboardStats() {
         revenueSparkline: revenueSparkline.map((p) => Number(p.total)),
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching dashboard stats:", error);
-    return { success: false, error: error.message || "Failed to fetch dashboard stats" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) ||
+        "Failed to fetch dashboard stats",
+    };
   }
 }
 
@@ -271,9 +276,9 @@ export async function getAnalyticsChartsData() {
         attendanceData,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching chart data:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -309,8 +314,8 @@ export async function getDashboardActivity() {
         role: a.user.role,
       })),
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -373,8 +378,8 @@ export async function getDashboardSchedules() {
       success: true,
       data: scheduleItems.sort((a, b) => a.time.localeCompare(b.time)),
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -450,8 +455,8 @@ export async function getSuperAdminRevenueStats() {
         chartData,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching super admin revenue stats:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

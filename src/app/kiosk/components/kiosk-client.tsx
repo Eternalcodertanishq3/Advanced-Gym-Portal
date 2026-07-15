@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   QrCode,
@@ -30,15 +30,7 @@ export function KioskClient() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (phone.length >= 4) {
-      handleSearch();
-    } else {
-      setMember(null);
-    }
-  }, [phone]);
-
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     setLoading(true);
     const res = await searchMemberByPhone(phone);
     if (res.success) {
@@ -47,7 +39,15 @@ export function KioskClient() {
       setMember(null);
     }
     setLoading(false);
-  };
+  }, [phone]);
+
+  useEffect(() => {
+    if (phone.length >= 4) {
+      handleSearch();
+    } else {
+      setMember(null);
+    }
+  }, [phone, handleSearch]);
 
   const handleCheckIn = async () => {
     if (!member) return;

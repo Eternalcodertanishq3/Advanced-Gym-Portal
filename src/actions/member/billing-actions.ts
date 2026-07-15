@@ -128,9 +128,14 @@ export async function createCheckoutSession(planId: string) {
         },
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Razorpay order creation failed:", error);
-    return { success: false, error: error.message || "Failed to initiate checkout session" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) ||
+        "Failed to initiate checkout session",
+    };
   }
 }
 
@@ -227,16 +232,20 @@ export async function verifyPaymentSignature(data: {
     revalidatePath("/member/billing");
     revalidatePath("/member/subscription");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Signature verification failed:", error);
-    return { success: false, error: error.message || "Signature verification failed" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Signature verification failed",
+    };
   }
 }
 
 /**
  * Updates the default payment method (simulated).
  */
-export async function setDefaultPaymentMethod(pmId: string) {
+export async function setDefaultPaymentMethod(_pmId: string) {
   try {
     const session = await auth();
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };

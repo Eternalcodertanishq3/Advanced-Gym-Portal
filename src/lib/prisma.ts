@@ -8,7 +8,7 @@ import { headers } from "next/headers";
 
 export const tenantStorage = new AsyncLocalStorage<{ tenantId: string }>();
 
-const globalForPrisma = globalThis as unknown as {
+const globalForPrisma = globalThis as any as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 

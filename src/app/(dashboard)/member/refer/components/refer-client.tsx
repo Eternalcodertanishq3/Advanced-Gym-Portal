@@ -28,7 +28,7 @@ export function ReferClient({ referralCode, referralCount, totalReferralXP }: Pr
       try {
         await navigator.share(shareData);
       } catch (err) {
-        console.log("Share failed", err);
+        console.debug("Share failed", err);
       }
     } else {
       // Fallback: Copy link

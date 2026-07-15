@@ -15,8 +15,8 @@ export async function getGymSettings() {
     }, {});
 
     return { success: true, data: settingsMap };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -34,7 +34,7 @@ export async function updateGymSetting(key: string, value: any) {
     });
     revalidatePath("/admin/settings");
     return { success: true, data: setting };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

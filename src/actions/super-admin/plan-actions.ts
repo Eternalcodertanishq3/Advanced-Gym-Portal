@@ -13,7 +13,7 @@ export async function getPlans() {
       orderBy: { sortOrder: "asc" },
     });
     return { success: true, plans };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch plans:", error);
     return { success: false, error: "Failed to load subscription plans" };
   }
@@ -54,7 +54,7 @@ export async function createPlan(data: any) {
 
     revalidatePath("/super-admin/subscription-plans");
     return { success: true, plan };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to create plan:", error);
     return { success: false, error: "Failed to create plan" };
   }
@@ -99,7 +99,7 @@ export async function updatePlan(id: string, data: any) {
 
     revalidatePath("/super-admin/subscription-plans");
     return { success: true, plan };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to update plan:", error);
     return { success: false, error: "Failed to update plan" };
   }
@@ -127,7 +127,7 @@ export async function togglePlanStatus(id: string, currentStatus: boolean) {
 
     revalidatePath("/super-admin/subscription-plans");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to toggle plan status:", error);
     return { success: false, error: "Failed to update status" };
   }
@@ -162,7 +162,7 @@ export async function deletePlan(id: string) {
 
     revalidatePath("/super-admin/subscription-plans");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to delete plan:", error);
     return { success: false, error: "Failed to delete plan" };
   }

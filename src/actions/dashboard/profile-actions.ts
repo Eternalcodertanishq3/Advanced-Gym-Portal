@@ -49,8 +49,8 @@ export async function updateProfile(formData: FormData) {
 
     revalidatePath("/(dashboard)", "layout");
     return { success: true, message: "Profile updated successfully" };
-  } catch (error: any) {
-    if (error.code === "P2002") {
+  } catch (error: unknown) {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
       return { error: "Email or phone already in use" };
     }
     return { error: "Failed to update profile" };

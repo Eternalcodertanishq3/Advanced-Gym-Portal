@@ -15,7 +15,7 @@ export async function getAuditLogs(page = 1, limit = 20, search = "") {
 
     const skip = (page - 1) * limit;
 
-    let where: any = {};
+    const where: any = {};
     if (search) {
       where.OR = [
         { action: { contains: search, mode: "insensitive" } },

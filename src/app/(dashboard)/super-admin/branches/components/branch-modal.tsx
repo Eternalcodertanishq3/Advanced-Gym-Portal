@@ -74,8 +74,9 @@ export function BranchModal({ isOpen, onClose, branch }: Props) {
 
   const handleDelete = async () => {
     if (!branch) return;
-    if (!confirm("Are you sure you want to delete this branch? It will be marked as CLOSED."))
+    if (!confirm("Are you sure you want to delete this branch? It will be marked as CLOSED.")) {
       return;
+    }
 
     setIsDeleting(true);
     const res = await deleteBranch(branch.id);

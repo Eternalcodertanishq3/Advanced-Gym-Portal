@@ -26,7 +26,7 @@ export async function getAuditLogs() {
     }));
 
     return { success: true, logs: mappedLogs };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch audit logs:", error);
     return { success: false, error: "Failed to load audit logs" };
   }

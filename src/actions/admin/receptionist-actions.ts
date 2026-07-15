@@ -68,9 +68,12 @@ export async function getReceptionistDashboardStats() {
         newWalkIns,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching receptionist stats:", error);
-    return { success: false, error: error.message || "Failed to fetch stats" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to fetch stats",
+    };
   }
 }
 
@@ -102,7 +105,7 @@ export async function generateVisitorPass(data: {
     });
 
     return { success: true, data: pass };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return { success: false, error: "Failed to generate pass" };
   }
 }
@@ -114,7 +117,7 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
   }
   try {
     const skip = (page - 1) * limit;
-    let where: any = {};
+    const where: any = {};
 
     if (search) {
       where.user = {
@@ -149,9 +152,13 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
         totalPages: Math.ceil(total / limit),
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching receptionists:", error);
-    return { success: false, error: error.message || "Failed to fetch receptionists" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Failed to fetch receptionists",
+    };
   }
 }
 
@@ -167,8 +174,8 @@ export async function getReceptionistById(id: string) {
     });
     if (!rec) return { success: false, error: "Receptionist not found" };
     return { success: true, data: rec };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -212,12 +219,15 @@ export async function createReceptionist(data: any) {
 
     revalidatePath("/admin/receptionists");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating receptionist:", error);
-    if (error.code === "P2002") {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
       return { success: false, error: "Email or phone number already exists." };
     }
-    return { success: false, error: error.message || "Failed to onboard staff" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to onboard staff",
+    };
   }
 }
 
@@ -251,8 +261,11 @@ export async function updateReceptionist(id: string, data: any) {
 
     revalidatePath("/admin/receptionists");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating receptionist:", error);
-    return { success: false, error: error.message || "Failed to update staff" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to update staff",
+    };
   }
 }

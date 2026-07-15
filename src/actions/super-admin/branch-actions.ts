@@ -43,7 +43,7 @@ export async function getBranches() {
     });
 
     return { success: true, branches: mappedBranches };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch branches:", error);
     return { success: false, error: "Failed to load branches" };
   }
@@ -74,7 +74,7 @@ export async function createBranch(data: {
 
     revalidatePath("/super-admin/branches");
     return { success: true, branch };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to create branch:", error);
     return { success: false, error: "Failed to create branch" };
   }
@@ -109,7 +109,7 @@ export async function updateBranch(
     });
     revalidatePath("/super-admin/branches");
     return { success: true, branch };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to update branch:", error);
     return { success: false, error: "Failed to update branch" };
   }
@@ -136,7 +136,7 @@ export async function deleteBranch(id: string) {
     });
     revalidatePath("/super-admin/branches");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to delete branch:", error);
     return { success: false, error: "Failed to delete branch" };
   }

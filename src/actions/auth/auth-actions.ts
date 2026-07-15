@@ -21,8 +21,8 @@ export async function getUserProfile(userId: string) {
       },
     });
     return { success: true, data: user };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -38,7 +38,7 @@ export async function updateUserProfile(userId: string, data: { name?: string; p
     });
     revalidatePath("/");
     return { success: true, data: user };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

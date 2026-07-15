@@ -65,7 +65,7 @@ export async function logWater(amount: number) {
 
     if (!member) return { success: false, error: "Member not found" };
 
-    const newLog = await (prisma as any).waterLog.create({
+    const newLog = await prisma.waterLog.create({
       data: {
         memberId: member.id,
         amount,
@@ -97,7 +97,7 @@ export async function getNutritionStats() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const waterLogs = await (prisma as any).waterLog.findMany({
+    const waterLogs = await prisma.waterLog.findMany({
       where: {
         memberId: member.id,
         date: {
@@ -107,7 +107,7 @@ export async function getNutritionStats() {
       orderBy: { date: "desc" },
     });
 
-    const mealLogs = await (prisma as any).dietLog.findMany({
+    const mealLogs = await prisma.dietLog.findMany({
       where: {
         memberId: member.id,
         createdAt: {
@@ -115,7 +115,11 @@ export async function getNutritionStats() {
         },
       },
       include: {
-        meal: true,
+        dietPlan: {
+          include: {
+            meals: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -130,14 +134,17 @@ export async function getNutritionStats() {
       data: {
         todayWater: totalWater,
         waterGoal: 3500,
-        recipesCount: await (prisma as any).recipe.count({ where: { isPublic: true } }),
+        recipesCount: await prisma.recipe.count({ where: { isPublic: true } }),
         waterLogs,
-        mealLogs: mealLogs.map((log: any) => ({
-          id: log.id,
-          name: log.meal?.name || "Custom Meal",
-          calories: log.actualCalories || log.meal?.calories || 0,
-          createdAt: log.createdAt,
-        })),
+        mealLogs: mealLogs.map((log: any) => {
+          const meal = log.dietPlan?.meals?.find((m: any) => m.id === log.mealId);
+          return {
+            id: log.id,
+            name: meal?.name || "Custom Meal",
+            calories: log.actualCalories || meal?.calories || 0,
+            createdAt: log.createdAt,
+          };
+        }),
       },
     };
   } catch (error) {
@@ -175,8 +182,9 @@ export async function logMeal(data: {
     if (!member) return { success: false, error: "Member not found" };
 
     const activePlanId = data.dietPlanId || member.dietPlans?.[0]?.id;
-    if (!activePlanId)
+    if (!activePlanId) {
       return { success: false, error: "No active diet plan found to log against." };
+    }
 
     // If no mealId provided (ad-hoc meal), we create a "Custom" meal entry for this plan first
     // Or we just allow the log if the schema permitted null mealId. Since it doesn't, we'll find or create a "Custom Log" meal.
@@ -203,7 +211,7 @@ export async function logMeal(data: {
       targetMealId = customMeal.id;
     }
 
-    const log = await (prisma as any).dietLog.create({
+    const log = await prisma.dietLog.create({
       data: {
         memberId: member.id,
         dietPlanId: activePlanId,
@@ -236,7 +244,7 @@ export async function getRecipes() {
   const session = await auth();
   if (!session?.user) return { success: false, error: "Unauthorized" };
   try {
-    const recipes = await (prisma as any).recipe.findMany({
+    const recipes = await prisma.recipe.findMany({
       where: { isPublic: true },
       orderBy: { createdAt: "desc" },
     });

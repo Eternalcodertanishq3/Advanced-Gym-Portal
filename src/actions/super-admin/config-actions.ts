@@ -20,7 +20,7 @@ export async function getSystemConfig() {
     });
 
     return { success: true, config };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch system config:", error);
     return { success: false, error: "Failed to load system settings" };
   }
@@ -61,7 +61,7 @@ export async function updateSystemConfig(data: Record<string, any>) {
     revalidatePath("/super-admin/system-config");
     revalidatePath("/");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to update system config:", error);
     return { success: false, error: "Failed to update system settings" };
   }

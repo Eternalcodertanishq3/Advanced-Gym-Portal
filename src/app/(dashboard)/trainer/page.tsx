@@ -173,7 +173,7 @@ export default function TrainerDashboardPage() {
             </div>
 
             <div className="relative space-y-4 before:absolute before:inset-y-0 before:left-[19px] before:w-px before:bg-border">
-              {schedule.map((session, index) => (
+              {schedule.map((session, _index) => (
                 <div key={session.id} className="group relative flex items-center gap-4 pl-12">
                   {/* Timeline Dot */}
                   <div

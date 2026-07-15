@@ -22,7 +22,7 @@ export const metadata = {
 
 export default async function RecipesPage() {
   const res = await getRecipes();
-  const recipes = res.success ? res.data : [];
+  const recipes = res.success && res.data ? res.data : [];
 
   return (
     <div className="mx-auto h-full w-full max-w-7xl space-y-12 p-6 duration-500 animate-in fade-in md:p-10">

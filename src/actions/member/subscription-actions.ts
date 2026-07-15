@@ -109,7 +109,7 @@ export async function subscribeToPlan({
     revalidatePath("/member");
     revalidatePath("/super-admin/audit-logs");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Subscription failed:", error);
     return { success: false, error: "Failed to process subscription." };
   }
@@ -120,7 +120,7 @@ export async function getMemberSubscriptionDetails() {
   if (!session?.user) return { success: false, error: "Not authenticated" };
 
   try {
-    const member = await (prisma as any).member.findUnique({
+    const member = await prisma.member.findUnique({
       where: { userId: session.user.id },
       include: {
         subscription: {
@@ -141,7 +141,7 @@ export async function getMemberSubscriptionDetails() {
         payments: member.payments,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching subscription details:", error);
     return { success: false, error: "Failed to fetch details" };
   }

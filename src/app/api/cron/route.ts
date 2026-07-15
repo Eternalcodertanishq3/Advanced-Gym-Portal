@@ -56,7 +56,7 @@ export async function GET(req: Request) {
       };
     });
 
-    console.log(
+    console.debug(
       `[Subscription Cron Executed]: Expired ${result.expiredSubscriptionsCount} subscriptions and ${result.expiredTenantsCount} tenants.`,
     );
 
@@ -65,8 +65,11 @@ export async function GET(req: Request) {
       message: "Subscription status verification completed successfully.",
       data: result,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Scheduled cron verification job failed:", error);
-    return NextResponse.json({ error: error.message || "Internal Cron Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: (error instanceof Error ? error.message : String(error)) || "Internal Cron Error" },
+      { status: 500 },
+    );
   }
 }

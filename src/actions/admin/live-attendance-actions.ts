@@ -103,8 +103,12 @@ export async function getLiveAttendanceData() {
         })),
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching live attendance data:", error);
-    return { success: false, error: error.message || "Failed to fetch live data" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Failed to fetch live data",
+    };
   }
 }

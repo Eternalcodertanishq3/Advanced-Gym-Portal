@@ -59,10 +59,12 @@ export default function InventoryPage() {
   };
 
   const getStockStatus = (quantity: number) => {
-    if (quantity === 0)
+    if (quantity === 0) {
       return { label: "Out of Stock", badge: "bg-red-100 text-red-800 border-red-200" };
-    if (quantity < 10)
+    }
+    if (quantity < 10) {
       return { label: "Low Stock", badge: "bg-orange-100 text-orange-800 border-orange-200" };
+    }
     return { label: "In Stock", badge: "bg-green-100 text-green-800 border-green-200" };
   };
 

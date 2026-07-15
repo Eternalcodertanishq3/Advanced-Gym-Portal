@@ -75,9 +75,12 @@ export async function getTrainerDashboardStats(trainerId: string) {
         schedule,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching trainer stats:", error);
-    return { success: false, error: error.message || "Failed to fetch stats" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to fetch stats",
+    };
   }
 }
 
@@ -94,8 +97,8 @@ export async function getTrainers() {
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: trainers };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -127,9 +130,9 @@ export async function getTrainerMembers(trainerId: string) {
     });
 
     return { success: true, data: members };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching trainer members:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -146,8 +149,8 @@ export async function assignWorkoutPlan(memberId: string, planId: string) {
 
     revalidatePath("/trainer/my-members");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -164,8 +167,8 @@ export async function assignDietPlan(memberId: string, planId: string) {
 
     revalidatePath("/trainer/my-members");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -209,9 +212,9 @@ export async function getMemberProfileForTrainer(memberId: string) {
     if (!member) return { success: false, error: "Member not found" };
 
     return { success: true, data: member };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching member profile:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -246,8 +249,8 @@ export async function schedulePTSession(data: {
     revalidatePath("/trainer/sessions");
     revalidatePath("/trainer");
     return { success: true, data: session };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -269,8 +272,11 @@ export async function getTrainerById(id: string) {
 
     if (!trainer) return { success: false, error: "Trainer not found" };
     return { success: true, data: trainer };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to fetch trainer" };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to fetch trainer",
+    };
   }
 }
 
@@ -294,8 +300,8 @@ export async function updateSessionStatus(sessionId: string, status: string, fee
     revalidatePath("/trainer/sessions");
     revalidatePath("/trainer");
     return { success: true, data: session };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -347,12 +353,16 @@ export async function createTrainer(data: any) {
 
     revalidatePath("/admin/trainers");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating trainer:", error);
-    if (error.code === "P2002") {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
       return { success: false, error: "Email or phone number already exists." };
     }
-    return { success: false, error: error.message || "Failed to onboard trainer" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Failed to onboard trainer",
+    };
   }
 }
 
@@ -391,8 +401,11 @@ export async function updateTrainer(id: string, data: any) {
 
     revalidatePath("/admin/trainers");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating trainer:", error);
-    return { success: false, error: error.message || "Failed to update trainer" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to update trainer",
+    };
   }
 }

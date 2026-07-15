@@ -14,7 +14,7 @@ export async function getStaff(page = 1, limit = 10, search = "") {
   try {
     const skip = (page - 1) * limit;
 
-    let whereClause = {};
+    let whereClause: any = {};
     if (search) {
       whereClause = {
         user: {
@@ -46,8 +46,8 @@ export async function getStaff(page = 1, limit = 10, search = "") {
       success: true,
       data: { staff: workers, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -72,7 +72,7 @@ export async function getStaffAttendance(limit = 20) {
     });
 
     return { success: true, data: attendance };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return { success: false, error: "Failed to load staff attendance" };
   }
 }
@@ -89,8 +89,8 @@ export async function getStaffById(id: string) {
     });
     if (!worker) return { success: false, error: "Staff member not found" };
     return { success: true, data: worker };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -135,12 +135,15 @@ export async function createStaff(data: any) {
 
     revalidatePath("/admin/staff");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating staff:", error);
-    if (error.code === "P2002") {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
       return { success: false, error: "Email or phone number already exists." };
     }
-    return { success: false, error: error.message || "Failed to onboard staff" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to onboard staff",
+    };
   }
 }
 
@@ -175,8 +178,11 @@ export async function updateStaff(id: string, data: any) {
 
     revalidatePath("/admin/staff");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating staff:", error);
-    return { success: false, error: error.message || "Failed to update staff" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to update staff",
+    };
   }
 }

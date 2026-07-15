@@ -80,8 +80,8 @@ export async function triggerPaymentReminders() {
 
     revalidatePath("/super-admin");
     return { success: true, sentCount, totalFound: dueSubscriptions.length };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to trigger reminders:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

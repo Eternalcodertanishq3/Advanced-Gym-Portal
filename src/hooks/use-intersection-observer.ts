@@ -6,9 +6,10 @@ export function useIntersectionObserver(options = {}) {
     const observer = new IntersectionObserver(([entry]) => {
       setIsIntersecting(entry.isIntersecting);
     }, options);
-    if (elementRef.current) observer.observe(elementRef.current);
+    const currentElement = elementRef.current;
+    if (currentElement) observer.observe(currentElement);
     return () => {
-      if (elementRef.current) observer.unobserve(elementRef.current);
+      if (currentElement) observer.unobserve(currentElement);
     };
   }, [options]);
   return [elementRef, isIntersecting] as const;

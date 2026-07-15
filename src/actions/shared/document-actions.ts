@@ -16,8 +16,8 @@ export async function getUserDocuments(memberId: string) {
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: documents };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -38,8 +38,8 @@ export async function getAllDocuments() {
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: documents };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -52,7 +52,7 @@ export async function deleteDocument(id: string) {
     await prisma.document.delete({ where: { id } });
     revalidatePath("/admin/documents");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

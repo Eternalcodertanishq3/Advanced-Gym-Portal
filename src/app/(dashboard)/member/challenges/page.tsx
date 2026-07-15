@@ -14,7 +14,7 @@ export default async function ChallengesPage() {
   if (!session?.user) redirect("/login");
 
   const challengeRes = await getChallenges();
-  const challenges = challengeRes.success ? challengeRes.data : [];
+  const challenges = challengeRes.success && challengeRes.data ? challengeRes.data : [];
 
   return <ChallengesClient challenges={challenges} />;
 }

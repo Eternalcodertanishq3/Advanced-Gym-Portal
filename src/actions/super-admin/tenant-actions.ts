@@ -33,9 +33,12 @@ export async function getTenants() {
     });
 
     return { success: true, data: tenants };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch tenants:", error);
-    return { success: false, error: error.message || "Failed to load tenants." };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to load tenants.",
+    };
   }
 }
 
@@ -67,12 +70,15 @@ export async function createTenant(rawValues: z.infer<typeof TenantSchema>) {
 
     revalidatePath("/super-admin/tenants");
     return { success: true, data: tenant };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to create tenant:", error);
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }
-    return { success: false, error: error.message || "Failed to create tenant." };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to create tenant.",
+    };
   }
 }
 
@@ -92,9 +98,12 @@ export async function updateTenant(id: string, rawValues: Partial<z.infer<typeof
 
     revalidatePath("/super-admin/tenants");
     return { success: true, data: tenant };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to update tenant:", error);
-    return { success: false, error: error.message || "Failed to update tenant." };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to update tenant.",
+    };
   }
 }
 
@@ -109,9 +118,13 @@ export async function suspendTenant(id: string) {
 
     revalidatePath("/super-admin/tenants");
     return { success: true, data: tenant };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to suspend tenant:", error);
-    return { success: false, error: error.message || "Failed to suspend tenant." };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Failed to suspend tenant.",
+    };
   }
 }
 
@@ -126,8 +139,12 @@ export async function activateTenant(id: string) {
 
     revalidatePath("/super-admin/tenants");
     return { success: true, data: tenant };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to activate tenant:", error);
-    return { success: false, error: error.message || "Failed to activate tenant." };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) || "Failed to activate tenant.",
+    };
   }
 }

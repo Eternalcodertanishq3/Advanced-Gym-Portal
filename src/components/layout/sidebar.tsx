@@ -470,7 +470,7 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
 
         {/* Navigation */}
         <nav className="scrollbar-thin flex-1 space-y-6 overflow-y-auto px-3 py-4">
-          {sections.map((section, sIdx) => (
+          {sections.map((section, _sIdx) => (
             <div key={section.title}>
               <AnimatePresence>
                 {!collapsed && (

@@ -13,7 +13,7 @@ export async function getWorkoutPlans(page = 1, limit = 10, search = "") {
   try {
     const skip = (page - 1) * limit;
 
-    let whereClause = {};
+    let whereClause: any = {};
     if (search) {
       whereClause = {
         name: { contains: search, mode: "insensitive" },
@@ -42,8 +42,8 @@ export async function getWorkoutPlans(page = 1, limit = 10, search = "") {
         pagination: { total, pages: Math.ceil(total / limit), page, limit },
       },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -69,8 +69,8 @@ export async function createWorkoutPlan(data: {
 
     revalidatePath("/trainer/workouts");
     return { success: true, data: plan };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -86,7 +86,7 @@ export async function getWorkoutTemplates() {
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: templates };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

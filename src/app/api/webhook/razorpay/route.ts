@@ -136,8 +136,13 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ received: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Razorpay webhook handler failure:", error);
-    return NextResponse.json({ error: error.message || "Internal Webhook Error" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: (error instanceof Error ? error.message : String(error)) || "Internal Webhook Error",
+      },
+      { status: 500 },
+    );
   }
 }

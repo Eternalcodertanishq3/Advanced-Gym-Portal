@@ -77,8 +77,11 @@ export default function RegisterPage() {
       } else {
         toast.error(res.error || "Registration failed. Please try again.");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Registration failed. Please try again.");
+    } catch (error: unknown) {
+      toast.error(
+        (error instanceof Error ? error.message : String(error)) ||
+          "Registration failed. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }

@@ -19,7 +19,7 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
         ? filterBranchId
         : contextBranchId;
 
-    let where: any = {};
+    const where: any = {};
 
     if (effectiveBranchId) {
       where.user = {
@@ -75,9 +75,12 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
         totalPages: Math.ceil(total / limit),
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching members:", error);
-    return { success: false, error: error.message || "Failed to fetch members" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to fetch members",
+    };
   }
 }
 
@@ -123,9 +126,14 @@ export async function getMemberById(id: string) {
     }
 
     return { success: true, data: member };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching member:", error);
-    return { success: false, error: error.message || "Failed to fetch member details" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) ||
+        "Failed to fetch member details",
+    };
   }
 }
 
@@ -199,9 +207,12 @@ export async function createMember(formData: any) {
     revalidatePath("/admin/members");
     revalidatePath("/super-admin/audit-logs");
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating member:", error);
-    return { success: false, error: error.message || "Failed to create member" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to create member",
+    };
   }
 }
 
@@ -242,8 +253,11 @@ export async function updateMember(id: string, formData: any) {
     revalidatePath("/admin/members");
     revalidatePath(`/admin/members/${id}`);
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating member:", error);
-    return { success: false, error: error.message || "Failed to update member" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to update member",
+    };
   }
 }

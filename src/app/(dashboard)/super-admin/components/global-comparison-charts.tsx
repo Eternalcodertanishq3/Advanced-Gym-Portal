@@ -95,7 +95,7 @@ export function GlobalComparisonCharts({ data }: Props) {
                 formatter={(value: number) => [formatCurrency(value), "Revenue"]}
               />
               <Bar dataKey="revenue" radius={[6, 6, 0, 0]} barSize={40}>
-                {data.map((entry, index) => (
+                {data.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
@@ -156,7 +156,7 @@ export function GlobalComparisonCharts({ data }: Props) {
                 formatter={(value: number) => [value, "Active Members"]}
               />
               <Bar dataKey="members" radius={[6, 6, 0, 0]} barSize={40}>
-                {data.map((entry, index) => (
+                {data.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[(index + 2) % COLORS.length]}

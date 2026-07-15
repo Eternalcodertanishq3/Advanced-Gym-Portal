@@ -198,7 +198,7 @@ export default function MemberProfilePage() {
                 </Button>
               </div>
               <div className="space-y-4">
-                {member.progress?.slice(0, 5).map((log: any, idx: number) => (
+                {member.progress?.slice(0, 5).map((log: any, _idx: number) => (
                   <div
                     key={log.id}
                     className="flex items-center justify-between rounded-xl border border-transparent bg-surface-sunken/50 p-3 transition-all hover:border-border"

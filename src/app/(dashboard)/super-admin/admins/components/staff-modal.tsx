@@ -106,8 +106,9 @@ export function StaffModal({ isOpen, onClose, staff }: Props) {
       !confirm(
         "Are you sure you want to remove this staff member? They will be marked as INACTIVE.",
       )
-    )
+    ) {
       return;
+    }
 
     setIsDeleting(true);
     const res = await deleteStaff(staff.id);

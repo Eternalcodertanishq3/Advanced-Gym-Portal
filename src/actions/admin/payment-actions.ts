@@ -11,7 +11,7 @@ export async function getPayments(page = 1, limit = 10, status?: string) {
 
     const { branchId } = await getBranchContext();
 
-    let whereClause: any = {};
+    const whereClause: any = {};
     if (status) {
       whereClause.status = status;
     }
@@ -48,8 +48,8 @@ export async function getPayments(page = 1, limit = 10, status?: string) {
         pagination: { total, pages: Math.ceil(total / limit), page, limit },
       },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -88,8 +88,8 @@ export async function createPayment(data: {
 
     revalidatePath("/admin/payments");
     return { success: true, data: payment };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -97,7 +97,7 @@ export async function getPaymentStats() {
   try {
     const { branchId } = await getBranchContext();
 
-    let whereClause: any = {};
+    const whereClause: any = {};
     if (branchId) {
       whereClause.member = {
         user: { branchId: branchId },
@@ -126,7 +126,7 @@ export async function getPaymentStats() {
         totalTransactions,
       },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

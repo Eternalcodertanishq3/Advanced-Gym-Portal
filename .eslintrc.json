@@ -1,12 +1,14 @@
 {
   "extends": "next/core-web-vitals",
+  "ignorePatterns": ["src/scripts/**/*.ts", "src/scripts/**/*.js"],
   "rules": {
-    "prefer-const": "off",
+    "prefer-const": "error",
     "no-var": "error",
     "eqeqeq": ["error", "always"],
     "curly": ["error", "multi-line"],
     "react/no-unescaped-entities": "off",
     "@next/next/no-img-element": "off",
-    "react-hooks/exhaustive-deps": "off"
+    "react-hooks/exhaustive-deps": "error",
+    "no-console": ["error", { "allow": ["warn", "error", "info", "debug"] }]
   }
 }

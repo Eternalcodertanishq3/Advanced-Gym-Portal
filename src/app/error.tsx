@@ -29,7 +29,8 @@ export default function Error({
         <h2 className="mb-2 text-2xl font-bold tracking-tight">Something went wrong</h2>
 
         <p className="mb-6 text-muted-foreground">
-          {error.message || "An unexpected error occurred. Please try again."}
+          {(error instanceof Error ? error.message : String(error)) ||
+            "An unexpected error occurred. Please try again."}
         </p>
 
         {error.digest && (

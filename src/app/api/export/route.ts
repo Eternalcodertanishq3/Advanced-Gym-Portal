@@ -35,7 +35,7 @@ export async function GET(req: Request) {
       whereClause.user = { branchId };
     }
 
-    const members = await prisma.member.findMany({
+    const members = (await prisma.member.findMany({
       where: whereClause,
       include: {
         user: {
@@ -46,7 +46,7 @@ export async function GET(req: Request) {
         },
       },
       orderBy: { joinDate: "desc" },
-    });
+    })) as any[];
 
     // Formulate CSV dataset
     const records = members.map((m) => ({
@@ -73,10 +73,14 @@ export async function GET(req: Request) {
         "Content-Disposition": `attachment; filename=gymflow_members_${Date.now()}.csv`,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Member export failure:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to generate CSV export" },
+      {
+        error:
+          (error instanceof Error ? error.message : String(error)) ||
+          "Failed to generate CSV export",
+      },
       { status: 500 },
     );
   }

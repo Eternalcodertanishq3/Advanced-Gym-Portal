@@ -10,7 +10,7 @@ export async function getClasses(page = 1, limit = 10, search = "") {
   try {
     const skip = (page - 1) * limit;
 
-    let whereClause = {};
+    let whereClause: any = {};
     if (search) {
       whereClause = {
         name: { contains: search, mode: "insensitive" },
@@ -46,8 +46,8 @@ export async function getClasses(page = 1, limit = 10, search = "") {
         pagination: { total, pages: Math.ceil(total / limit), page, limit },
       },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -77,8 +77,8 @@ export async function createClass(data: {
 
     revalidatePath("/admin/classes");
     return { success: true, data: gymClass };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -95,8 +95,8 @@ export async function getClassById(id: string) {
     });
     if (!cls) return { success: false, error: "Class not found" };
     return { success: true, data: cls };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -121,8 +121,8 @@ export async function updateClass(id: string, data: any) {
 
     revalidatePath("/admin/classes");
     return { success: true, data: cls };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -138,8 +138,8 @@ export async function deleteClass(id: string) {
 
     revalidatePath("/admin/classes");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -192,8 +192,11 @@ export async function bookClass(scheduleId: string) {
 
     revalidatePath("/member/classes");
     return { success: true, data: booking };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error booking class:", error);
-    return { success: false, error: error.message || "Failed to book class" };
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to book class",
+    };
   }
 }

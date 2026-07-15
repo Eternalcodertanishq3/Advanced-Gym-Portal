@@ -11,7 +11,7 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
 
     const { branchId } = await getBranchContext();
 
-    let where: any = {};
+    const where: any = {};
 
     if (branchId) {
       where.member = {
@@ -67,8 +67,8 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
         },
       },
     };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -109,8 +109,8 @@ export async function checkInMember(memberId: string) {
 
     revalidatePath("/admin/attendance");
     return { success: true, data: attendance };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -134,8 +134,8 @@ export async function checkOutMember(attendanceId: string) {
 
     revalidatePath("/admin/attendance");
     return { success: true, data: attendance };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -168,7 +168,7 @@ export async function searchMemberByPhone(query: string) {
     if (!member) return { success: false, error: "Member not found" };
 
     return { success: true, data: member };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return { success: false, error: "Search failed" };
   }
 }

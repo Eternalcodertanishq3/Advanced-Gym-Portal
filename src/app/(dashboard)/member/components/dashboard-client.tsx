@@ -453,7 +453,7 @@ function MemberStatCard({
   value,
   color,
   subtitle,
-  sparklineData,
+  sparklineData: _sparklineData,
 }: {
   icon: React.ReactNode;
   label: string;

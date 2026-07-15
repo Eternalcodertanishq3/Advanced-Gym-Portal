@@ -48,8 +48,13 @@ export async function createInitialSuperAdmin(data: any) {
 
     revalidatePath("/");
     return { success: true, user };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Setup failed:", error);
-    return { success: false, error: error.message || "Failed to create master account" };
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) ||
+        "Failed to create master account",
+    };
   }
 }

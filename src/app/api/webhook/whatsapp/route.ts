@@ -30,7 +30,7 @@ export async function GET(req: Request) {
   }
 
   if (mode === "subscribe" && token === (verifyToken || "eagle_gym_verify_token")) {
-    console.log("WhatsApp Webhook verified successfully.");
+    console.debug("WhatsApp Webhook verified successfully.");
     return new Response(challenge, { status: 200 });
   }
 
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     const payload = JSON.parse(rawBody);
 
     // Log incoming event hook for debugging and tracking
-    console.log("[WhatsApp Event Webhook Received]:", JSON.stringify(payload, null, 2));
+    console.debug("[WhatsApp Event Webhook Received]:", JSON.stringify(payload, null, 2));
 
     // Handle incoming messages or check-in notifications
     if (payload.object === "whatsapp_business_account") {
@@ -88,15 +88,18 @@ export async function POST(req: Request) {
 
       if (value?.messages) {
         const message = value.messages[0];
-        console.log(`Inbound WhatsApp message from ${message.from}: ${message.text?.body}`);
+        console.debug(`Inbound WhatsApp message from ${message.from}: ${message.text?.body}`);
       }
     }
 
     return NextResponse.json({ received: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("WhatsApp webhook handler failed:", error);
     return NextResponse.json(
-      { error: error.message || "Webhook processing error" },
+      {
+        error:
+          (error instanceof Error ? error.message : String(error)) || "Webhook processing error",
+      },
       { status: 500 },
     );
   }
