@@ -6,11 +6,8 @@ export async function GET(req: Request) {
     const authHeader = req.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
 
-    if (!cronSecret) {
-      console.warn("WARNING: CRON_SECRET is missing from environment variables.");
-    }
-
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+      console.warn("CRON_SECRET missing or invalid authorization header.");
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 

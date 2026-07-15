@@ -54,11 +54,46 @@ export const NotificationService = {
   },
 
   /**
-   * Send an SMS (Twilio/Mock)
+   * Send an SMS (via Twilio API)
    */
   async sendSMS({ to, message }: SMSParams) {
-    // Placeholder for Twilio/AWS SNS implementation
-    console.log(`[SMS MOCK] To: ${to}, Message: ${message}`);
-    return { success: true, provider: "Mock/Twilio Placeholder" };
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+
+    if (!accountSid || !authToken || !fromNumber) {
+      console.warn("Twilio credentials missing. SMS suppressed.");
+      return { success: false, error: "Twilio credentials missing" };
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString("base64")}`,
+          },
+          body: new URLSearchParams({
+            To: to,
+            From: fromNumber,
+            Body: message,
+          }).toString(),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Twilio Error:", data);
+        return { success: false, error: data.message || "Failed to send SMS" };
+      }
+
+      return { success: true, data };
+    } catch (error: any) {
+      console.error("SMS Service Error:", error);
+      return { success: false, error: error.message };
+    }
   },
 };

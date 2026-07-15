@@ -43,6 +43,7 @@ const TENANT_SCOPED_MODELS = [
   "visitorpass",
   "gymsetting",
   "backup",
+  "testimonial",
 ] as const;
 
 export function resolveTenantId(): string | undefined {
