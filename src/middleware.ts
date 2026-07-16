@@ -40,7 +40,16 @@ interface CacheEntry {
   expiresAt: number;
 }
 
-const tenantCache = new Map<string, CacheEntry>();
+const globalForTenantCache = globalThis as unknown as {
+  tenantCache: Map<string, CacheEntry> | undefined;
+};
+
+const tenantCache = globalForTenantCache.tenantCache ?? new Map<string, CacheEntry>();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForTenantCache.tenantCache = tenantCache;
+}
+
 const MAX_CACHE_SIZE = 1000;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
