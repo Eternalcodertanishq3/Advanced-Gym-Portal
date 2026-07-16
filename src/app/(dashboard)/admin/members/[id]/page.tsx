@@ -127,9 +127,29 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                       {formatDate(member.subscription.endDate)}
                     </span>
                   </div>
-                  <Button className="mt-2 w-full bg-brand-navy text-white hover:bg-brand-navy/90">
-                    Renew Plan
-                  </Button>
+                  {(() => {
+                    const isExpired = new Date(member.subscription.endDate) < new Date();
+                    const daysToExpiry = Math.ceil(
+                      (new Date(member.subscription.endDate).getTime() - new Date().getTime()) /
+                        (1000 * 60 * 60 * 24),
+                    );
+                    const canRenew = isExpired || (daysToExpiry >= 0 && daysToExpiry <= 30);
+                    return (
+                      <>
+                        <Button
+                          disabled={!canRenew}
+                          className="mt-2 w-full bg-brand-navy text-white hover:bg-brand-navy/90"
+                        >
+                          Renew Plan
+                        </Button>
+                        {!canRenew && (
+                          <p className="text-center text-[10px] text-obsidian-400">
+                            Renewal option opens 30 days before expiration.
+                          </p>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               ) : (
                 <div className="py-4 text-center">
