@@ -28,7 +28,7 @@ graph TD
     end
     
     subgraph "Security Layer"
-    RL[Rate Limiter (Upstash Redis)]
+    RL["Rate Limiter (Upstash Redis)"]
     AG[Auth Gateway & Session Check]
     end
     
