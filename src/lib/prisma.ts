@@ -1,12 +1,16 @@
 import { PrismaClient } from "@prisma/client";
-import { AsyncLocalStorage } from "async_hooks";
-import { headers } from "next/headers";
+import type { AsyncLocalStorage as AsyncLocalStorageType } from "async_hooks";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Prisma Client Singleton with Multi-Tenancy
 // ═══════════════════════════════════════════════════════════════
 
-export const tenantStorage = new AsyncLocalStorage<{ tenantId: string }>();
+export const tenantStorage =
+  typeof window === "undefined"
+    ? new (require("async_hooks").AsyncLocalStorage as typeof AsyncLocalStorageType)<{
+        tenantId: string;
+      }>()
+    : (null as any);
 
 const globalForPrisma = globalThis as any as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
@@ -50,6 +54,7 @@ export function resolveTenantId(): string | undefined {
   let tenantId = tenantStorage.getStore()?.tenantId;
   if (!tenantId) {
     try {
+      const { headers } = require("next/headers");
       const headersList = headers();
       tenantId = headersList.get("x-tenant-id") || undefined;
     } catch {
