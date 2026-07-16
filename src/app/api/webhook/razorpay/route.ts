@@ -42,7 +42,24 @@ export async function POST(req: Request) {
     }
 
     const payload = JSON.parse(rawBody);
+    const eventId = payload.id;
     const eventType = payload.event;
+
+    if (!eventId) {
+      return NextResponse.json({ error: "Missing event ID" }, { status: 400 });
+    }
+
+    // 1. Initial check outside transaction (fast path to avoid lock overhead)
+    const duplicateEvent = await prisma.webhookEvent.findUnique({
+      where: { eventId },
+    });
+
+    if (duplicateEvent) {
+      return NextResponse.json(
+        { duplicate: true, message: "Webhook event already processed" },
+        { status: 200 },
+      );
+    }
 
     // Handle payment capture events
     if (eventType === "payment.captured" || eventType === "order.paid") {
@@ -61,6 +78,15 @@ export async function POST(req: Request) {
           const endDate = new Date(now.getTime() + plan.duration * 24 * 60 * 60 * 1000);
 
           await prisma.$transaction(async (tx) => {
+            // 2. Insert event ID inside the transaction (database enforcement check for concurrent requests)
+            await tx.webhookEvent.create({
+              data: {
+                eventId,
+                provider: "RAZORPAY",
+                eventType,
+              },
+            });
+
             // Fetch member's user profile to get branch context
             const user = await tx.user.findFirst({
               where: { member: { id: memberId } },
@@ -133,6 +159,15 @@ export async function POST(req: Request) {
           });
         }
       }
+    } else {
+      // Create record for other webhook event types so they are not re-processed
+      await prisma.webhookEvent.create({
+        data: {
+          eventId,
+          provider: "RAZORPAY",
+          eventType,
+        },
+      });
     }
 
     return NextResponse.json({ received: true });

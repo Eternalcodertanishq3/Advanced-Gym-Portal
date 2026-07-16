@@ -1619,3 +1619,18 @@ model Backup {
   @@index([tenantId])
   @@map("backups")
 }
+
+// ═══════════════════════════════════════════════════════════════
+// WEBHOOK EVENTS (Idempotency)
+// ═══════════════════════════════════════════════════════════════
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  provider    String   // e.g., "RAZORPAY"
+  eventType   String
+  processedAt DateTime @default(now())
+
+  @@index([eventId])
+  @@map("webhook_events")
+}
