@@ -392,3 +392,12 @@
   outline-offset: 2px;
 }
 
+/* ── Prevent Radix UI scrollbar layout shifting ── */
+html {
+  overflow-y: scroll !important;
+}
+
+body {
+  padding-right: 0px !important;
+}
+
