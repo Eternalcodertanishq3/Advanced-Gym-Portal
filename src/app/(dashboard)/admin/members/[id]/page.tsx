@@ -89,13 +89,17 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
 
         {/* Profile Actions */}
         <div className="flex items-center justify-center gap-2 md:self-start">
-          <Button variant="outline" className="border-surface-sunken bg-surface-card">
-            <Mail className="mr-2 h-4 w-4" />
-            Message
-          </Button>
-          <Button className="bg-brand-orange text-white hover:bg-brand-orange/90">
-            Edit Profile
-          </Button>
+          <a href={`mailto:${user.email}`} className="inline-block">
+            <Button variant="outline" className="border-surface-sunken bg-surface-card">
+              <Mail className="mr-2 h-4 w-4" />
+              Message
+            </Button>
+          </a>
+          <Link href={`/admin/members/${member.id}/edit`}>
+            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90">
+              Edit Profile
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -187,9 +191,11 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
               ) : (
                 <div className="py-4 text-center">
                   <p className="mb-4 text-sm text-obsidian-500">No trainer assigned.</p>
-                  <Button variant="outline" className="w-full">
-                    Assign Trainer
-                  </Button>
+                  <Link href={`/admin/members/${member.id}/edit`} className="w-full">
+                    <Button variant="outline" className="w-full">
+                      Assign Trainer
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -256,13 +262,15 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                 </CardTitle>
                 <CardDescription>Last 5 transaction records</CardDescription>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-brand-orange hover:text-brand-orange/80"
-              >
-                View All
-              </Button>
+              <Link href={`/admin/payments?search=${encodeURIComponent(user.email || "")}`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-brand-orange hover:text-brand-orange/80"
+                >
+                  View All
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent>
               {member.payments && member.payments.length > 0 ? (
