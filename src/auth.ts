@@ -2,6 +2,12 @@ import NextAuth from "next-auth";
 // Force IDE re-evaluation
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
+import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
+import Apple from "next-auth/providers/apple";
+import Resend from "next-auth/providers/resend";
+import Passkey from "next-auth/providers/passkey";
 import bcryptjs from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { authConfig } from "./auth.config";
@@ -56,5 +62,30 @@ export const {
         return null;
       },
     }),
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    GitHub({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    MicrosoftEntraID({
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    Apple({
+      clientId: process.env.AUTH_APPLE_ID,
+      clientSecret: process.env.AUTH_APPLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    Resend({
+      apiKey: process.env.RESEND_API_KEY,
+      from: process.env.EMAIL_FROM || "GymFlow SaaS <noreply@gymflow.io>",
+    }),
+    Passkey,
   ],
 });

@@ -76,6 +76,12 @@ export async function changePassword(formData: FormData) {
     });
 
     if (!user) return { error: "User not found" };
+    if (!user.password) {
+      return {
+        error:
+          "This account does not use a password login (OAuth/Magic Link active). Contact support to add a password.",
+      };
+    }
 
     const passwordMatch = await bcrypt.compare(currentPassword, user.password);
     if (!passwordMatch) return { error: "Incorrect current password" };
