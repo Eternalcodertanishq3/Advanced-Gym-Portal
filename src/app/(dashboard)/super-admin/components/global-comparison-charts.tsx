@@ -47,7 +47,7 @@ export function GlobalComparisonCharts({ data }: Props) {
   return (
     <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
       {/* Revenue Comparison */}
-      <div className="glass-card group relative overflow-hidden rounded-2xl border border-border p-6">
+      <div className="glass-card group relative overflow-hidden rounded-3xl border border-border p-6">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(249,115,22,0.03),transparent_70%)]" />
 
         <div className="relative z-10 mb-8 flex items-center justify-between">
@@ -109,7 +109,7 @@ export function GlobalComparisonCharts({ data }: Props) {
       </div>
 
       {/* Member Distribution */}
-      <div className="glass-card group relative overflow-hidden rounded-2xl border border-border p-6">
+      <div className="glass-card group relative overflow-hidden rounded-3xl border border-border p-6">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.03),transparent_70%)]" />
 
         <div className="relative z-10 mb-8 flex items-center justify-between">

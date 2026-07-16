@@ -6,14 +6,14 @@ import { ShieldAlert } from "lucide-react";
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 pb-10">
+    <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 pb-10">
       {/* Super Admin Header Banner */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card flex w-full items-center gap-4 rounded-2xl border border-crimson/10 bg-gradient-to-r from-crimson/5 via-background to-background p-4 shadow-sm shadow-crimson/5"
+        className="glass-card flex w-full items-center gap-4 rounded-3xl border border-crimson/10 bg-gradient-to-r from-crimson/5 via-background to-background p-4 shadow-sm shadow-crimson/5"
       >
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-crimson/20 bg-crimson/10 shadow-[0_0_20px_rgba(255,49,49,0.1)]">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-crimson/20 bg-crimson/10 shadow-[0_0_20px_rgba(255,49,49,0.1)]">
           <ShieldAlert className="h-6 w-6 text-crimson" />
         </div>
         <div>

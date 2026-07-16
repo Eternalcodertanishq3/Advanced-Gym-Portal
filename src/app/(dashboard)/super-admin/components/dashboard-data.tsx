@@ -79,7 +79,7 @@ export async function RecentLogsList() {
       {logs.map((log: any) => (
         <div
           key={log.id}
-          className="flex items-center gap-4 rounded-xl border border-border bg-muted/30 p-3"
+          className="flex items-center gap-4 rounded-2xl border border-border bg-muted/30 p-3"
         >
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-electric-cyan/20">
             <Activity className="h-4 w-4 text-electric-cyan" />

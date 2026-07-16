@@ -132,7 +132,7 @@
 @layer components {
   /* ── Surface Card (Liquid Glass Edition) ── */
   .surface-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm transition-all duration-300;
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm transition-all duration-300 rounded-3xl;
   }
 
   .surface-card:hover {
@@ -140,7 +140,7 @@
   }
 
   .dark .surface-card {
-    @apply bg-[#1A1D27]/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+    @apply bg-[#1A1D27]/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] rounded-3xl;
   }
 
   .dark .surface-card:hover {
@@ -149,11 +149,11 @@
 
   /* Static variant (no hover lift) */
   .surface-card-static {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm;
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm rounded-3xl;
   }
 
   .dark .surface-card-static {
-    @apply bg-[#1A1D27]/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+    @apply bg-[#1A1D27]/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] rounded-3xl;
   }
 
   /* ── Backward compat: glass-card → surface-card ── */

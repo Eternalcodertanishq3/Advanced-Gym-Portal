@@ -30,7 +30,7 @@ export default function SystemHealthPanel() {
 
   if (loading) {
     return (
-      <div className="glass-card flex h-[300px] flex-col items-center justify-center rounded-2xl border border-border p-6">
+      <div className="glass-card flex h-[300px] flex-col items-center justify-center rounded-3xl border border-border p-6">
         <Loader2 className="mb-2 h-8 w-8 animate-spin text-brand-orange/40" />
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           Scanning Infrastructure...
@@ -73,7 +73,7 @@ export default function SystemHealthPanel() {
   const overallHealth = Math.round(modules.reduce((acc, m) => acc + m.health, 0) / modules.length);
 
   return (
-    <div className="glass-card group relative overflow-hidden rounded-2xl border border-border p-6">
+    <div className="glass-card group relative overflow-hidden rounded-3xl border border-border p-6">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(16,185,129,0.03),transparent_70%)]" />
 
       <div className="relative z-10 mb-6 flex items-center justify-between">
@@ -110,12 +110,12 @@ export default function SystemHealthPanel() {
         {modules.map((m) => (
           <div
             key={m.name}
-            className="flex flex-col gap-3 rounded-xl border border-border/50 bg-muted/30 p-4 transition-all hover:border-border hover:bg-muted/50"
+            className="flex flex-col gap-3 rounded-2xl border border-border/50 bg-muted/30 p-4 transition-all hover:border-border hover:bg-muted/50"
           >
             <div className="flex items-center gap-3">
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-lg bg-background shadow-sm",
+                  "flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-sm",
                   m.color,
                 )}
               >
