@@ -61,7 +61,7 @@ export default function EditMemberPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 pb-12">
+    <div className="mx-auto max-w-[1400px] space-y-8 pb-12">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button
