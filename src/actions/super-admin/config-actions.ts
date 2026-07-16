@@ -6,10 +6,6 @@ import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
 import { auth } from "@/auth";
 
 export async function getSystemConfig() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Unauthorized: Authentication required.");
-  }
   try {
     const settings = await prisma.gymSetting.findMany();
 
