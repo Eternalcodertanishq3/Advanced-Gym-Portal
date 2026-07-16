@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import { ROUTES } from "@/lib/constants";
-import { prisma } from "@/lib/prisma";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 GymFlow SaaS — Multi-Tenant Middleware Router
@@ -61,6 +60,12 @@ function getTenantSlug(host: string) {
 
 export default auth(async (req) => {
   const { nextUrl } = req;
+
+  // Bypass middleware for the internal tenant resolution API to prevent infinite loop
+  if (nextUrl.pathname.startsWith("/api/tenant/resolve")) {
+    return NextResponse.next();
+  }
+
   const host = req.headers.get("host") || "";
   const tenantSlug = getTenantSlug(host);
 
@@ -82,18 +87,9 @@ export default auth(async (req) => {
       tenant = cached.tenant;
     } else {
       try {
-        const resolved = await prisma.tenant.findUnique({
-          where: { subdomain: tenantSlug },
-          select: {
-            id: true,
-            subdomain: true,
-            saasStatus: true,
-            name: true,
-            logo: true,
-            currency: true,
-            locale: true,
-          },
-        });
+        const origin = nextUrl.origin;
+        const res = await fetch(`${origin}/api/tenant/resolve?subdomain=${tenantSlug}`);
+        const resolved = res.ok ? await res.json() : null;
         tenant = resolved;
 
         // Evict oldest if cache gets too large
@@ -150,11 +146,13 @@ export default auth(async (req) => {
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-      if (role === "SUPER_ADMIN")
-        {return NextResponse.redirect(new URL(ROUTES.SUPER_ADMIN, nextUrl));}
+      if (role === "SUPER_ADMIN") {
+        return NextResponse.redirect(new URL(ROUTES.SUPER_ADMIN, nextUrl));
+      }
       if (role === "ADMIN") return NextResponse.redirect(new URL(ROUTES.ADMIN, nextUrl));
-      if (role === "RECEPTIONIST")
-        {return NextResponse.redirect(new URL(ROUTES.RECEPTIONIST, nextUrl));}
+      if (role === "RECEPTIONIST") {
+        return NextResponse.redirect(new URL(ROUTES.RECEPTIONIST, nextUrl));
+      }
       if (role === "TRAINER") return NextResponse.redirect(new URL(ROUTES.TRAINER, nextUrl));
       if (role === "MEMBER") return NextResponse.redirect(new URL(ROUTES.MEMBER, nextUrl));
       if (role === "WORKER") return NextResponse.redirect(new URL(ROUTES.WORKER, nextUrl));
