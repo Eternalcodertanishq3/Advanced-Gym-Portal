@@ -66,9 +66,9 @@ export function DashboardClient({ statsChild, logsChild, chartsChild }: Props) {
 
       <div>{statsChild}</div>
 
-      <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-12">
+      <div className="grid grid-cols-1 items-stretch gap-8 xl:grid-cols-12">
         {/* Master Column (Left 8/12) */}
-        <div className="space-y-8 xl:col-span-8">
+        <div className="flex flex-col gap-8 xl:col-span-8">
           {/* Main Charts Row */}
           {chartsChild && (
             <div className="duration-1000 animate-in fade-in slide-in-from-bottom-4">
@@ -77,11 +77,11 @@ export function DashboardClient({ statsChild, logsChild, chartsChild }: Props) {
           )}
 
           {/* System Health */}
-          <SystemHealthPanel />
+          <SystemHealthPanel className="flex-1" />
         </div>
 
         {/* Sidebar Column (Right 4/12) */}
-        <div className="space-y-8 xl:col-span-4">
+        <div className="flex flex-col gap-8 xl:col-span-4">
           {/* Quick Actions */}
           <div className="glass-card relative flex flex-col gap-6 overflow-hidden rounded-3xl border border-border p-6">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(168,85,247,0.02),transparent_70%)]" />
@@ -118,7 +118,7 @@ export function DashboardClient({ statsChild, logsChild, chartsChild }: Props) {
           </div>
 
           {/* Activity Stream */}
-          <div className="glass-card relative flex min-h-[300px] flex-col gap-6 overflow-hidden rounded-3xl border border-border p-6">
+          <div className="glass-card relative flex min-h-[300px] flex-1 flex-col gap-6 overflow-hidden rounded-3xl border border-border p-6">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,240,255,0.03),transparent_70%)]" />
 
             <div className="relative z-10 flex items-center justify-between">

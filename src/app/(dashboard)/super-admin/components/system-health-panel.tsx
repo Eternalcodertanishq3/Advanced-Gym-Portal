@@ -5,7 +5,7 @@ import { Server, Database, Shield, Zap, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSystemHealth } from "@/actions/super-admin/dashboard-actions";
 
-export default function SystemHealthPanel() {
+export default function SystemHealthPanel({ className }: { className?: string }) {
   const [data, setData] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -30,7 +30,12 @@ export default function SystemHealthPanel() {
 
   if (loading) {
     return (
-      <div className="glass-card flex h-[300px] flex-col items-center justify-center rounded-3xl border border-border p-6">
+      <div
+        className={cn(
+          "glass-card flex h-[300px] flex-col items-center justify-center rounded-3xl border border-border p-6",
+          className,
+        )}
+      >
         <Loader2 className="mb-2 h-8 w-8 animate-spin text-brand-orange/40" />
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           Scanning Infrastructure...
@@ -73,7 +78,12 @@ export default function SystemHealthPanel() {
   const overallHealth = Math.round(modules.reduce((acc, m) => acc + m.health, 0) / modules.length);
 
   return (
-    <div className="glass-card group relative overflow-hidden rounded-3xl border border-border p-6">
+    <div
+      className={cn(
+        "glass-card group relative flex flex-col overflow-hidden rounded-3xl border border-border p-6",
+        className,
+      )}
+    >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(16,185,129,0.03),transparent_70%)]" />
 
       <div className="relative z-10 mb-6 flex items-center justify-between">
@@ -106,11 +116,11 @@ export default function SystemHealthPanel() {
         </div>
       </div>
 
-      <div className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="relative z-10 grid flex-1 grid-cols-1 gap-4 md:grid-cols-3">
         {modules.map((m) => (
           <div
             key={m.name}
-            className="flex flex-col gap-3 rounded-2xl border border-border/50 bg-muted/30 p-4 transition-all hover:border-border hover:bg-muted/50"
+            className="flex h-full flex-col gap-3 rounded-2xl border border-border/50 bg-muted/30 p-4 transition-all hover:border-border hover:bg-muted/50"
           >
             <div className="flex items-center gap-3">
               <div
