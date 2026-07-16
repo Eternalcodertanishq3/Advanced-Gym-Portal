@@ -394,10 +394,11 @@
 
 /* ── Prevent Radix UI scrollbar layout shifting ── */
 html {
-  overflow-y: scroll !important;
+  scrollbar-gutter: stable;
 }
 
 body {
   padding-right: 0px !important;
+  margin-right: 0px !important;
 }
 
