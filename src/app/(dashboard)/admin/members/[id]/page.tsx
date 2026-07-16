@@ -32,17 +32,63 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
   const avatarColor = getAvatarColor(name);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      {/* Back & Actions */}
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-[1400px] space-y-6">
+      {/* Back to Members Navigation */}
+      <div className="flex items-center">
         <Link
           href="/admin/members"
-          className="flex items-center text-sm text-obsidian-500 transition-colors hover:text-obsidian-900"
+          className="flex items-center text-sm font-medium text-obsidian-500 transition-colors hover:text-obsidian-900"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Members
         </Link>
-        <div className="flex items-center gap-2">
+      </div>
+
+      {/* Main Profile Header */}
+      <div className="flex flex-col gap-6 rounded-2xl border border-surface-sunken bg-surface-card p-6 shadow-sm md:flex-row md:items-center md:justify-between md:p-8">
+        <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
+          <div
+            className={cn(
+              "flex h-24 w-24 shrink-0 items-center justify-center rounded-full text-3xl font-bold md:h-32 md:w-32 md:text-5xl",
+              avatarColor,
+            )}
+          >
+            {initials}
+          </div>
+          <div className="text-center md:text-left">
+            <h1 className="font-display text-3xl font-bold text-obsidian-950">{name}</h1>
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-obsidian-600 md:justify-start">
+              <span className="flex items-center gap-1.5">
+                <Mail className="h-4 w-4" /> {user.email}
+              </span>
+              {user.phone && (
+                <span className="flex items-center gap-1.5">
+                  <Phone className="h-4 w-4" /> {user.phone}
+                </span>
+              )}
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4" /> Joined {formatDate(member.joinDate)}
+              </span>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+              <Badge
+                variant="outline"
+                className="border-surface-sunken bg-surface-base px-3 py-1 font-medium text-obsidian-700"
+              >
+                {member.status}
+              </Badge>
+              <Badge
+                variant="secondary"
+                className="bg-brand-navy/10 px-3 py-1 font-medium text-brand-navy"
+              >
+                Plan: {member.subscription?.plan?.name || "No Plan"}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Profile Actions */}
+        <div className="flex items-center justify-center gap-2 md:self-start">
           <Button variant="outline" className="border-surface-sunken bg-surface-card">
             <Mail className="mr-2 h-4 w-4" />
             Message
@@ -53,52 +99,10 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
         </div>
       </div>
 
-      {/* Main Profile Header */}
-      <div className="flex flex-col items-center gap-6 rounded-2xl border border-surface-sunken bg-surface-card p-6 shadow-sm md:flex-row md:items-start md:p-8">
-        <div
-          className={cn(
-            "flex h-24 w-24 shrink-0 items-center justify-center rounded-full text-3xl font-bold md:h-32 md:w-32 md:text-5xl",
-            avatarColor,
-          )}
-        >
-          {initials}
-        </div>
-        <div className="flex-1 text-center md:text-left">
-          <h1 className="font-display text-3xl font-bold text-obsidian-950">{name}</h1>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-obsidian-600 md:justify-start">
-            <span className="flex items-center gap-1.5">
-              <Mail className="h-4 w-4" /> {user.email}
-            </span>
-            {user.phone && (
-              <span className="flex items-center gap-1.5">
-                <Phone className="h-4 w-4" /> {user.phone}
-              </span>
-            )}
-            <span className="flex items-center gap-1.5">
-              <Calendar className="h-4 w-4" /> Joined {formatDate(member.joinDate)}
-            </span>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:justify-start">
-            <Badge
-              variant="outline"
-              className="border-surface-sunken bg-surface-base px-3 py-1 font-medium text-obsidian-700"
-            >
-              {member.status}
-            </Badge>
-            <Badge
-              variant="secondary"
-              className="bg-brand-navy/10 px-3 py-1 font-medium text-brand-navy"
-            >
-              Plan: {member.subscription?.plan?.name || "No Plan"}
-            </Badge>
-          </div>
-        </div>
-      </div>
-
       {/* Details Grid */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {/* Left Col - Subscription & Trainer */}
-        <div className="space-y-6 md:col-span-1">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Col 1 - Subscription & Trainer */}
+        <div className="space-y-6">
           <Card className="border-surface-sunken bg-surface-card shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -172,9 +176,9 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
           </Card>
         </div>
 
-        {/* Right Col - Activity & Payments */}
-        <div className="space-y-6 md:col-span-2">
-          <Card className="border-surface-sunken bg-surface-card shadow-sm">
+        {/* Col 2 - Activity */}
+        <div className="space-y-6">
+          <Card className="h-full border-surface-sunken bg-surface-card shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -219,8 +223,11 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
               )}
             </CardContent>
           </Card>
+        </div>
 
-          <Card className="border-surface-sunken bg-surface-card shadow-sm">
+        {/* Col 3 - Payments */}
+        <div className="space-y-6">
+          <Card className="h-full border-surface-sunken bg-surface-card shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
                 <CardTitle className="flex items-center gap-2 text-lg">
