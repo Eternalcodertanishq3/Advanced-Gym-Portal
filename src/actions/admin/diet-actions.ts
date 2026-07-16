@@ -1,13 +1,12 @@
-"use server";
-
 import { auth } from "@/auth";
+import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function getDietPlans(page = 1, limit = 10, search = "") {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:diet")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -48,7 +47,7 @@ export async function getDietPlans(page = 1, limit = 10, search = "") {
 
 export async function getDietTemplates() {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:diet")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -71,7 +70,7 @@ export async function createDietPlan(data: {
   type: any;
 }) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:diet")) {
     return { success: false, error: "Unauthorized" };
   }
   try {

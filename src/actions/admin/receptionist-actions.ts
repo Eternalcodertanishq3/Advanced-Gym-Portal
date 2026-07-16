@@ -1,6 +1,5 @@
-"use server";
-
 import { auth } from "@/auth";
+import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -8,7 +7,7 @@ import { SECURITY } from "@/lib/constants";
 
 export async function getReceptionistDashboardStats() {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -88,7 +87,7 @@ export async function generateVisitorPass(data: {
   validUntil: Date;
 }) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -112,7 +111,7 @@ export async function generateVisitorPass(data: {
 
 export async function getReceptionists(page = 1, limit = 10, search = "") {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -164,7 +163,7 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
 
 export async function getReceptionistById(id: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -181,7 +180,7 @@ export async function getReceptionistById(id: string) {
 
 export async function createReceptionist(data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -233,7 +232,7 @@ export async function createReceptionist(data: any) {
 
 export async function updateReceptionist(id: string, data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {

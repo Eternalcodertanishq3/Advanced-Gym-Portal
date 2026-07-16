@@ -1,6 +1,5 @@
-"use server";
-
 import { auth } from "@/auth";
+import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -8,7 +7,7 @@ import { SECURITY } from "@/lib/constants";
 
 export async function getStaff(page = 1, limit = 10, search = "") {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -56,7 +55,7 @@ export async function getStaff(page = 1, limit = 10, search = "") {
  */
 export async function getStaffAttendance(limit = 20) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -79,7 +78,7 @@ export async function getStaffAttendance(limit = 20) {
 
 export async function getStaffById(id: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -96,7 +95,7 @@ export async function getStaffById(id: string) {
 
 export async function createStaff(data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -149,7 +148,7 @@ export async function createStaff(data: any) {
 
 export async function updateStaff(id: string, data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:staff")) {
     return { success: false, error: "Unauthorized" };
   }
   try {

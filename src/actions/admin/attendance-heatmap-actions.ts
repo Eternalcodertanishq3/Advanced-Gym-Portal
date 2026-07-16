@@ -1,12 +1,11 @@
-"use server";
-
 import { auth } from "@/auth";
+import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
 
 export async function getAttendanceHeatmapData(year: number, month: number) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "view:members")) {
     return { success: false, error: "Unauthorized" };
   }
   try {

@@ -1,13 +1,12 @@
-"use server";
-
 import { auth } from "@/auth";
+import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function getInventoryItems(page = 1, limit = 10, search = "") {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:inventory")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -38,7 +37,7 @@ export async function getInventoryItems(page = 1, limit = 10, search = "") {
 
 export async function updateInventoryQuantity(id: string, newQuantity: number) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:inventory")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -68,7 +67,7 @@ export async function processSale(data: {
   total: number;
 }) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:inventory")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -137,7 +136,7 @@ export async function processSale(data: {
 
 export async function getProductById(id: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:inventory")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -153,7 +152,7 @@ export async function getProductById(id: string) {
 
 export async function createProduct(data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:inventory")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -178,7 +177,7 @@ export async function createProduct(data: any) {
 
 export async function updateProduct(id: string, data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:inventory")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -204,7 +203,7 @@ export async function updateProduct(id: string, data: any) {
 
 export async function deleteProduct(id: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:inventory")) {
     return { success: false, error: "Unauthorized" };
   }
   try {

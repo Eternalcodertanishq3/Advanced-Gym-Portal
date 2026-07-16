@@ -2,11 +2,13 @@
 
 import prisma, { resolveTenantId } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
+import { recordAudit } from "@/lib/action-utils";
+import { ensurePermission } from "@/lib/permissions";
 import { auth } from "@/auth";
 
 export async function getSystemConfig() {
   try {
+    await ensurePermission("manage:system");
     const settings = await prisma.gymSetting.findMany();
 
     // Map settings array to a more useful object
@@ -24,7 +26,7 @@ export async function getSystemConfig() {
 
 export async function updateSystemConfig(data: Record<string, any>) {
   try {
-    const user = await ensureSuperAdmin();
+    const user = await ensurePermission("manage:system");
     const updatedBy = user.id;
 
     // Fetch old values for audit logging

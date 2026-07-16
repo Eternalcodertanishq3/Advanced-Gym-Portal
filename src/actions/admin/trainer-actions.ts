@@ -1,6 +1,5 @@
-"use server";
-
 import { auth } from "@/auth";
+import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -8,7 +7,7 @@ import { SECURITY } from "@/lib/constants";
 
 export async function getTrainerDashboardStats(trainerId: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -86,7 +85,7 @@ export async function getTrainerDashboardStats(trainerId: string) {
 
 export async function getTrainers() {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -104,7 +103,7 @@ export async function getTrainers() {
 
 export async function getTrainerMembers(trainerId: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -138,7 +137,7 @@ export async function getTrainerMembers(trainerId: string) {
 
 export async function assignWorkoutPlan(memberId: string, planId: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -156,7 +155,7 @@ export async function assignWorkoutPlan(memberId: string, planId: string) {
 
 export async function assignDietPlan(memberId: string, planId: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -174,7 +173,7 @@ export async function assignDietPlan(memberId: string, planId: string) {
 
 export async function getMemberProfileForTrainer(memberId: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -230,7 +229,7 @@ export async function schedulePTSession(data: {
   notes?: string;
 }) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -256,7 +255,7 @@ export async function schedulePTSession(data: {
 
 export async function getTrainerById(id: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -285,7 +284,7 @@ export async function getTrainerById(id: string) {
  */
 export async function updateSessionStatus(sessionId: string, status: string, feedback?: string) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -310,7 +309,7 @@ export async function updateSessionStatus(sessionId: string, status: string, fee
  */
 export async function createTrainer(data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
@@ -371,7 +370,7 @@ export async function createTrainer(data: any) {
  */
 export async function updateTrainer(id: string, data: any) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user || !hasPermission(session.user.role, "manage:trainers")) {
     return { success: false, error: "Unauthorized" };
   }
   try {
