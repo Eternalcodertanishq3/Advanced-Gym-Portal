@@ -6,6 +6,10 @@ const nextConfig = {
 
   reactStrictMode: true,
 
+  experimental: {
+    instrumentationHook: true,
+  },
+
   // Image optimization - removed wildcard remote patterns for security
   images: {
     remotePatterns: [
