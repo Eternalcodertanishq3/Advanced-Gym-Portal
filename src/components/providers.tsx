@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
+import { AnalyticsProvider } from "@/components/analytics-provider";
+import { PostHogPageView } from "@/components/posthog-pageview";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Application Providers Wrapper
@@ -29,18 +31,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster position="top-right" richColors duration={2000} />
-        </ThemeProvider>
-      </SessionProvider>
-    </QueryClientProvider>
+    <AnalyticsProvider>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            {children}
+            <PostHogPageView />
+            <Toaster position="top-right" richColors duration={2000} />
+          </ThemeProvider>
+        </SessionProvider>
+      </QueryClientProvider>
+    </AnalyticsProvider>
   );
 }

@@ -21,6 +21,7 @@ import { MEMBERSHIP_FEATURES } from "@/lib/constants/features";
 import { subscribeToPlan } from "@/actions/member/subscription-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/posthog";
 import {
   Dialog,
   DialogContent,
@@ -87,6 +88,14 @@ export function SelectPlanClient({
         branchId: selectedBranchId,
       });
       if (res.success) {
+        trackEvent("Subscription Initiated", {
+          planId: selectedPlan.id,
+          planName: selectedPlan.name,
+          amount: selectedPlan.price,
+          paymentMethod: paymentMethod,
+          branchId: selectedBranchId,
+        });
+
         toast.success("Request Sent! Please complete the payment to activate your account.");
         router.push("/member/subscription");
       } else {

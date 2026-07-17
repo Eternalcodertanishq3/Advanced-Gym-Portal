@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/posthog";
 import { motion } from "framer-motion";
 import {
   User,
@@ -72,6 +73,12 @@ export default function RegisterPage() {
       });
 
       if (res.success) {
+        // Track client-side activation event
+        trackEvent("User Registered", {
+          email: formData.email,
+          phone: formData.phone,
+        });
+
         toast.success("Account created successfully! Please log in.");
         router.push("/login");
       } else {
