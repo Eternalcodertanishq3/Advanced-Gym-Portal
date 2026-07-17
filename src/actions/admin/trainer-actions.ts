@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { SECURITY } from "@/lib/constants";
 
 export async function getTrainerDashboardStats(trainerId: string) {
@@ -146,7 +145,7 @@ export async function assignWorkoutPlan(memberId: string, planId: string) {
       data: { memberId },
     });
 
-    revalidatePath("/trainer/my-members");
+    require("next/cache").revalidatePath("/trainer/my-members");
     return { success: true };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -164,7 +163,7 @@ export async function assignDietPlan(memberId: string, planId: string) {
       data: { memberId },
     });
 
-    revalidatePath("/trainer/my-members");
+    require("next/cache").revalidatePath("/trainer/my-members");
     return { success: true };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -245,8 +244,8 @@ export async function schedulePTSession(data: {
       },
     });
 
-    revalidatePath("/trainer/sessions");
-    revalidatePath("/trainer");
+    require("next/cache").revalidatePath("/trainer/sessions");
+    require("next/cache").revalidatePath("/trainer");
     return { success: true, data: session };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -296,8 +295,8 @@ export async function updateSessionStatus(sessionId: string, status: string, fee
       },
     });
 
-    revalidatePath("/trainer/sessions");
-    revalidatePath("/trainer");
+    require("next/cache").revalidatePath("/trainer/sessions");
+    require("next/cache").revalidatePath("/trainer");
     return { success: true, data: session };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -350,7 +349,7 @@ export async function createTrainer(data: any) {
       return trainer;
     });
 
-    revalidatePath("/admin/trainers");
+    require("next/cache").revalidatePath("/admin/trainers");
     return { success: true, data: result };
   } catch (error: unknown) {
     console.error("Error creating trainer:", error);
@@ -398,7 +397,7 @@ export async function updateTrainer(id: string, data: any) {
       return trainer;
     });
 
-    revalidatePath("/admin/trainers");
+    require("next/cache").revalidatePath("/admin/trainers");
     return { success: true, data: result };
   } catch (error: unknown) {
     console.error("Error updating trainer:", error);

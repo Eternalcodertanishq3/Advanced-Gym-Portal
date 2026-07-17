@@ -36,7 +36,7 @@ export async function updateSystemConfig(data: Record<string, any>) {
     const oldValue: Record<string, any> = {};
     oldSettings.forEach((s) => (oldValue[s.key] = s.value));
 
-    const tenantId = resolveTenantId() || null;
+    const tenantId = (await resolveTenantId()) || null;
     const operations = Object.entries(data).map(([key, value]) =>
       prisma.gymSetting.upsert({
         where: { key_tenantId: { key, tenantId: tenantId || "" } },

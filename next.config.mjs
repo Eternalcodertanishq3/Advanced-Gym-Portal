@@ -128,9 +128,9 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "5mb",
     },
-    typedRoutes: true,
   },
 
+  typedRoutes: true,
   poweredByHeader: false,
   compress: true,
   trailingSlash: false,

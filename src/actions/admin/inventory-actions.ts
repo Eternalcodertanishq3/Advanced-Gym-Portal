@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 export async function getInventoryItems(page = 1, limit = 10, search = "") {
   const session = await auth();
@@ -45,7 +44,7 @@ export async function updateInventoryQuantity(id: string, newQuantity: number) {
       where: { id },
       data: { stock: newQuantity },
     });
-    revalidatePath("/admin/inventory");
+    require("next/cache").revalidatePath("/admin/inventory");
     return { success: true, data: item };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -122,8 +121,8 @@ export async function processSale(data: {
       return newSale;
     });
 
-    revalidatePath("/admin/inventory");
-    revalidatePath("/admin/payments");
+    require("next/cache").revalidatePath("/admin/inventory");
+    require("next/cache").revalidatePath("/admin/payments");
     return { success: true, data: sale };
   } catch (error: unknown) {
     console.error("Sale processing failed:", error);
@@ -168,7 +167,7 @@ export async function createProduct(data: any) {
       },
     });
 
-    revalidatePath("/admin/inventory");
+    require("next/cache").revalidatePath("/admin/inventory");
     return { success: true, data: product };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -194,7 +193,7 @@ export async function updateProduct(id: string, data: any) {
       },
     });
 
-    revalidatePath("/admin/inventory");
+    require("next/cache").revalidatePath("/admin/inventory");
     return { success: true, data: product };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -211,7 +210,7 @@ export async function deleteProduct(id: string) {
       where: { id },
     });
 
-    revalidatePath("/admin/inventory");
+    require("next/cache").revalidatePath("/admin/inventory");
     return { success: true };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };

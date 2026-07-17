@@ -8,7 +8,7 @@ export default async function MemberLayout({ children }: { children: React.React
   if (!session?.user) redirect("/login");
 
   if (session.user.role === "MEMBER") {
-    const headersList = headers();
+    const headersList = await headers();
     const pathname = headersList.get("x-url") || "";
 
     const active = await hasActiveSubscription(session.user.id);

@@ -69,7 +69,7 @@ export async function recordAudit({
   newValue?: any;
 }) {
   try {
-    const headersList = headers();
+    const headersList = await headers();
     const ipAddress = headersList.get("x-forwarded-for") || "unknown";
     const userAgent = headersList.get("user-agent") || "unknown";
 

@@ -15,11 +15,11 @@ export interface TenantDetails {
 }
 
 /**
- * Resolves the active Tenant's metadata from HTTP headers dynamically.
+ * Resolves the active Tenant's metadata from HTTP headers dynamically (asynchronous).
  * Provides safe fallback constants during build operations or offline CLI tasks.
  */
-export function getTenantDetails(): TenantDetails {
-  const tenantId = resolveTenantId();
+export async function getTenantDetails(): Promise<TenantDetails> {
+  const tenantId = await resolveTenantId();
   if (!tenantId) {
     return {
       id: null,
@@ -32,7 +32,8 @@ export function getTenantDetails(): TenantDetails {
   }
 
   try {
-    const headersList = headers();
+    const { headers } = require("next/headers");
+    const headersList = await headers();
     return {
       id: tenantId,
       subdomain: headersList.get("x-tenant-subdomain"),
@@ -51,4 +52,18 @@ export function getTenantDetails(): TenantDetails {
       locale: "en-IN",
     };
   }
+}
+
+/**
+ * Synchronous fallback resolver for client bundles and formatting libraries.
+ */
+export function getTenantDetailsSync(): TenantDetails {
+  return {
+    id: null,
+    subdomain: null,
+    name: "GymFlow SaaS",
+    logo: "/logo.png",
+    currency: "INR",
+    locale: "en-IN",
+  };
 }

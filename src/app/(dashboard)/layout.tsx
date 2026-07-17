@@ -21,7 +21,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/login");
   }
 
-  const tenant = getTenantDetails();
+  const tenant = await getTenantDetails();
   const allowedFeatures = await getMemberFeatures();
   const userRole = session.user.role as Role;
 

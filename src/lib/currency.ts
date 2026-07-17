@@ -1,4 +1,4 @@
-import { getTenantDetails } from "@/lib/tenant";
+import { getTenantDetailsSync } from "@/lib/tenant";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Dynamic Multi-Currency Utility
@@ -9,7 +9,7 @@ export function formatCurrency(
   options: { showSymbol?: boolean; decimals?: number; currency?: string; locale?: string } = {},
 ): string {
   // Dynamically resolve tenant settings from active headers
-  const tenant = getTenantDetails();
+  const tenant = getTenantDetailsSync();
 
   const {
     showSymbol = true,
@@ -79,7 +79,7 @@ export function formatNumber(
   decimals: number = 0,
   options: { locale?: string } = {},
 ): string {
-  const tenant = getTenantDetails();
+  const tenant = getTenantDetailsSync();
   const { locale = tenant.locale } = options;
 
   if (num === null || num === undefined || num === "") return "0";

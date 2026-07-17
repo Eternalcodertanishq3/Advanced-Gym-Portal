@@ -50,12 +50,12 @@ const TENANT_SCOPED_MODELS = [
   "testimonial",
 ] as const;
 
-export function resolveTenantId(): string | undefined {
+export async function resolveTenantId(): Promise<string | undefined> {
   let tenantId = tenantStorage.getStore()?.tenantId;
   if (!tenantId) {
     try {
       const { headers } = require("next/headers");
-      const headersList = headers();
+      const headersList = await headers();
       tenantId = headersList.get("x-tenant-id") || undefined;
     } catch {
       // safe fallback for builds/scripts/initial nextauth loads
@@ -64,8 +64,8 @@ export function resolveTenantId(): string | undefined {
   return tenantId;
 }
 
-function applyFilters(model: string, args: any) {
-  const tenantId = resolveTenantId();
+async function applyFilters(model: string, args: any) {
+  const tenantId = await resolveTenantId();
   args.where = args.where || {};
 
   // Inject tenantId filter if in tenant context
@@ -88,21 +88,21 @@ function createPrismaClient() {
     query: {
       $allModels: {
         async findMany({ model, args, query }) {
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async findFirst({ model, args, query }) {
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async findFirstOrThrow({ model, args, query }) {
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async findUnique({ model, args, query }) {
-          const tenantId = resolveTenantId();
+          const tenantId = await resolveTenantId();
           if (tenantId && TENANT_SCOPED_MODELS.includes(model.toLowerCase() as any)) {
-            applyFilters(model, args);
+            await applyFilters(model, args);
             return (client as any)[model].findFirst(args);
           }
           if (SOFT_DELETE_MODELS.includes(model.toLowerCase() as any)) {
@@ -111,15 +111,15 @@ function createPrismaClient() {
           return query(args);
         },
         async count({ model, args, query }) {
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async update({ model, args, query }) {
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async updateMany({ model, args, query }) {
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async delete({ model, args, query }) {
@@ -129,7 +129,7 @@ function createPrismaClient() {
               data: { deletedAt: new Date() },
             });
           }
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async deleteMany({ model, args, query }) {
@@ -139,18 +139,18 @@ function createPrismaClient() {
               data: { deletedAt: new Date() },
             });
           }
-          applyFilters(model, args);
+          await applyFilters(model, args);
           return query(args);
         },
         async create({ model, args, query }) {
-          const tenantId = resolveTenantId();
+          const tenantId = await resolveTenantId();
           if (tenantId && TENANT_SCOPED_MODELS.includes(model.toLowerCase() as any)) {
             args.data = { ...args.data, tenantId } as any;
           }
           return query(args);
         },
         async createMany({ model, args, query }) {
-          const tenantId = resolveTenantId();
+          const tenantId = await resolveTenantId();
           if (tenantId && TENANT_SCOPED_MODELS.includes(model.toLowerCase() as any)) {
             if (Array.isArray(args.data)) {
               args.data = args.data.map((item: any) => ({ ...item, tenantId })) as any;
@@ -161,7 +161,7 @@ function createPrismaClient() {
           return query(args);
         },
         async upsert({ model, args, query }) {
-          const tenantId = resolveTenantId();
+          const tenantId = await resolveTenantId();
           if (tenantId && TENANT_SCOPED_MODELS.includes(model.toLowerCase() as any)) {
             args.where = { ...args.where, tenantId } as any;
             args.create = { ...args.create, tenantId } as any;

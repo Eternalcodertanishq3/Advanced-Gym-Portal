@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { SECURITY } from "@/lib/constants";
 
 export async function getReceptionistDashboardStats() {
@@ -216,7 +215,7 @@ export async function createReceptionist(data: any) {
       return rec;
     });
 
-    revalidatePath("/admin/receptionists");
+    require("next/cache").revalidatePath("/admin/receptionists");
     return { success: true, data: result };
   } catch (error: unknown) {
     console.error("Error creating receptionist:", error);
@@ -258,7 +257,7 @@ export async function updateReceptionist(id: string, data: any) {
       return rec;
     });
 
-    revalidatePath("/admin/receptionists");
+    require("next/cache").revalidatePath("/admin/receptionists");
     return { success: true, data: result };
   } catch (error: unknown) {
     console.error("Error updating receptionist:", error);

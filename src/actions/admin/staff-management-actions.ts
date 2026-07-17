@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { SECURITY } from "@/lib/constants";
 
 export async function getStaff(page = 1, limit = 10, search = "") {
@@ -132,7 +131,7 @@ export async function createStaff(data: any) {
       return worker;
     });
 
-    revalidatePath("/admin/staff");
+    require("next/cache").revalidatePath("/admin/staff");
     return { success: true, data: result };
   } catch (error: unknown) {
     console.error("Error creating staff:", error);
@@ -175,7 +174,7 @@ export async function updateStaff(id: string, data: any) {
       return worker;
     });
 
-    revalidatePath("/admin/staff");
+    require("next/cache").revalidatePath("/admin/staff");
     return { success: true, data: result };
   } catch (error: unknown) {
     console.error("Error updating staff:", error);

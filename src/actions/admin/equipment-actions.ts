@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 export async function getEquipment(page = 1, limit = 10, search = "") {
   const session = await auth();
@@ -48,7 +47,7 @@ export async function markEquipmentUnderMaintenance(id: string, notes?: string) 
         notes: notes ? `[MAINTENANCE] ${notes}` : undefined,
       },
     });
-    revalidatePath("/admin/equipment");
+    require("next/cache").revalidatePath("/admin/equipment");
     return { success: true, data: item };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };

@@ -26,7 +26,7 @@ export async function updateGymSetting(key: string, value: any) {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const tenantId = resolveTenantId() || null;
+    const tenantId = (await resolveTenantId()) || null;
     const setting = await prisma.gymSetting.upsert({
       where: { key_tenantId: { key, tenantId: tenantId || "" } },
       update: { value, updatedBy: "ADMIN" },

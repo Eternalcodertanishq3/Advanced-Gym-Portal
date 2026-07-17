@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 export async function getDietPlans(page = 1, limit = 10, search = "") {
   const session = await auth();
@@ -85,7 +84,7 @@ export async function createDietPlan(data: {
       },
     });
 
-    revalidatePath("/trainer/diet");
+    require("next/cache").revalidatePath("/trainer/diet");
     return { success: true, data: plan };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
