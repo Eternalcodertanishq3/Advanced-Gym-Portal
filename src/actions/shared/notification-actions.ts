@@ -57,6 +57,24 @@ export async function sendBroadcast(title: string, message: string, type: string
       })),
     });
 
+    // Trigger realtime push event via Pusher
+    try {
+      const { pusherServer } = require("@/lib/pusher-server");
+      const { getTenantDetailsSync } = require("@/lib/tenant");
+      const tenant = getTenantDetailsSync();
+
+      if (tenant?.id && process.env.NEXT_PUBLIC_PUSHER_KEY) {
+        await pusherServer.trigger(`tenant-${tenant.id}`, "broadcast", {
+          title,
+          body: message,
+          type: type || "SYSTEM",
+          createdAt: new Date().toISOString(),
+        });
+      }
+    } catch (pusherErr) {
+      console.warn("Pusher trigger failed, continuing gracefully:", pusherErr);
+    }
+
     revalidatePath("/admin/notifications");
     return { success: true };
   } catch (error: unknown) {

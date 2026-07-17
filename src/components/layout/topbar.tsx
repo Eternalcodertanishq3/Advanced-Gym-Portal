@@ -28,6 +28,8 @@ import { cn } from "@/lib/utils";
 import { formatDate, getGreeting } from "@/lib/utils";
 import { useAuthStore, useSidebarStore } from "@/stores/auth-store";
 import { useNotificationStore } from "@/stores/auth-store";
+import { useRealtimeNotifications } from "@/hooks/use-realtime-notifications";
+import { getTenantDetailsSync } from "@/lib/tenant";
 import { getRoleBadgeClass, getRoleLabel } from "@/lib/rbac";
 import type { Role } from "@/lib/constants";
 
@@ -54,13 +56,45 @@ export function Topbar({ user }: TopbarProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { logout } = useAuthStore();
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationStore();
+
+  const tenant = getTenantDetailsSync();
+  useRealtimeNotifications(user.id, tenant.id);
+
+  const { notifications, unreadCount, markAsRead, markAllAsRead, setNotifications } =
+    useNotificationStore();
   const { collapsed } = useSidebarStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+
+    async function loadNotifications() {
+      if (!user.id) return;
+      try {
+        const { getNotifications } = await import("@/actions/shared/notification-actions");
+        const res = await getNotifications(user.id);
+        if (res.success && res.data) {
+          setNotifications(
+            res.data.map((notif) => ({
+              id: notif.id,
+              title: notif.title,
+              body: notif.body,
+              type: notif.type,
+              isRead: notif.isRead,
+              createdAt:
+                notif.createdAt instanceof Date
+                  ? notif.createdAt.toISOString()
+                  : String(notif.createdAt),
+            })),
+          );
+        }
+      } catch (err) {
+        console.error("Failed to load initial notifications:", err);
+      }
+    }
+
+    loadNotifications();
+  }, [user.id, setNotifications]);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
