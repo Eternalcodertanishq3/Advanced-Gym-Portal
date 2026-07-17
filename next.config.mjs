@@ -76,7 +76,7 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' blob: data: https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com https://res.cloudinary.com; connect-src 'self' wss://*; frame-src 'self'; media-src 'self';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' blob: data: https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com https://res.cloudinary.com; connect-src 'self' wss://*; frame-src 'self'; media-src 'self'; report-uri /api/csp-report;",
           },
           {
             key: "Permissions-Policy",

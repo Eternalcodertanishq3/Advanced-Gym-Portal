@@ -1,0 +1,4 @@
+Contact: mailto:security@gymflow.io
+Expires: 2027-07-17T18:00:00.000Z
+Preferred-Languages: en
+Policy: https://gymflow.io/security-policy
