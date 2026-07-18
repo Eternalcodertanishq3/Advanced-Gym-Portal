@@ -21,6 +21,58 @@ export const {
   ...authConfig,
   adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
+  callbacks: {
+    ...authConfig.callbacks,
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.role = token.role as any;
+        session.user.id = token.id as string;
+        session.user.firstName = token.firstName as string;
+        session.user.lastName = token.lastName as string;
+        (session.user as any).branchId = token.branchId as string;
+        (session.user as any).passwordResetRequired = token.passwordResetRequired as boolean;
+
+        // Impersonation check (runs on Node server, safe from edge constraints)
+        const isOriginalAdmin = token.role === "SUPER_ADMIN" || token.role === "ADMIN";
+        if (isOriginalAdmin) {
+          try {
+            const { cookies } = await import("next/headers");
+            const cookieStore = await cookies();
+            const impersonatedId = cookieStore.get("impersonated_user_id")?.value;
+
+            if (impersonatedId) {
+              const targetUser = await prisma.user.findUnique({
+                where: { id: impersonatedId },
+                select: {
+                  id: true,
+                  email: true,
+                  firstName: true,
+                  lastName: true,
+                  role: true,
+                  branchId: true,
+                  status: true,
+                },
+              });
+              if (targetUser) {
+                session.user.id = targetUser.id;
+                session.user.email = targetUser.email;
+                session.user.name = `${targetUser.firstName} ${targetUser.lastName}`;
+                session.user.firstName = targetUser.firstName;
+                session.user.lastName = targetUser.lastName;
+                session.user.role = targetUser.role as any;
+                session.user.status = targetUser.status;
+                (session.user as any).branchId = targetUser.branchId;
+                session.user.impersonatorId = token.id as string;
+              }
+            }
+          } catch (err) {
+            console.error("Failed to load impersonation profile:", err);
+          }
+        }
+      }
+      return session;
+    },
+  },
   providers: [
     CredentialsProvider({
       name: "credentials",

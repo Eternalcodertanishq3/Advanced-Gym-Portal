@@ -11,6 +11,8 @@ import {
   Moon,
   Sun,
   Smartphone,
+  ShieldAlert,
+  Lock,
 } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import { Button } from "@/components/ui/button";
@@ -23,14 +25,14 @@ export default function SettingsPage() {
   const { data: settings, isLoading, updateSetting } = useSettings();
   const [activeTab, setActiveTab] = useState("general");
 
-  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [formValues, setFormValues] = useState<Record<string, any>>({});
 
   // Sync state once data loads
   if (settings && Object.keys(formValues).length === 0) {
     setFormValues(settings);
   }
 
-  const handleChange = (key: string, value: string) => {
+  const handleChange = (key: string, value: any) => {
     setFormValues((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -57,6 +59,7 @@ export default function SettingsPage() {
     { id: "hours", label: "Working Hours", icon: <Clock className="mr-2 h-4 w-4" /> },
     { id: "notifications", label: "Notifications", icon: <Bell className="mr-2 h-4 w-4" /> },
     { id: "appearance", label: "Appearance", icon: <Palette className="mr-2 h-4 w-4" /> },
+    { id: "system", label: "System Controls", icon: <ShieldAlert className="mr-2 h-4 w-4" /> },
   ];
 
   return (
@@ -296,6 +299,66 @@ export default function SettingsPage() {
                       <div className="flex h-5 w-10 cursor-pointer items-center justify-end rounded-full bg-brand-navy px-1">
                         <div className="h-3.5 w-3.5 rounded-full bg-white"></div>
                       </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* System Controls */}
+              {activeTab === "system" && (
+                <>
+                  <div>
+                    <h2 className="font-display text-xl font-bold text-obsidian-950">
+                      System Controls
+                    </h2>
+                    <p className="mt-1 text-sm text-obsidian-500">
+                      Manage platform access, maintenance, and emergency states.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-base p-4">
+                      <div>
+                        <p className="font-medium text-obsidian-950">Maintenance Mode</p>
+                        <p className="mt-0.5 text-xs text-obsidian-500">
+                          Redirect non-admin users to a scheduled maintenance screen.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          handleChange("maintenance_mode", formValues["maintenance_mode"] !== true)
+                        }
+                        className={cn(
+                          "flex h-5 w-10 cursor-pointer items-center rounded-full px-1 transition-colors duration-200",
+                          formValues["maintenance_mode"] === true
+                            ? "justify-end bg-brand-orange"
+                            : "justify-start bg-obsidian-300",
+                        )}
+                      >
+                        <div className="h-3.5 w-3.5 rounded-full bg-white shadow-sm"></div>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-base p-4">
+                      <div>
+                        <p className="font-medium text-obsidian-950">Emergency Lock</p>
+                        <p className="mt-0.5 text-xs text-obsidian-500">
+                          Instantly freeze and disable all write operations across the tenant.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          handleChange("emergency_lock", formValues["emergency_lock"] !== true)
+                        }
+                        className={cn(
+                          "flex h-5 w-10 cursor-pointer items-center rounded-full px-1 transition-colors duration-200",
+                          formValues["emergency_lock"] === true
+                            ? "justify-end bg-red-600"
+                            : "justify-start bg-obsidian-300",
+                        )}
+                      >
+                        <div className="h-3.5 w-3.5 rounded-full bg-white shadow-sm"></div>
+                      </button>
                     </div>
                   </div>
                 </>

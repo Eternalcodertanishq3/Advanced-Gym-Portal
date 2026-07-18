@@ -91,3 +91,32 @@ export async function recordAudit({
     // but in a high-security app, you might want to.
   }
 }
+
+/**
+ * 🔒 GYMFLOW — Emergency Lock Check
+ * Throws an error if emergency lock is active and the user is not an Admin/Super Admin.
+ */
+export async function checkEmergencyLock() {
+  const session = await auth();
+
+  // Admins and Super Admins can bypass emergency lock to do corrections
+  if (session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "ADMIN") {
+    return;
+  }
+
+  try {
+    const { resolveTenantId } = require("@/lib/prisma");
+    const tenantId = (await resolveTenantId()) || null;
+    const lockSetting = await prisma.gymSetting.findUnique({
+      where: { key_tenantId: { key: "emergency_lock", tenantId: tenantId || "" } },
+    });
+    if (lockSetting && lockSetting.value === true) {
+      throw new Error("System is currently under emergency lock. Operations are suspended.");
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("emergency lock")) {
+      throw err;
+    }
+    // Continue if database check fails/is unreachable
+  }
+}

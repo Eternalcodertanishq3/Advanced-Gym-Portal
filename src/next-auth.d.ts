@@ -9,6 +9,7 @@ declare module "next-auth" {
       firstName: string;
       lastName: string;
       status: UserStatus;
+      impersonatorId?: string;
     } & DefaultSession["user"];
   }
   interface User {

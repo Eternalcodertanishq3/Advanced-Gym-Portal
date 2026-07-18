@@ -19,13 +19,15 @@ import {
   Filter,
   Copy,
   Check,
+  User,
 } from "lucide-react";
 import { formatCurrency, formatDate, getInitials, getAvatarColor, cn } from "@/lib/utils";
 import { useMembers } from "@/hooks/use-members";
 import { toast } from "sonner";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useSession } from "next-auth/react";
+import { useDebounce } from "@/hooks/use-debounce";
 import { getBranches } from "@/actions/super-admin/branch-actions";
+import { impersonateUser } from "@/actions/super-admin/impersonate-actions";
 import {
   Select,
   SelectContent,
@@ -60,6 +62,16 @@ export default function MembersPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+
+  const handleImpersonate = async (targetUserId: string) => {
+    const res = await impersonateUser(targetUserId);
+    if (res.success) {
+      toast.success("Impersonation started successfully");
+      window.location.href = "/member";
+    } else {
+      toast.error(res.error || "Failed to impersonate user");
+    }
+  };
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
@@ -358,6 +370,12 @@ export default function MembersPage() {
                               onClick={() => router.push(`/admin/members/${member.id}/edit`)}
                             >
                               <Edit3 className="mr-2 h-4 w-4" /> Edit Member
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleImpersonate(member.userId)}
+                              className="text-brand-orange focus:bg-brand-orange/5"
+                            >
+                              <User className="mr-2 h-4 w-4" /> Impersonate Member
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-surface-sunken" />
                             <DropdownMenuItem
