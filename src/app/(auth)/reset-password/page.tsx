@@ -1,20 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import { Lock, ShieldCheck, ArrowRight, CheckCircle2, Dumbbell, AlertTriangle } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  Lock,
+  ShieldCheck,
+  ArrowRight,
+  CheckCircle2,
+  Dumbbell,
+  AlertTriangle,
+  Loader2,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { resetInitialPassword } from "@/actions/auth/reset-actions";
+import { resetPasswordWithToken } from "@/actions/auth/reset-token-actions";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Dashboard Consistent Reset Password Page
 // ═══════════════════════════════════════════════════════════════
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -35,12 +47,24 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
     try {
-      const res = await resetInitialPassword(password);
-      if (res.success) {
-        toast.success("Password updated! Please log in with your new credentials.");
-        signOut({ callbackUrl: "/login" });
+      if (token) {
+        // Token reset flow (from forgot-password email link)
+        const res = await resetPasswordWithToken(token, password);
+        if (res.success) {
+          toast.success("Password updated! Please log in with your new credentials.");
+          router.push("/login");
+        } else {
+          toast.error(res.error || "Failed to reset password");
+        }
       } else {
-        toast.error(res.error || "Failed to reset password");
+        // Initial password reset flow (logged in user)
+        const res = await resetInitialPassword(password);
+        if (res.success) {
+          toast.success("Password updated! Please log in with your new credentials.");
+          signOut({ callbackUrl: "/login" });
+        } else {
+          toast.error(res.error || "Failed to reset password");
+        }
       }
     } catch {
       toast.error("Something went wrong");
@@ -174,5 +198,19 @@ export default function ResetPasswordPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="relative flex min-h-screen items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-brand-orange" />
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

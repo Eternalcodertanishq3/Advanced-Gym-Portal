@@ -7,6 +7,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+import { requestPasswordReset } from "@/actions/auth/reset-token-actions";
+
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Dashboard Consistent Forgot Password Page
 // ═══════════════════════════════════════════════════════════════
@@ -26,9 +28,13 @@ export default function ForgotPasswordPage() {
 
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setIsSent(true);
-      toast.success("Reset link sent to your email!");
+      const res = await requestPasswordReset(email);
+      if (res.success) {
+        setIsSent(true);
+        toast.success("Reset link sent to your email!");
+      } else {
+        toast.error(res.error || "Failed to send reset link");
+      }
     } catch {
       toast.error("Failed to send reset link");
     } finally {
