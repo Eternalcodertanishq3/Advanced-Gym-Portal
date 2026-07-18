@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Shield, Key, Eye, EyeOff, Lock, AlertCircle } from "lucide-react";
+import { Shield, Key, Eye, EyeOff, Lock, AlertCircle, FileSpreadsheet, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updatePassword } from "@/actions/member/profile-actions";
+import { requestAccountDeletion } from "@/actions/dashboard/profile-actions";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -13,6 +14,25 @@ export function SecuritySettings() {
   const [showNew, setShowNew] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ current: "", new: "", confirm: "" });
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleRequestDeletion = async () => {
+    if (
+      !window.confirm(
+        "Are you absolutely sure you want to request account deletion? This action is irreversible and our support team will process it for compliance review.",
+      )
+    ) {
+      return;
+    }
+    setIsDeleting(true);
+    const res = await requestAccountDeletion();
+    if (res.success) {
+      toast.success(res.message);
+    } else {
+      toast.error(res.error || "Failed to submit deletion request");
+    }
+    setIsDeleting(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,19 +160,37 @@ export function SecuritySettings() {
             </Button>
           </form>
 
-          <div className="border-t border-border/50 pt-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-sm font-bold text-foreground">Two-Factor Authentication</h4>
-                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-txt-tertiary">
-                  Recommended for all elite members
-                </p>
-              </div>
+          {/* Data Privacy & Compliance Controls */}
+          <div className="space-y-6 border-t border-border/50 pt-8">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                Data Privacy & Compliance
+              </h3>
+              <p className="mt-1 text-[11px] leading-relaxed text-txt-tertiary">
+                Export your personal record history or request permanent deletion of your profile
+                under compliance frameworks.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 sm:flex-row">
               <Button
+                type="button"
+                onClick={() => (window.location.href = "/api/export")}
                 variant="outline"
-                className="h-10 cursor-not-allowed rounded-xl border-border/50 px-4 text-[10px] font-black uppercase tracking-widest opacity-50"
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border-border/50 text-xs font-bold uppercase tracking-wider hover:bg-surface-sunken"
               >
-                Enable
+                <FileSpreadsheet className="h-4 w-4" />
+                Export My Data (CSV)
+              </Button>
+
+              <Button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleRequestDeletion}
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-600/10 text-xs font-bold uppercase tracking-wider text-red-500 transition-all hover:bg-red-500 hover:text-white active:scale-95"
+              >
+                <Trash2 className="h-4 w-4" />
+                {isDeleting ? "Requesting..." : "Request Account Deletion"}
               </Button>
             </div>
           </div>

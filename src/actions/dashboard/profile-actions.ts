@@ -98,3 +98,44 @@ export async function changePassword(formData: FormData) {
     return { error: "Failed to change password" };
   }
 }
+
+export async function requestAccountDeletion() {
+  const session = await auth();
+  if (!session?.user) return { error: "Unauthorized" };
+
+  try {
+    const member = await prisma.member.findFirst({
+      where: { userId: session.user.id },
+      include: {
+        subscription: true,
+      },
+    });
+
+    const hasActiveSubscription =
+      member && member.subscription && member.subscription.status === "ACTIVE";
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        deletionRequested: true,
+        deletionRequestedAt: new Date(),
+      },
+    });
+
+    if (hasActiveSubscription) {
+      return {
+        success: true,
+        message:
+          "Account deletion requested. Please ensure you cancel any active subscriptions to prevent recurring charges.",
+      };
+    }
+
+    return {
+      success: true,
+      message:
+        "Your account deletion request has been submitted. Our compliance team will process it shortly.",
+    };
+  } catch (error) {
+    return { error: "Failed to submit deletion request" };
+  }
+}
