@@ -79,6 +79,7 @@ export const {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        twoFactorVerified: { label: "TwoFactorVerified", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -99,6 +100,11 @@ export const {
         );
 
         if (passwordsMatch) {
+          // If 2FA is active on the account, check verification status
+          if (user.twoFactorEnabled && credentials.twoFactorVerified !== "true") {
+            throw new Error("2FA_REQUIRED");
+          }
+
           return {
             id: user.id,
             email: user.email,

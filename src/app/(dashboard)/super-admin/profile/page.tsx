@@ -131,6 +131,7 @@ export default async function SuperAdminProfilePage() {
               email: user.email,
               phone: user.phone,
             }}
+            twoFactorEnabled={user.twoFactorEnabled}
           />
         </div>
 

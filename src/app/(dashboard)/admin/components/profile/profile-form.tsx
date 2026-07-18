@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { User, Mail, Phone, Save, Loader2 } from "lucide-react";
+import { User, Mail, Phone, Save, Loader2, ShieldCheck } from "lucide-react";
 import { updateProfile } from "@/actions/dashboard/profile-actions";
+import { toggleUser2FA } from "@/actions/auth/two-factor-actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,10 +35,31 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 interface ProfileFormProps {
   initialData: ProfileFormValues;
+  twoFactorEnabled?: boolean;
 }
 
-export function ProfileForm({ initialData }: ProfileFormProps) {
+export function ProfileForm({ initialData, twoFactorEnabled = false }: ProfileFormProps) {
   const [isPending, setIsPending] = React.useState(false);
+  const [mfaEnabled, setMfaEnabled] = React.useState(twoFactorEnabled);
+  const [is2FAPending, setIs2FAPending] = React.useState(false);
+
+  const handle2FAToggle = async () => {
+    setIs2FAPending(true);
+    try {
+      const nextState = !mfaEnabled;
+      const res = await toggleUser2FA(nextState);
+      if (res.success) {
+        setMfaEnabled(nextState);
+        toast.success(`Multi-Factor Authentication ${nextState ? "enabled" : "disabled"}`);
+      } else {
+        toast.error(res.error || "Failed to update 2FA status");
+      }
+    } catch {
+      toast.error("Failed to update 2FA settings");
+    } finally {
+      setIs2FAPending(false);
+    }
+  };
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -194,6 +216,37 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
           </div>
         </form>
       </Form>
+
+      {/* 2FA Security Segment */}
+      <div className="mt-8 border-t border-border pt-6">
+        <div className="flex items-center justify-between rounded-xl border border-brand-orange/10 bg-brand-orange/5 p-4">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange" />
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                Multi-Factor Authentication (2FA)
+              </h4>
+              <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
+                Enhance your performance workspace security by requesting a secure 6-digit
+                verification code delivered to your email address on every sign-in attempt.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled={is2FAPending}
+            onClick={handle2FAToggle}
+            className={cn(
+              "flex h-5 w-10 shrink-0 cursor-pointer items-center rounded-full px-1 transition-colors duration-200",
+              mfaEnabled
+                ? "justify-end bg-brand-orange"
+                : "justify-start border border-border bg-muted",
+            )}
+          >
+            <div className="h-3.5 w-3.5 rounded-full bg-white shadow-sm"></div>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

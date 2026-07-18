@@ -355,6 +355,9 @@ model User {
   passwordResetToken    String?    @unique
   passwordResetExpires  DateTime?
   emailVerificationToken String?   @unique
+  twoFactorEnabled      Boolean   @default(false)
+  twoFactorCode         String?
+  twoFactorExpires      DateTime?
   xp                    Int       @default(0)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt

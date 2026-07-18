@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { check2FARequired, verify2FAOtp } from "@/actions/auth/two-factor-actions";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Dashboard Consistent Login Page
@@ -32,6 +33,8 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [authMethod, setAuthMethod] = useState<"password" | "magic-link">("password");
+  const [show2FA, setShow2FA] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,10 +49,63 @@ const LoginPage = () => {
       return;
     }
 
+    if (show2FA) {
+      if (twoFactorCode.length < 6) {
+        toast.error("Please enter the complete 6-digit code");
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const verifyRes = await verify2FAOtp(email, twoFactorCode);
+        if (verifyRes.success) {
+          const result = await signIn("credentials", {
+            email: email.trim().toLowerCase(),
+            password,
+            twoFactorVerified: "true",
+            redirect: false,
+            callbackUrl: "/",
+          });
+
+          if (result?.error) {
+            toast.error(result.error);
+            setIsLoading(false);
+            return;
+          }
+
+          if (result?.ok) {
+            toast.success("Welcome back to Eagle Gym!");
+            router.push("/");
+            router.refresh();
+          }
+        } else {
+          toast.error(verifyRes.error || "Invalid 2FA code");
+        }
+      } catch {
+        toast.error("Verification failed");
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       if (authMethod === "password") {
+        const checkRes = await check2FARequired(email, password);
+        if (!checkRes.success) {
+          toast.error(checkRes.error || "Authentication failed");
+          setIsLoading(false);
+          return;
+        }
+
+        if (checkRes.requires2FA) {
+          setShow2FA(true);
+          toast.success("Verification code sent to your email!");
+          setIsLoading(false);
+          return;
+        }
+
         const result = await signIn("credentials", {
           email: email.trim().toLowerCase(),
           password,
@@ -163,112 +219,157 @@ const LoginPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Field */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="email"
-                className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
-              >
-                Email Address
-              </label>
-              <div className="group relative">
-                <Mail
-                  className={cn(
-                    "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
-                    focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary",
-                  )}
-                />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onFocus={() => setFocusedField("email")}
-                  onBlur={() => setFocusedField(null)}
-                  placeholder="Email Address"
-                  className="surface-input h-11 pl-11 text-sm"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            {/* Password Field (Only shown in password mode) */}
-            {authMethod === "password" && (
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+            {show2FA ? (
+              <div className="space-y-4 duration-300 animate-in fade-in slide-in-from-bottom-2">
+                <div className="space-y-1.5">
                   <label
-                    htmlFor="password"
+                    htmlFor="twoFactorCode"
                     className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
                   >
-                    Password
+                    MFA Verification Code
                   </label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-[11px] font-bold text-brand-orange transition-colors hover:text-brand-orange-hover"
-                  >
-                    Forgot?
-                  </Link>
+                  <div className="group relative">
+                    <ShieldCheck
+                      className={cn(
+                        "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
+                        focusedField === "2fa" ? "text-brand-orange" : "text-txt-tertiary",
+                      )}
+                    />
+                    <input
+                      id="twoFactorCode"
+                      type="text"
+                      maxLength={6}
+                      value={twoFactorCode}
+                      onChange={(e) => setTwoFactorCode(e.target.value)}
+                      onFocus={() => setFocusedField("2fa")}
+                      onBlur={() => setFocusedField(null)}
+                      placeholder="Enter 6-Digit Code"
+                      className="surface-input h-11 pl-11 text-center text-sm font-bold tracking-[4px]"
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-txt-tertiary">
+                    A secure authentication code has been sent to your registered email address.
+                  </p>
                 </div>
-                <div className="group relative">
-                  <Lock
-                    className={cn(
-                      "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
-                      focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary",
-                    )}
-                  />
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onFocus={() => setFocusedField("password")}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="••••••••"
-                    className="surface-input h-11 pl-11 pr-11 text-sm"
-                    disabled={isLoading}
-                  />
+              </div>
+            ) : (
+              <>
+                {/* Email Field */}
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="email"
+                    className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                  >
+                    Email Address
+                  </label>
+                  <div className="group relative">
+                    <Mail
+                      className={cn(
+                        "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
+                        focusedField === "email" ? "text-brand-orange" : "text-txt-tertiary",
+                      )}
+                    />
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onFocus={() => setFocusedField("email")}
+                      onBlur={() => setFocusedField(null)}
+                      placeholder="Email Address"
+                      className="surface-input h-11 pl-11 text-sm"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                {/* Password Field (Only shown in password mode) */}
+                {authMethod === "password" && (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="password"
+                        className="text-[11px] font-bold uppercase tracking-wider text-txt-tertiary"
+                      >
+                        Password
+                      </label>
+                      <Link
+                        href="/forgot-password"
+                        className="text-[11px] font-bold text-brand-orange transition-colors hover:text-brand-orange-hover"
+                      >
+                        Forgot?
+                      </Link>
+                    </div>
+                    <div className="group relative">
+                      <Lock
+                        className={cn(
+                          "absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
+                          focusedField === "password" ? "text-brand-orange" : "text-txt-tertiary",
+                        )}
+                      />
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onFocus={() => setFocusedField("password")}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder="••••••••"
+                        className="surface-input h-11 pl-11 pr-11 text-sm"
+                        disabled={isLoading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-txt-tertiary transition-colors hover:text-foreground"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Toggle Sign In Method */}
+                <div className="text-right">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-txt-tertiary transition-colors hover:text-foreground"
+                    onClick={() =>
+                      setAuthMethod(authMethod === "password" ? "magic-link" : "password")
+                    }
+                    className="text-xs font-bold text-brand-orange transition-colors hover:text-brand-orange-hover"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {authMethod === "password" ? "Use Magic Link instead" : "Use Password instead"}
                   </button>
                 </div>
-              </div>
-            )}
 
-            {/* Toggle Sign In Method */}
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={() => setAuthMethod(authMethod === "password" ? "magic-link" : "password")}
-                className="text-xs font-bold text-brand-orange transition-colors hover:text-brand-orange-hover"
-              >
-                {authMethod === "password" ? "Use Magic Link instead" : "Use Password instead"}
-              </button>
-            </div>
-
-            {/* Remember Me (Only in password mode) */}
-            {authMethod === "password" && (
-              <div className="flex items-center py-1">
-                <label className="group flex cursor-pointer select-none items-center gap-2">
-                  <div
-                    className={cn(
-                      "flex h-4.5 w-4.5 items-center justify-center rounded border-2 transition-all duration-200",
-                      rememberMe
-                        ? "border-brand-orange bg-brand-orange"
-                        : "border-surface-border group-hover:border-brand-orange/50",
-                    )}
-                    onClick={() => setRememberMe(!rememberMe)}
-                  >
-                    {rememberMe && <ShieldCheck className="h-3 w-3 text-white" />}
+                {/* Remember Me (Only in password mode) */}
+                {authMethod === "password" && (
+                  <div className="flex items-center py-1">
+                    <label className="group flex cursor-pointer select-none items-center gap-2">
+                      <div
+                        className={cn(
+                          "flex h-4.5 w-4.5 items-center justify-center rounded border-2 transition-all duration-200",
+                          rememberMe
+                            ? "border-brand-orange bg-brand-orange"
+                            : "border-surface-border group-hover:border-brand-orange/50",
+                        )}
+                        onClick={() => setRememberMe(!rememberMe)}
+                      >
+                        {rememberMe && <ShieldCheck className="h-3 w-3 text-white" />}
+                      </div>
+                      <span className="text-xs font-semibold text-txt-secondary transition-colors group-hover:text-foreground">
+                        Remember me
+                      </span>
+                    </label>
                   </div>
-                  <span className="text-xs font-semibold text-txt-secondary transition-colors group-hover:text-foreground">
-                    Remember me
-                  </span>
-                </label>
-              </div>
+                )}
+              </>
             )}
 
             {/* Action Button */}
@@ -281,7 +382,11 @@ const LoginPage = () => {
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               ) : (
                 <>
-                  {authMethod === "password" ? "Sign In to Dashboard" : "Send Magic Link"}
+                  {show2FA
+                    ? "Verify & Sign In"
+                    : authMethod === "password"
+                      ? "Sign In to Dashboard"
+                      : "Send Magic Link"}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}

@@ -25,6 +25,7 @@ export default async function ProfilePage() {
       email: true,
       phone: true,
       avatar: true,
+      twoFactorEnabled: true,
     },
   });
 
@@ -67,7 +68,7 @@ export default async function ProfilePage() {
         </TabsList>
 
         <TabsContent value="general" className="space-y-6">
-          <ProfileForm initialData={user} />
+          <ProfileForm initialData={user} twoFactorEnabled={user.twoFactorEnabled} />
         </TabsContent>
 
         <TabsContent value="security">
