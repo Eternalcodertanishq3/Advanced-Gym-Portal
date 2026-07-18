@@ -13,7 +13,9 @@ import {
   Smartphone,
   ShieldAlert,
   Lock,
+  Crown,
 } from "lucide-react";
+import { SaasSubscriptionTab } from "./components/saas-subscription-tab";
 import { useSettings } from "@/hooks/use-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +62,7 @@ export default function SettingsPage() {
     { id: "notifications", label: "Notifications", icon: <Bell className="mr-2 h-4 w-4" /> },
     { id: "appearance", label: "Appearance", icon: <Palette className="mr-2 h-4 w-4" /> },
     { id: "system", label: "System Controls", icon: <ShieldAlert className="mr-2 h-4 w-4" /> },
+    { id: "subscription", label: "SaaS Plan & Billing", icon: <Crown className="mr-2 h-4 w-4" /> },
   ];
 
   return (
@@ -75,14 +78,16 @@ export default function SettingsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            className="bg-brand-navy text-white hover:bg-brand-navy/90"
-            onClick={handleSave}
-            disabled={updateSetting.isPending}
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {updateSetting.isPending ? "Saving..." : "Save Changes"}
-          </Button>
+          {activeTab !== "subscription" && (
+            <Button
+              className="bg-brand-navy text-white hover:bg-brand-navy/90"
+              onClick={handleSave}
+              disabled={updateSetting.isPending}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {updateSetting.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -363,6 +368,9 @@ export default function SettingsPage() {
                   </div>
                 </>
               )}
+
+              {/* SaaS Subscription & Billing */}
+              {activeTab === "subscription" && <SaasSubscriptionTab />}
             </div>
           )}
         </div>
