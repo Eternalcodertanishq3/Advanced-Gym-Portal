@@ -28,6 +28,7 @@ import { useSession } from "next-auth/react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getBranches } from "@/actions/super-admin/branch-actions";
 import { impersonateUser } from "@/actions/super-admin/impersonate-actions";
+import { SavedFilters } from "@/components/shared/saved-filters";
 import {
   Select,
   SelectContent,
@@ -168,7 +169,7 @@ export default function MembersPage() {
       </div>
 
       {/* Filters Card */}
-      <div className="rounded-2xl border border-surface-sunken bg-surface-card p-4 shadow-sm">
+      <div className="space-y-4 rounded-2xl border border-surface-sunken bg-surface-card p-4 shadow-sm">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-obsidian-400" />
@@ -200,6 +201,19 @@ export default function MembersPage() {
               Filter
             </Button>
           </div>
+        </div>
+
+        {/* Saved Filter Presets */}
+        <div className="border-t border-surface-sunken/60 pt-3">
+          <SavedFilters
+            storageKey="members-search-presets"
+            currentFilters={{ search, branchId: selectedBranchId }}
+            onApplyFilters={(filters) => {
+              setSearch(filters.search);
+              setSelectedBranchId(filters.branchId || "ALL");
+              setPage(1);
+            }}
+          />
         </div>
       </div>
 
