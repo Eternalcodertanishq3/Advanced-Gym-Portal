@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NotificationService } from "@/lib/notification-service";
 import crypto from "crypto";
 
 // ═══════════════════════════════════════════════════════════════
@@ -155,6 +156,76 @@ export async function POST(req: Request) {
                   data: { xp: { increment: 150 } },
                 });
               }
+            }
+          });
+        }
+      }
+    } else if (eventType === "payment.failed") {
+      const paymentEntity = payload.payload.payment.entity;
+      const notes = paymentEntity.notes || {};
+      const { memberId, planId } = notes;
+
+      if (memberId && planId) {
+        const plan = await prisma.plan.findUnique({
+          where: { id: planId },
+        });
+
+        if (plan) {
+          await prisma.$transaction(async (tx) => {
+            // Write event to idempotency check table
+            await tx.webhookEvent.create({
+              data: {
+                eventId,
+                provider: "RAZORPAY",
+                eventType,
+              },
+            });
+
+            const user = await tx.user.findFirst({
+              where: { member: { id: memberId } },
+            });
+            const branchId = user?.branchId || null;
+
+            // 1. Create a FAILED payment log
+            await tx.payment.create({
+              data: {
+                memberId,
+                amount: plan.price,
+                total: plan.price,
+                method: "ONLINE",
+                type: "SUBSCRIPTION",
+                status: "FAILED",
+                receiptNo: `REC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
+                transactionId: paymentEntity.id,
+                branchId,
+                description: `Failed payment attempt for subscription plan ${plan.name}`,
+              },
+            });
+
+            // 2. Alert the user of their failed payment & provide a recovery path (Dunning Flow)
+            if (user?.email) {
+              await NotificationService.sendEmail({
+                to: user.email,
+                subject: "Payment Failed — GymFlow SaaS Subscription Alert",
+                html: `
+                  <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #f1f1f1; border-radius: 12px;">
+                    <h2 style="color: #ef4444; font-size: 20px; font-weight: bold; margin-bottom: 16px;">Payment Verification Failed</h2>
+                    <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
+                      Hello ${user.firstName},<br/><br/>
+                      We were unable to process your payment of <strong>₹${plan.price}</strong> for the subscription plan <strong>${plan.name}</strong>.
+                    </p>
+                    <div style="text-align: center; margin-bottom: 24px;">
+                      <a href="${process.env.NEXTAUTH_URL || "http://localhost:3000"}/member/subscription" 
+                         style="background-color: #ef4444; color: #ffffff; padding: 12px 30px; font-weight: bold; font-size: 14px; text-decoration: none; border-radius: 8px; display: inline-block;">
+                        Retry Payment Securely
+                      </a>
+                    </div>
+                    <p style="color: #64748b; font-size: 11px; line-height: 1.6;">
+                      If your bank account was debited, the amount will be automatically refunded by your card issuer/UPI provider within 3-5 business days.
+                    </p>
+                  </div>
+                `,
+              });
             }
           });
         }

@@ -279,18 +279,35 @@ export function MemberSubscriptionClient({ subscription, payments }: Props) {
                             <p className="text-sm font-bold text-foreground">₹{payment.amount}</p>
                           </td>
                           <td className="px-6 py-5">
-                            <span className="rounded-full bg-success-soft px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-success">
+                            <span
+                              className={cn(
+                                "rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider",
+                                payment.status === "COMPLETED" && "bg-success-soft text-success",
+                                payment.status === "FAILED" && "bg-danger-soft text-danger",
+                                payment.status === "PENDING" && "bg-warning-soft text-warning",
+                              )}
+                            >
                               {payment.status}
                             </span>
                           </td>
                           <td className="px-6 py-5 text-right">
-                            <button
-                              onClick={() => downloadReceipt(payment)}
-                              aria-label="Download Receipt"
-                              className="rounded-lg bg-surface-elevated p-2 text-txt-tertiary transition-colors hover:text-brand-orange"
-                            >
-                              <Download className="h-4 w-4" />
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              {payment.status === "FAILED" ? (
+                                <Link href="/member/select-plan">
+                                  <Button className="h-8 rounded-lg bg-red-600 px-3 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-red-700">
+                                    Retry
+                                  </Button>
+                                </Link>
+                              ) : (
+                                <button
+                                  onClick={() => downloadReceipt(payment)}
+                                  aria-label="Download Receipt"
+                                  className="rounded-lg bg-surface-elevated p-2 text-txt-tertiary transition-colors hover:text-brand-orange"
+                                >
+                                  <Download className="h-4 w-4" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))

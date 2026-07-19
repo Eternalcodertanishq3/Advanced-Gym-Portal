@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 interface EmailParams {
   to: string;
@@ -23,7 +23,7 @@ export const NotificationService = {
    * Send an Email via Resend
    */
   async sendEmail({ to, subject, html, fromName }: EmailParams) {
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.warn("RESEND_API_KEY not found. Email suppressed.");
       return { success: false, error: "API Key missing" };
     }
