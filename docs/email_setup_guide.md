@@ -1,61 +1,192 @@
-# SaaS Email Deliverability Guide: SPF, DKIM, & DMARC
-
-To send transactional emails (login OTPs, registration greetings, and payment alerts) under your custom domain (e.g. `notifications@yourgym.com`) with high inbox placement and zero spam flagging, you must verify your sending domain inside **Resend** and publish the corresponding DNS records in your domain registrar (e.g. Cloudflare, Route 53, GoDaddy).
-
----
-
-## Step 1: Add Domain to Resend
-
-1. Go to the [Resend Domains Dashboard](https://resend.com/domains).
-2. Click **Add Domain**.
-3. Input your domain name (e.g., `yourgym.com`) and choose your region (e.g., `us-east-1`).
-4. Resend will generate **3 CNAME records** for domain verification and DKIM alignment.
+# 📧 EMAIL INTEGRATION & DELIVERABILITY GUIDE
+### *Resend API • SMTP Relay Fallbacks • DNS Hardening*
 
 ---
 
-## Step 2: Configure DNS Records
-
-Login to your DNS manager (e.g. Cloudflare, AWS Route 53, GoDaddy) and add the following records:
-
-### 1. DKIM (DomainKeys Identified Mail)
-DKIM signs outgoing emails with a cryptographic signature, proving that the email was actually sent by your domain and wasn't tampered with in transit.
-* Add the **3 CNAME records** generated in the Resend dashboard.
-* Example:
-  * **Type**: `CNAME`
-  * **Name**: `resend._domainkey`
-  * **Target**: `dkim.resend.com`
-
-### 2. SPF (Sender Policy Framework)
-SPF defines which mail servers are authorized to send email on behalf of your domain.
-* Resend configures SPF automatically through the CNAME records added in Step 1 (which set up a verified return path subdomain e.g. `bounces.yourgym.com` pointing to Resend).
-* However, if you are also sending emails using other services (like Google Workspace), ensure your root domain's TXT record includes Resend if needed, or rely on the aligned bounces subdomain (default and recommended by Resend).
-* Root SPF Record example (if you have multiple senders):
-  * **Type**: `TXT`
-  * **Name**: `@`
-  * **Value**: `v=spf1 include:_spf.google.com include:feedback-smtp.us-east-1.amazonses.com ~all`
-
-### 3. DMARC (Domain-based Message Authentication, Reporting, and Conformance)
-DMARC tells receiving mail servers (like Gmail or Yahoo) what to do with messages that fail SPF or DKIM checks. It is now a **strict requirement** by Google and Yahoo for all domain senders.
-
-* Add a new TXT record:
-  * **Type**: `TXT`
-  * **Name**: `_dmarc` (resolves to `_dmarc.yourgym.com`)
-  * **Value**: `v=DMARC1; p=none; pct=100; rua=mailto:dmarc-reports@yourgym.com`
-
-> [!TIP]
-> **DMARC Policy Phases (`p` tag)**:
-> 1. **Phase 1 (Monitoring)**: Use `p=none` initially. This gathers reports of who is sending mail on your domain without blocking or quarantining any emails.
-> 2. **Phase 2 (Quarantine)**: After 2-4 weeks of reports showing no legitimate mail is failing, change to `p=quarantine;` (sends failing emails to the spam folder).
-> 3. **Phase 3 (Reject)**: Finally, move to `p=reject;` (completely blocks any emails that fail SPF/DKIM).
+```
+   GYMFLOW SaaS SYSTEM MODULE: EMAIL ENGINE
+   ===========================================
+   [DELIVERY CORE] : RESEND API / NODEMAILER SMTP
+   [SECURITY DNS]  : SPF / DKIM / DMARC ENABLED
+   ===========================================
+```
 
 ---
 
-## Step 3: Verify Domain in Resend
+## 📖 TABLE OF CONTENTS
+1. [Email Dispatch Architecture](#1-email-dispatch-architecture)
+2. [Resend API Integration](#2-resend-api-integration)
+3. [SMTP Fallback Configuration](#3-smtp-fallback-configuration)
+4. [DNS Configuration & Authentication](#4-dns-configuration--authentication)
+5. [Ecosystem Email Triggers Directory](#5-ecosystem-email-triggers-directory)
+6. [Email Dispatch Logic Diagram](#6-email-dispatch-logic-diagram)
+7. [Environment Variable Configuration](#7-environment-variable-configuration)
+8. [Troubleshooting & Delivery Auditing](#8-troubleshooting--delivery-auditing)
 
-1. Go back to the Resend dashboard.
-2. Click **Verify** on your domain.
-3. Once DNS propagation is complete (usually takes 5-15 minutes, up to 24 hours for GoDaddy/Namecheap), your domain status will change to **Verified** (labeled in green).
-4. Update your `.env` or deployment variables to point to your new sender email:
-   ```bash
-   RESEND_FROM_EMAIL="notifications@yourgym.com"
-   ```
+---
+
+## 1. EMAIL DISPATCH ARCHITECTURE
+
+The Email Deliverability and Integration Guide covers the setup of the primary Resend API client, fallback SMTP relays, DNS security records, and transactional email templates in GymFlow.
+
+```mermaid
+graph TD
+    A[Trigger Email Action] --> B{Resend API Configured?}
+    B -- Yes --> C[Dispatch via Resend Client]
+    B -- No --> D{SMTP Configured?}
+    
+    C -- Success --> E[Log success to terminal]
+    C -- Failed --> D
+    
+    D -- Yes --> F[Dispatch via Nodemailer SMTP]
+    D -- No --> G[Write email parameters to console logs]
+    
+    F -- Success --> E
+    F -- Failed --> G
+    
+    style A fill:#1A1A1A,stroke:#F26522,stroke-width:2px,color:#F26522
+```
+
+We configure transactional emails with multiple fallbacks to ensure deliverability.
+
+---
+
+## 2. RESEND API INTEGRATION
+
+GymFlow uses the Resend API as its primary email delivery service.
+* **API Dispatch**: Next.js server actions send emails using the Resend client, reducing connection times compared to standard SMTP.
+* **Dynamic Domain Names**: The system reads default email senders from the config table to match the workspace's branding.
+
+---
+
+## 3. SMTP FALLBACK CONFIGURATION
+
+If the Resend API credentials are not configured, GymFlow uses Nodemailer to send emails through a fallback SMTP server.
+
+```
++-----------------------------------------------------------------+
+|                      Email Provider Hierarchy                   |
++---------------------+---------------------+---------------------+
+| Tier 1: Resend API  | Tier 2: SMTP Relay  | Tier 3: Console Log |
+| (Primary Option)    | (Nodemailer Fallback)| (Local Dev Backup)  |
++---------------------+---------------------+---------------------+
+           |                     |                     |
+           v                     v                     v
+[Uses fast HTTP calls] [Relays via standard] [Outputs to terminal]
+                       [SMTP configurations] [to prevent blocking]
+```
+
+This multi-tiered configuration prevents application errors if mail keys are missing during local development.
+
+---
+
+## 4. DNS CONFIGURATION & AUTHENTICATION
+
+To prevent emails from being flagged as spam, configure the SPF, DKIM, and DMARC records on your domain.
+
+### 4.1 Sender Policy Framework (SPF)
+Add an TXT record to authorize the email servers to send mail for your domain:
+
+```
+v=spf1 include:amazonses.com include:resend.com ~all
+```
+
+### 4.2 DomainKeys Identified Mail (DKIM)
+Add the DKIM public keys generated by your email provider as TXT records to authenticate messages.
+
+### 4.3 DMARC Policy
+Add a DMARC policy TXT record (`_dmarc.yourdomain.com`) to instruct receiving servers on how to handle failed messages:
+
+```
+v=DMARC1; p=quarantine; pct=100; rua=mailto:dmarc@yourdomain.com
+```
+
+---
+
+## 5. ECOSYSTEM EMAIL TRIGGERS DIRECTORY
+
+GymFlow sends transactional emails on specific system actions:
+
+| Action Trigger | Primary Content | Destination | Delivery Policy |
+| :--- | :--- | :--- | :--- |
+| **User Sign-up** | Verification link and token. | Member | Crucial (Immediate) |
+| **Password Reset**| Password reset link and token. | User | Crucial (Immediate) |
+| **OTP Auth** | 6-digit Multi-Factor PIN. | User | Crucial (Immediate) |
+| **Invoice Paid** | PDF invoice receipt. | Member | Standard (Within 5 Min) |
+| **Plan Failed** | Recovery payment links. | Member | High priority (Immediate) |
+
+---
+
+## 6. EMAIL DISPATCH LOGIC DIAGRAM
+
+This sequence diagram shows the step-by-step email delivery and fallback logic:
+
+```mermaid
+sequenceDiagram
+    actor App as Server Action
+    participant Mail as Email Service
+    participant Resend as Resend API
+    participant SMTP as SMTP Relays
+    participant Terminal as Server Log
+
+    App->>Mail: sendEmail(to, subject, html)
+    alt Resend API Active
+        Mail->>Resend: Request email dispatch
+        Resend-->>Mail: Return successful response
+        Mail-->>App: Return success status
+    else Resend Absent / Fails
+        Mail->>SMTP: Request relay dispatch
+        alt SMTP Successful
+            SMTP-->>Mail: Return success response
+            Mail-->>App: Return success status
+        else SMTP Absent / Fails
+            Mail->>Terminal: Log email details to console
+            Mail-->>App: Return fallback success
+        end
+    end
+```
+
+---
+
+## 7. ENVIRONMENT VARIABLE CONFIGURATION
+
+Configure these environment variables in your deployment settings:
+
+```ini
+# Primary Resend API Configuration
+RESEND_API_KEY="re_aBc123..."
+RESEND_FROM_EMAIL="notifications@yourdomain.com"
+
+# Fallback SMTP Mail Relay Settings
+SMTP_HOST="smtp.mailtrap.io"
+SMTP_PORT="587"
+SMTP_SECURE="false"
+SMTP_USER="smtp-username"
+SMTP_PASS="smtp-password"
+SMTP_FROM_EMAIL="fallback@yourdomain.com"
+```
+
+---
+
+## 8. TROUBLESHOOTING & DELIVERY AUDITING
+
+### 8.1 Resolution Procedures for Deliverability Issues
+
+#### Issue: Verification Emails Marked as Spam
+* **Possible Cause**: Missing or invalid SPF or DKIM records on the sending domain.
+* **Resolution**: Run a check on DNS records using online validation tools and update missing domain keys.
+
+#### Issue: Password Resets Fail to Deliver
+* **Possible Cause**: Resend API limits exceeded, or fallback SMTP server credentials are invalid.
+* **Resolution**: Check email logs in the Resend dashboard, verify fallback SMTP login parameters, and confirm that the rate-limiter is not blocking requests.
+
+#### Issue: Kiosk OTP Code Dispatch Delayed
+* **Possible Cause**: Network latency on SMTP relays.
+* **Resolution**: Use the primary Resend API for OTP delivery to minimize latency.
+
+---
+
+<div align="center">
+  <p><b>GymFlow SaaS Portal • Email Integration Guide</b></p>
+  <p>© 2026 GYMFLOW SAAS. ALL RIGHTS RESERVED.</p>
+</div>

@@ -1,66 +1,199 @@
-<div align="center">
-
-# 🦅 TRAINER COMMAND CENTER
-### *Squad Management • Blueprint Deployment • Performance Analytics*
+# 📋 TRAINER WORKFLOWS & CLIENT MANAGEMENT GUIDE
+### *Workout Assignment • Diet Customization • Progress Monitoring*
 
 ---
 
-[![Status](https://img.shields.io/badge/System-ONLINE-F26522?style=for-the-badge&logo=statuspage&logoColor=white)]()
-[![Module](https://img.shields.io/badge/Module-TRAINER_OPS-1A1A1A?style=for-the-badge&logo=expert-voice&logoColor=white)]()
+```
+   GYMFLOW SaaS SYSTEM MODULE: TRAINER PORTAL
+   ===========================================
+   [AUTHORIZATION] : TRAINER (LEVEL 2) / ADMIN (LEVEL 3)
+   [CLIENT SYSTEM] : WEB / MOBILE RESPONSIVE DASHBOARD
+   ===========================================
+```
 
 ---
 
-</div>
+## 📖 TABLE OF CONTENTS
+1. [Trainer Interface Overview](#1-trainer-interface-overview)
+2. [Workout Program Builder](#2-workout-program-builder)
+3. [Nutrition & Calorie Allocation Panel](#3-nutrition--calorie-allocation-panel)
+4. [Client Progress Monitoring](#4-client-progress-monitoring)
+5. [Direct Client Communications](#5-direct-client-communications)
+6. [Operational Activity Workflows](#6-operational-activity-workflows)
+7. [Database Schema ER Diagram](#7-database-schema-er-diagram)
+8. [Troubleshooting & Program Customization](#8-troubleshooting--program-customization)
 
-## 🌀 COACHING SEQUENCE
+---
+
+## 1. TRAINER INTERFACE OVERVIEW
+
+The Trainer Module provides fitness trainers with tools to manage assigned client rosters, build workout routines, track caloric targets, and monitor client progress.
+
+```mermaid
+graph TD
+    A[Trainer User] --> B( Roster Management)
+    A --> C(Workout Customization)
+    A --> D(Nutrition Planner)
+    A --> E(Progress Monitoring)
+    
+    B --> B1[Active Clients]
+    B --> B2[New Assignations]
+    
+    C --> C1[Routine Library]
+    C --> C2[Calisthenics Log]
+    
+    D --> D1[Macro Allocations]
+    D --> D2[Meal Schedules]
+    
+    E --> E1[Measurement Charts]
+    E --> E2[Assessment Sheets]
+    
+    style A fill:#1A1A1A,stroke:#F26522,stroke-width:4px,color:#F26522
+```
+
+Trainers design personalized programs for their assigned members.
+
+---
+
+## 2. WORKOUT PROGRAM BUILDER
+
+Trainers can build custom exercise routines using the built-in program template editor.
+
+### 2.1 Routine Logs & Exercise Definitions
+Trainers customize exercises, sets, reps, and target loads:
+
+```
++-----------------------------------------------------------------+
+|                       Deadlift Program                          |
++--------+------------------+------------------+------------------+
+| Set 1  | 8 reps @ 100kg   | Intensity: Low   | Rest: 120s       |
+| Set 2  | 6 reps @ 120kg   | Intensity: Medium| Rest: 120s       |
+| Set 3  | 4 reps @ 140kg   | Intensity: High  | Rest: 180s       |
++--------+------------------+------------------+------------------+
+```
+
+These programs are delivered to the member's portal automatically upon assignment.
+
+---
+
+## 3. NUTRITION & CALORIE ALLOCATION PANEL
+
+Trainers set daily calorie and macronutrient targets for members based on their goals.
+
+### 3.1 Diet Logs & Macro Configs
+Calculates macro targets using the built-in calculator:
+
+```mermaid
+stateDiagram-v2
+    [*] --> TargetConfigured : Targets Assigned
+    TargetConfigured --> MealPlanSaved : Diet Sheet Created
+    MealPlanSaved --> CalorieCheck : Member logs daily intake
+    CalorieCheck --> TargetConfigured : Targets updated on check-in
+```
+
+These allocations update the member's portal dashboard.
+
+---
+
+## 4. CLIENT PROGRESS MONITORING
+
+Trainers track member progress, including body weight, body fat percentage, and training history.
+* **Progress Graphs**: Displays change charts mapping metrics over time to help trainers adjust programs.
+
+---
+
+## 5. DIRECT CLIENT COMMUNICATIONS
+
+The Messaging interface allows trainers to communicate with their clients.
+* **Message Logs**: Tracks messages between trainers and clients to maintain communication.
+
+---
+
+## 6. OPERATIONAL ACTIVITY WORKFLOWS
+
+### 6.1 Program Creation Sequence
+This sequence diagram shows the step-by-step process of creating a training program:
 
 ```mermaid
 sequenceDiagram
-    participant T as Trainer
-    participant S as System
-    participant M as Member
-    
-    T->>S: Deploys Workout Blueprint
-    S-->>M: Plan Synchronized
-    M->>S: Logs Session Data
-    S-->>T: Performance Alert Triggered
-    T->>M: Direct Coaching Feedback
+    actor Trainer as Trainer User
+    participant Server as Server Action
+    participant DB as Prisma Database
+    participant Email as Notification System
+
+    Trainer->{Server}: Save Workout Program (memberId, exercises)
+    Server->>DB: Check member profile ID
+    alt Profile Valid
+        DB-->>Server: Profile ID Confirmed
+        Server->>DB: Create Program Record
+        Server->>DB: Log "CREATE" event in AuditLog
+        Server->>Email: Send workout update notification
+        Email-->>Trainer: Delivery successful
+    else Profile Invalid
+        DB-->>Server: Invalid Profile ID
+        Server-->>Trainer: Return error and abort creation
+    end
 ```
 
 ---
 
-## 🚀 CORE SYSTEMS
+## 7. DATABASE SCHEMA ER DIAGRAM
 
-### 👥 SQUAD MANAGEMENT `(trainer/my-members)`
-- **Member Roster**: Complete visibility of assigned athletes.
-- **Client Profiles**: Deep-dive into medical history, goals, and metrics.
-- **Progress Surveillance**: side-by-side photo comparison for transformation audits.
-
-### 📜 BLUEPRINT FORGE `(trainer/workouts)`
-- **Tactical Builder**: Create complex training regimens with precision.
-- **Diet Protocol**: Configure macro-targets and meal structures.
-- **Template Engine**: Rapid deployment of proven training strategies.
-
-### 📈 ANALYTICS TERMINAL `(trainer/progress)`
-- **Volume Tracking**: Monitoring cumulative load over time.
-- **Consistency Audits**: Identifying gaps in athlete check-ins.
-- **Strength Milestones**: Visualizing 1RM progression across major lifts.
-
----
-
-## 📊 OPERATIONAL LOAD
+The following entity-relationship diagram shows how trainer activities map to database tables:
 
 ```mermaid
-pie title "Trainer Activity Distribution"
-    "Plan Design" : 35
-    "Performance Audit" : 30
-    "Direct Messaging" : 20
-    "Assessments" : 15
+erDiagram
+    TrainerProfile ||--o{ ClientAssignation : manages
+    ClientAssignation }|--|| Member : references
+    TrainerProfile ||--o{ WorkoutTemplate : creates
+    TrainerProfile ||--o{ DietPlan : designs
+
+    TrainerProfile {
+        string id PK
+        string userId FK
+        string branchId
+    }
+    ClientAssignation {
+        string id PK
+        string trainerId FK
+        string memberId FK
+        datetime assignedAt
+    }
+    WorkoutTemplate {
+        string id PK
+        string name
+        json routine
+        string trainerId FK
+    }
+    DietPlan {
+        string id PK
+        int caloriesTarget
+        int proteinTarget
+        string trainerId FK
+    }
 ```
+
+---
+
+## 8. TROUBLESHOOTING & PROGRAM CUSTOMIZATION
+
+### 8.1 Resolution Procedures for Trainer Issues
+
+#### Issue: Workout Template Fails to Load
+* **Possible Cause**: Invalid characters in the exercise JSON data.
+* **Resolution**: Re-save the template using standard characters.
+
+#### Issue: Macro Targets Out of Bounds
+* **Possible Cause**: Calorie inputs exceed maximum allowed limits.
+* **Resolution**: Verify targets and ensure inputs match the member's calorie profile.
+
+#### Issue: Client Not Showing in Roster
+* **Possible Cause**: Client is assigned to a different branch or trainer.
+* **Resolution**: Check assignments in the Admin panel.
 
 ---
 
 <div align="center">
-  <p><b>PRECISION IN COACHING</b></p>
-  <p>Authorized for Certified Trainer Personnel Only</p>
+  <p><b>GymFlow SaaS Portal • Trainer Operations Guide</b></p>
+  <p>© 2026 GYMFLOW SAAS. ALL RIGHTS RESERVED.</p>
 </div>
