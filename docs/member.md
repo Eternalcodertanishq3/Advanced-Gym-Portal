@@ -179,7 +179,7 @@ erDiagram
     Member ||--o{ WorkoutLog : records
     Member ||--o{ MealLog : tracks
     Member ||--o{ Booking : reserves
-    Booking }|--|| Class : schedules
+    Booking }|--|| GymClass : schedules
 
     Member {
         string id PK
@@ -206,7 +206,7 @@ erDiagram
         string classId FK
         string status
     }
-    Class {
+    GymClass {
         string id PK
         string name
         datetime time
