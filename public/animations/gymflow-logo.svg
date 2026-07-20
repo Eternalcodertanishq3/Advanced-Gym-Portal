@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%" height="200">
+  <defs>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F26522"/>
+      <stop offset="50%" stop-color="#FF7A3B"/>
+      <stop offset="100%" stop-color="#F26522"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    @keyframes glow {
+      0%, 100% {
+        fill: #F26522;
+        filter: drop-shadow(0 0 2px rgba(242, 101, 34, 0.4));
+      }
+      50% {
+        fill: #FF7A3B;
+        filter: drop-shadow(0 0 12px rgba(255, 122, 59, 0.8));
+      }
+    }
+
+    @keyframes wave {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .pixel {
+      animation: glow 2.5s ease-in-out infinite;
+    }
+
+    /* Rhythmic animation delays for the letters */
+    .g-letter .pixel { animation-delay: 0.0s; }
+    .y-letter .pixel { animation-delay: 0.2s; }
+    .m-letter .pixel { animation-delay: 0.4s; }
+    .f-letter .pixel { animation-delay: 0.6s; }
+    .l-letter .pixel { animation-delay: 0.8s; }
+    .o-letter .pixel { animation-delay: 1.0s; }
+    .w-letter .pixel { animation-delay: 1.2s; }
+
+    .wave-group {
+      animation: wave 4s ease-in-out infinite;
+      transform-origin: center;
+    }
+  </style>
+
+  <!-- Background container -->
+  <rect width="100%" height="100%" fill="transparent"/>
+
+  <!-- Centered GymFlow block-pixel text -->
+  <g class="wave-group" transform="translate(118, 55)">
+    
+    <!-- Letter G (Offset: x=0) -->
+    <g class="g-letter" transform="translate(0, 0)">
+      <rect x="12" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="72" width="10" height="10" rx="2" class="pixel"/>
+    </g>
+
+    <!-- Letter Y (Offset: x=84) -->
+    <g class="y-letter" transform="translate(84, 0)">
+      <rect x="0" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="72" width="10" height="10" rx="2" class="pixel"/>
+    </g>
+
+    <!-- Letter M (Offset: x=168) -->
+    <g class="m-letter" transform="translate(168, 0)">
+      <rect x="0" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="72" width="10" height="10" rx="2" class="pixel"/>
+    </g>
+
+    <!-- Letter F (Offset: x=252) -->
+    <g class="f-letter" transform="translate(252, 0)">
+      <rect x="0" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="72" width="10" height="10" rx="2" class="pixel"/>
+    </g>
+
+    <!-- Letter L (Offset: x=336) -->
+    <g class="l-letter" transform="translate(336, 0)">
+      <rect x="0" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="72" width="10" height="10" rx="2" class="pixel"/>
+    </g>
+
+    <!-- Letter O (Offset: x=420) -->
+    <g class="o-letter" transform="translate(420, 0)">
+      <rect x="12" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="72" width="10" height="10" rx="2" class="pixel"/>
+    </g>
+
+    <!-- Letter W (Offset: x=504) -->
+    <g class="w-letter" transform="translate(504, 0)">
+      <rect x="0" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="0" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="12" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="24" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="36" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="24" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="48" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="12" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="36" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="60" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="0" y="72" width="10" height="10" rx="2" class="pixel"/>
+      <rect x="48" y="72" width="10" height="10" rx="2" class="pixel"/>
+    </g>
+
+  </g>
+</svg>

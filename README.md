@@ -1,4 +1,4 @@
-# 🦅 GymFlow SaaS (Advanced Multi-Tenant Gym Ecosystem)
+<h1 align="center">🦅 GymFlow SaaS (Advanced Multi-Tenant Gym Ecosystem)</h1>
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NextJS-Dark.svg" width="80" height="80" alt="Next.js" />
@@ -9,17 +9,9 @@
   <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Redis-Dark.svg" width="80" height="80" alt="Redis" />
 </p>
 
-```
-   ▄██████▄  ▄██   ▄      ▄▄▄▄███▄▄▄▄      ▄████████  ▄██████▄   ▄██████▄   ▄█   ▄█▄ 
-  ███    ███ ███   ██▄  ▄██▀▀▀███▀▀▀██▄   ███    ███ ███    ███ ███    ███ ███ ▄███▀ 
-  ███    █▀  ███▄▄▄███  ███   ███   ███   ███    █▀  ███    ███ ███    ███ ███▐██▀   
- ▄███        ▀▀▀▀▀▀███  ███   ███   ███  ▄███▄▄▄     ███    ███ ███    ███ █████▀    
-▀▀███ ████▄  ▄██   ███  ███   ███   ███ ▀▀███▀▀▀     ███    ███ ███    ███ ███  ██▄  
-  ███    ███ ███   ███  ███   ███   ███   ███        ███    ███ ███    ███ ███   ██▄ 
-  ███    ███ ███   ███  ███   ███   ███   ███        ███    ███ ███    ███ ███    ██▄
-  ████████▀   ▀█████▀    ▀█   ███   █▀    ███         ▀██████▀   ▀██████▀   ███    ▀█▄
-                                                                          ▀          
-```
+<p align="center">
+  <img src="./public/animations/gymflow-logo.svg" alt="GymFlow Logo" width="650" />
+</p>
 
 ---
 
