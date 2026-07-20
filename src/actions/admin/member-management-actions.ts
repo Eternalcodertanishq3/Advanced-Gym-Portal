@@ -19,10 +19,16 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
         ? filterBranchId
         : contextBranchId;
 
-    const where: any = {};
+    const where: any = {
+      deletedAt: null,
+      user: {
+        deletedAt: null,
+      },
+    };
 
     if (effectiveBranchId) {
       where.user = {
+        ...where.user,
         branchId: effectiveBranchId,
       };
     }
@@ -258,6 +264,130 @@ export async function updateMember(id: string, formData: any) {
     return {
       success: false,
       error: (error instanceof Error ? error.message : String(error)) || "Failed to update member",
+    };
+  }
+}
+
+export async function archiveMember(id: string) {
+  const session = await auth();
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
+    return { success: false, error: "Unauthorized" };
+  }
+  try {
+    const member = await prisma.member.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!member) {
+      return { success: false, error: "Member not found" };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.member.update({
+        where: { id },
+        data: {
+          status: "INACTIVE",
+          deletedAt: new Date(),
+        },
+      });
+
+      await tx.user.update({
+        where: { id: member.userId },
+        data: {
+          status: "INACTIVE",
+          deletedAt: new Date(),
+        },
+      });
+
+      // Audit Log
+      await tx.auditLog.create({
+        data: {
+          userId: session.user.id,
+          action: "DELETE",
+          entityType: "MEMBER",
+          entityId: id,
+          newValue: { archived: true },
+        },
+      });
+    });
+
+    revalidatePath("/admin/members");
+    return { success: true, message: "Member successfully archived." };
+  } catch (error: unknown) {
+    console.error("Error archiving member:", error);
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to archive member",
+    };
+  }
+}
+
+export async function bulkArchiveMembers(ids: string[]) {
+  const session = await auth();
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "RECEPTIONIST" &&
+      session.user.role !== "SUPER_ADMIN")
+  ) {
+    return { success: false, error: "Unauthorized" };
+  }
+  if (!ids || ids.length === 0) {
+    return { success: false, error: "No members specified for bulk archiving." };
+  }
+
+  try {
+    const members = await prisma.member.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, userId: true },
+    });
+
+    const userIds = members.map((m) => m.userId);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.member.updateMany({
+        where: { id: { in: ids } },
+        data: {
+          status: "INACTIVE",
+          deletedAt: new Date(),
+        },
+      });
+
+      await tx.user.updateMany({
+        where: { id: { in: userIds } },
+        data: {
+          status: "INACTIVE",
+          deletedAt: new Date(),
+        },
+      });
+
+      // Audit Logs (create audit log for the bulk event)
+      await tx.auditLog.create({
+        data: {
+          userId: session.user.id,
+          action: "DELETE",
+          entityType: "MEMBER",
+          entityId: ids.join(",").slice(0, 255),
+          newValue: { count: ids.length, bulk: true, archived: true },
+        },
+      });
+    });
+
+    revalidatePath("/admin/members");
+    return { success: true, message: `Successfully archived ${ids.length} members.` };
+  } catch (error: unknown) {
+    console.error("Error bulk archiving members:", error);
+    return {
+      success: false,
+      error:
+        (error instanceof Error ? error.message : String(error)) ||
+        "Failed to bulk archive members",
     };
   }
 }

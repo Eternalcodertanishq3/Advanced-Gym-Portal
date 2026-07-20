@@ -28,6 +28,7 @@ import { useSession } from "next-auth/react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getBranches } from "@/actions/super-admin/branch-actions";
 import { impersonateUser } from "@/actions/super-admin/impersonate-actions";
+import { archiveMember, bulkArchiveMembers } from "@/actions/admin/member-management-actions";
 import { SavedFilters } from "@/components/shared/saved-filters";
 import {
   Select,
@@ -72,6 +73,88 @@ export default function MembersPage() {
     } else {
       toast.error(res.error || "Failed to impersonate user");
     }
+  };
+
+  const [isMutating, setIsMutating] = useState(false);
+
+  const handleArchive = async (id: string, name: string) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to archive ${name}? They will not be able to log in or access the gym.`,
+      )
+    ) {
+      return;
+    }
+    setIsMutating(true);
+    try {
+      const res = await archiveMember(id);
+      if (res.success) {
+        toast.success(res.message || "Member archived successfully");
+        // Refetch by resetting search or state
+        setSelectedIds(new Set());
+      } else {
+        toast.error(res.error || "Failed to archive member");
+      }
+    } catch {
+      toast.error("An error occurred");
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
+  const handleBulkArchive = async () => {
+    const count = selectedIds.size;
+    if (count === 0) return;
+
+    if (
+      !window.confirm(
+        `Are you sure you want to bulk-archive ${count} selected members? They will be locked out and deactivated.`,
+      )
+    ) {
+      return;
+    }
+
+    setIsMutating(true);
+    try {
+      const res = await bulkArchiveMembers(Array.from(selectedIds));
+      if (res.success) {
+        toast.success(res.message || "Members archived successfully");
+        setSelectedIds(new Set());
+      } else {
+        toast.error(res.error || "Failed to archive members");
+      }
+    } catch {
+      toast.error("An error occurred");
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
+  const handleBulkExport = () => {
+    const selectedMembers = members.filter((m: any) => selectedIds.has(m.id));
+    if (selectedMembers.length === 0) return;
+
+    const headers = ["First Name", "Last Name", "Email", "Phone", "Status", "Plan", "Join Date"];
+    const rows = selectedMembers.map((m: any) => [
+      m.user.firstName,
+      m.user.lastName,
+      m.user.email,
+      m.user.phone || "",
+      m.status,
+      m.subscription?.plan?.name || "No Active Plan",
+      new Date(m.joinDate).toLocaleDateString(),
+    ]);
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `gym_members_export_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("CSV export downloaded successfully!");
   };
 
   const [search, setSearch] = useState("");
@@ -397,7 +480,11 @@ export default function MembersPage() {
                             >
                               <CreditCard className="mr-2 h-4 w-4" /> Collect Payment
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700">
+                            <DropdownMenuItem
+                              onClick={() => handleArchive(member.id, name)}
+                              disabled={isMutating}
+                              className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700"
+                            >
                               <Trash2 className="mr-2 h-4 w-4" /> Delete Member
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -440,6 +527,39 @@ export default function MembersPage() {
           </div>
         )}
       </div>
+
+      {/* Floating Bulk Action Bar */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-full border border-obsidian-800 bg-obsidian-950/95 px-6 py-3.5 text-white shadow-2xl backdrop-blur-md transition-all duration-300">
+          <span className="text-[10px] font-black uppercase tracking-widest text-obsidian-300">
+            {selectedIds.size} Selected
+          </span>
+          <div className="h-4 w-[1px] bg-white/20" />
+          <Button
+            onClick={handleBulkExport}
+            variant="ghost"
+            className="h-8 rounded-full px-3 text-[10px] font-bold uppercase tracking-wider text-obsidian-200 hover:bg-white/10 hover:text-white"
+          >
+            <Download className="mr-1.5 h-3.5 w-3.5" />
+            Export Selected
+          </Button>
+          <Button
+            onClick={handleBulkArchive}
+            disabled={isMutating}
+            className="flex h-8 items-center gap-1.5 rounded-full bg-red-600 px-4 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-red-700"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Archive
+          </Button>
+          <Button
+            onClick={() => setSelectedIds(new Set())}
+            variant="ghost"
+            className="h-8 rounded-full px-2 text-[10px] font-bold uppercase tracking-wider text-obsidian-400 hover:bg-transparent hover:text-white"
+          >
+            Deselect
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
