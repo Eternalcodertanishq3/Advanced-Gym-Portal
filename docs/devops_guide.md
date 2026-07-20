@@ -112,12 +112,12 @@ stateDiagram-v2
     LintChecks --> UnitTests : Run Jest tests
     UnitTests --> BuildTests : Run Next.js build
     
-    BuildTests -- Build Passed --> DeployStaging : Merge to main
+    BuildTests --> DeployStaging : Build Passed / Merge to main
     DeployStaging --> E2ETests : Run Playwright tests
-    E2ETests -- Pass --> DeployProduction : Promote to production
+    E2ETests --> DeployProduction : Pass / Promote to production
     
-    BuildTests -- Build Failed --> CancelDeploy : Block deployment
-    E2ETests -- Fail --> CancelDeploy
+    BuildTests --> CancelDeploy : Build Failed / Block deployment
+    E2ETests --> CancelDeploy : Fail
 ```
 
 This automated workflow prevents regression errors and maintains security in production.

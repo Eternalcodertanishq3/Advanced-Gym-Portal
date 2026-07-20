@@ -88,11 +88,11 @@ stateDiagram-v2
     RunLinter --> RunJestSuite : Run Jest tests
     RunJestSuite --> RunPlaywrightSuite : Run Playwright tests
     
-    RunPlaywrightSuite -- Success --> CompileOutput : Code builds cleanly
+    RunPlaywrightSuite --> CompileOutput : Success / Code builds cleanly
     CompileOutput --> DeployEcosystem : Deployment active
     
-    RunPlaywrightSuite -- Failure --> CancelTask : Deploy aborted
-    RunJestSuite -- Failure --> CancelTask
+    RunPlaywrightSuite --> CancelTask : Failure / Deploy aborted
+    RunJestSuite --> CancelTask : Failure
 ```
 
 Deployments are blocked if any test fails.
