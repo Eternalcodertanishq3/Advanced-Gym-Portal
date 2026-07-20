@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import Link from "next/link";
+import { captureException } from "@/lib/error-logger";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Error Boundary
@@ -16,7 +17,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("[Eagle Gym Error]:", error);
+    captureException(error, { digest: error.digest, area: "RootErrorBoundary" });
   }, [error]);
 
   return (
