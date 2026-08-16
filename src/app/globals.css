@@ -123,6 +123,30 @@
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground) / 0.3);
   }
+
+  /* Automatic High-Contrast Dark Mode for Legacy Obsidian Text Tokens */
+  .dark .text-obsidian-950,
+  .dark .text-obsidian-900 {
+    color: hsl(var(--foreground));
+  }
+  .dark .text-obsidian-800 {
+    color: hsl(var(--foreground) / 0.9);
+  }
+  .dark .text-obsidian-700 {
+    color: hsl(var(--muted-foreground) / 0.95);
+  }
+  .dark .text-obsidian-600 {
+    color: hsl(var(--muted-foreground));
+  }
+  .dark .text-obsidian-500 {
+    color: hsl(var(--muted-foreground) / 0.85);
+  }
+  .dark .text-obsidian-400 {
+    color: hsl(var(--muted-foreground) / 0.7);
+  }
+  .dark .text-obsidian-300 {
+    color: hsl(var(--muted-foreground) / 0.5);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
