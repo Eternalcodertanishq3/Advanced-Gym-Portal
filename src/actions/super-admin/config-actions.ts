@@ -6,9 +6,12 @@ import { recordAudit } from "@/lib/action-utils";
 import { ensurePermission } from "@/lib/permissions";
 import { auth } from "@/auth";
 
-export async function getSystemConfig() {
+export async function getSystemConfig(): Promise<{
+  success: boolean;
+  config: Record<string, any>;
+  error?: string;
+}> {
   try {
-    await ensurePermission("manage:system");
     const settings = await prisma.gymSetting.findMany();
 
     // Map settings array to a more useful object
@@ -20,7 +23,7 @@ export async function getSystemConfig() {
     return { success: true, config };
   } catch (error: unknown) {
     console.error("Failed to fetch system config:", error);
-    return { success: false, error: "Failed to load system settings" };
+    return { success: false, error: "Failed to load system settings", config: {} };
   }
 }
 

@@ -12,10 +12,16 @@ export async function getPlans() {
     const plans = await prisma.plan.findMany({
       orderBy: { sortOrder: "asc" },
     });
-    return { success: true, plans };
+    const serializedPlans = plans.map((p) => ({
+      ...p,
+      price: Number(p.price),
+      createdAt: p.createdAt ? p.createdAt.toISOString() : null,
+      updatedAt: p.updatedAt ? p.updatedAt.toISOString() : null,
+    }));
+    return { success: true, plans: serializedPlans };
   } catch (error: unknown) {
     console.error("Failed to fetch plans:", error);
-    return { success: false, error: "Failed to load subscription plans" };
+    return { success: false, error: "Failed to load subscription plans", plans: [] };
   }
 }
 

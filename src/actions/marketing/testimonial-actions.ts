@@ -51,7 +51,12 @@ export async function getApprovedTestimonials() {
       where: { isApproved: true },
       orderBy: { createdAt: "desc" },
     });
-    return { success: true, testimonials };
+    const serializedTestimonials = testimonials.map((t) => ({
+      ...t,
+      createdAt: t.createdAt ? t.createdAt.toISOString() : null,
+      updatedAt: t.updatedAt ? t.updatedAt.toISOString() : null,
+    }));
+    return { success: true, testimonials: serializedTestimonials };
   } catch (error) {
     return { success: false, testimonials: [] };
   }

@@ -4,6 +4,9 @@ import bcryptjs from "bcryptjs";
 
 // This is the config used by the edge-compatible middleware
 export const authConfig = {
+  experimental: {
+    enableWebAuthn: true,
+  },
   providers: [],
   pages: {
     signIn: "/login",
