@@ -64,7 +64,7 @@ export async function sendBroadcast(title: string, message: string, type: string
       const tenant = getTenantDetailsSync();
 
       if (tenant?.id && process.env.NEXT_PUBLIC_PUSHER_KEY) {
-        await pusherServer.trigger(`tenant-${tenant.id}`, "broadcast", {
+        await pusherServer.trigger(`private-tenant-${tenant.id}`, "broadcast", {
           title,
           body: message,
           type: type || "SYSTEM",

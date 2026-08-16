@@ -22,10 +22,11 @@ export function useRealtimeNotifications(userId: string | undefined, tenantId: s
 
     const pusher = new Pusher(key, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "ap2",
+      authEndpoint: "/api/pusher/auth",
     });
 
-    // 1. Direct targeted user notifications
-    const userChannel = pusher.subscribe(`user-${userId}`);
+    // 1. Direct targeted user notifications (Private Channel)
+    const userChannel = pusher.subscribe(`private-user-${userId}`);
     userChannel.bind("notification", (data: any) => {
       addNotification({
         id: data.id || Math.random().toString(),
@@ -38,9 +39,9 @@ export function useRealtimeNotifications(userId: string | undefined, tenantId: s
       toast.info(data.title, { description: data.body });
     });
 
-    // 2. Tenant broadcast messages
+    // 2. Tenant broadcast messages (Private Channel)
     if (tenantId) {
-      const tenantChannel = pusher.subscribe(`tenant-${tenantId}`);
+      const tenantChannel = pusher.subscribe(`private-tenant-${tenantId}`);
       tenantChannel.bind("broadcast", (data: any) => {
         addNotification({
           id: data.id || Math.random().toString(),
@@ -55,9 +56,9 @@ export function useRealtimeNotifications(userId: string | undefined, tenantId: s
     }
 
     return () => {
-      pusher.unsubscribe(`user-${userId}`);
+      pusher.unsubscribe(`private-user-${userId}`);
       if (tenantId) {
-        pusher.unsubscribe(`tenant-${tenantId}`);
+        pusher.unsubscribe(`private-tenant-${tenantId}`);
       }
       pusher.disconnect();
     };
