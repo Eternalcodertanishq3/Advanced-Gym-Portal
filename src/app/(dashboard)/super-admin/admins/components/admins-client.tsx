@@ -177,7 +177,7 @@ export function AdminsClient({ staff }: Props) {
           onClick={handleInvite}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 rounded-xl bg-brand-orange px-5 py-2.5 font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:shadow-brand-orange/30"
+          className="flex items-center gap-2 rounded-xl bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-orange/90"
         >
           <UserPlus className="h-4 w-4" />
           Invite Staff
