@@ -7,10 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
 
 const navLinks = [
+  { name: "Roles", href: "#roles" },
   { name: "Features", href: "#features" },
-  { name: "Membership", href: "#membership" },
-  { name: "Branches", href: "#branches" },
-  { name: "About", href: "#about" },
+  { name: "ROI Calculator", href: "#roi-calculator" },
+  { name: "Compare", href: "#compare" },
+  { name: "Pricing", href: "#pricing" },
 ];
 
 export function MarketingNav({
@@ -85,9 +86,9 @@ export function MarketingNav({
           </Link>
           <Link
             href="/register"
-            className="flex items-center gap-2 rounded-full bg-brand-orange px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:-translate-y-0.5 hover:shadow-brand-orange/40"
+            className="flex items-center gap-2 rounded-full bg-brand-orange px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-brand-orange/20 transition-all hover:-translate-y-0.5 hover:shadow-brand-orange/40"
           >
-            Join Now <ArrowRight className="h-4 w-4" />
+            Start Free Pilot <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
