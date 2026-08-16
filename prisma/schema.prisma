@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -822,6 +823,7 @@ model Payment {
   @@index([status])
   @@index([createdAt])
   @@index([receiptNo])
+  @@index([transactionId])
   @@index([tenantId])
   @@map("payments")
 }

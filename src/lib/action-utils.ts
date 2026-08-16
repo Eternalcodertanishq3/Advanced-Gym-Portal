@@ -5,45 +5,90 @@ import { LogAction } from "@prisma/client";
 import { headers } from "next/headers";
 
 /**
- * 🦅 EAGLE GYM — Server Action Protection
- * Ensures the user is authenticated and has the SUPER_ADMIN role.
- * Returns the user session or throws an error.
+ * 🔒 GYMFLOW — Live Session & Privilege Verifier
+ * Prevents privilege de-sync and stale JWT exploitation by verifying
+ * active user status and tenant operational status in the database.
  */
-export async function ensureSuperAdmin() {
+export async function verifyActiveSession() {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "SUPER_ADMIN") {
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized: Authentication required.");
+  }
+
+  const liveUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+      branchId: true,
+      deletedAt: true,
+      tenantId: true,
+      tenant: {
+        select: {
+          id: true,
+          isActive: true,
+          saasStatus: true,
+        },
+      },
+    },
+  });
+
+  if (!liveUser || liveUser.deletedAt || liveUser.status !== "ACTIVE") {
+    throw new Error("Unauthorized: User account is inactive or has been suspended.");
+  }
+
+  // Super Admin can access even during tenant subscription hold
+  if (liveUser.role !== "SUPER_ADMIN" && liveUser.tenant) {
+    if (!liveUser.tenant.isActive || liveUser.tenant.saasStatus === "SUSPENDED") {
+      throw new Error("Tenant subscription suspended. Please contact gym administrator.");
+    }
+  }
+
+  return liveUser;
+}
+
+/**
+ * 🦅 EAGLE GYM — Server Action Protection
+ * Ensures the user is authenticated, active in the database, and has the SUPER_ADMIN role.
+ * Returns the verified user or throws an error.
+ */
+export async function ensureSuperAdmin() {
+  const liveUser = await verifyActiveSession();
+
+  if (liveUser.role !== "SUPER_ADMIN") {
     throw new Error("Unauthorized: Super Admin access required.");
   }
 
-  return session.user;
+  return liveUser;
 }
 
 /**
  * 🏢 EAGLE GYM — Branch Context Resolver
- * Returns the branchId if the user is an ADMIN, or null if SUPER_ADMIN.
+ * Returns the branchId if the user is an ADMIN/Staff, or null if SUPER_ADMIN.
+ * Verifies live database status to protect against stale JWT permissions.
  */
 export async function getBranchContext() {
-  const session = await auth();
-
-  if (!session?.user) {
-    throw new Error("Unauthorized: Authentication required.");
-  }
-
-  const user = session.user as any;
+  const liveUser = await verifyActiveSession();
 
   // Super Admin sees everything
-  if (user.role === "SUPER_ADMIN") {
-    return { branchId: null, role: user.role };
+  if (liveUser.role === "SUPER_ADMIN") {
+    return { branchId: null, role: liveUser.role, user: liveUser };
   }
 
-  // Branch Admins see only their branch
-  if (user.role === "ADMIN" || user.role === "RECEPTIONIST" || user.role === "TRAINER") {
-    if (!user.branchId) {
-      // In a real app, you might want to handle unassigned staff differently
-      console.warn(`Staff user ${user.id} has no branchId assigned.`);
+  // Branch Admins and Staff see only their branch
+  if (
+    liveUser.role === "ADMIN" ||
+    liveUser.role === "MANAGER" ||
+    liveUser.role === "RECEPTIONIST" ||
+    liveUser.role === "TRAINER" ||
+    liveUser.role === "WORKER"
+  ) {
+    if (!liveUser.branchId) {
+      console.warn(`Staff user ${liveUser.id} has no branchId assigned.`);
     }
-    return { branchId: user.branchId, role: user.role };
+    return { branchId: liveUser.branchId, role: liveUser.role, user: liveUser };
   }
 
   throw new Error("Unauthorized: Management role required.");

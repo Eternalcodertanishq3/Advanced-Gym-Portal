@@ -243,6 +243,19 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ received: true });
   } catch (error: unknown) {
+    // Graceful handling of concurrent duplicate webhook event deliveries (Prisma P2002)
+    const isDuplicate =
+      (error as any)?.code === "P2002" ||
+      (error instanceof Error && error.message.includes("Unique constraint failed"));
+
+    if (isDuplicate) {
+      console.warn("Concurrent duplicate webhook processed idempotently.");
+      return NextResponse.json(
+        { received: true, duplicate: true, message: "Concurrent duplicate event handled." },
+        { status: 200 },
+      );
+    }
+
     console.error("Razorpay webhook handler failure:", error);
     return NextResponse.json(
       {

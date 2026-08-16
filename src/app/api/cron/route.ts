@@ -12,52 +12,76 @@ export async function GET(req: Request) {
     }
 
     const now = new Date();
+    const startTime = Date.now();
+    const BATCH_SIZE = 250;
 
-    const result = await prisma.$transaction(async (tx) => {
-      // 1. Expire Member Subscriptions
-      const expiredSubs = await tx.subscription.updateMany({
+    let totalExpiredSubscriptions = 0;
+    let totalExpiredMembers = 0;
+    let hasMore = true;
+
+    // 1. Process Expired Subscriptions & Members in bounded batch chunks
+    while (hasMore) {
+      const expiredBatch = await prisma.subscription.findMany({
         where: {
           status: "ACTIVE",
           endDate: { lt: now },
         },
-        data: {
-          status: "EXPIRED",
+        take: BATCH_SIZE,
+        select: {
+          id: true,
+          memberId: true,
         },
       });
 
-      // Update corresponding members status to EXPIRED
-      const expiredMembers = await tx.member.updateMany({
-        where: {
-          status: "ACTIVE",
-          subscription: {
-            endDate: { lt: now },
-          },
-        },
-        data: {
-          status: "EXPIRED",
-        },
-      });
+      if (expiredBatch.length === 0) {
+        hasMore = false;
+        break;
+      }
 
-      // 2. Expire B2B Tenants
-      const expiredTenants = await tx.tenant.updateMany({
-        where: {
-          saasStatus: "ACTIVE",
-          saasExpiry: { lt: now },
-        },
-        data: {
-          saasStatus: "EXPIRED",
-        },
-      });
+      const subIds = expiredBatch.map((s) => s.id);
+      const memberIds = expiredBatch.map((s) => s.memberId).filter(Boolean);
 
-      return {
-        expiredSubscriptionsCount: expiredSubs.count,
-        expiredMembersCount: expiredMembers.count,
-        expiredTenantsCount: expiredTenants.count,
-      };
+      await prisma.$transaction([
+        prisma.subscription.updateMany({
+          where: { id: { in: subIds } },
+          data: { status: "EXPIRED" },
+        }),
+        prisma.member.updateMany({
+          where: { id: { in: memberIds }, status: "ACTIVE" },
+          data: { status: "EXPIRED" },
+        }),
+      ]);
+
+      totalExpiredSubscriptions += subIds.length;
+      totalExpiredMembers += memberIds.length;
+
+      if (expiredBatch.length < BATCH_SIZE) {
+        hasMore = false;
+      }
+    }
+
+    // 2. Expire Overdue B2B Tenants in bounded batch
+    const expiredTenants = await prisma.tenant.updateMany({
+      where: {
+        saasStatus: "ACTIVE",
+        saasExpiry: { lt: now },
+      },
+      data: {
+        saasStatus: "EXPIRED",
+      },
     });
 
+    const executionDurationMs = Date.now() - startTime;
+
+    const result = {
+      expiredSubscriptionsCount: totalExpiredSubscriptions,
+      expiredMembersCount: totalExpiredMembers,
+      expiredTenantsCount: expiredTenants.count,
+      executionDurationMs,
+    };
+
     console.debug(
-      `[Subscription Cron Executed]: Expired ${result.expiredSubscriptionsCount} subscriptions and ${result.expiredTenantsCount} tenants.`,
+      `[Subscription Cron Executed]: Expired ${result.expiredSubscriptionsCount} subscriptions and ${result.expiredTenantsCount} tenants in ${executionDurationMs}ms.`,
     );
 
     return NextResponse.json({

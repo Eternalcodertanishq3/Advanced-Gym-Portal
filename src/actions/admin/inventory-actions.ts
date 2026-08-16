@@ -93,12 +93,26 @@ export async function processSale(data: {
         },
       });
 
-      // 2. Update stock for each product
+      // 2. Atomic stock check and decrement
       for (const item of data.items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { decrement: item.quantity } },
+        if (!item.quantity || item.quantity <= 0) {
+          throw new Error("Invalid product quantity requested.");
+        }
+
+        const updated = await tx.product.updateMany({
+          where: {
+            id: item.productId,
+            stock: { gte: item.quantity },
+            isActive: true,
+          },
+          data: {
+            stock: { decrement: item.quantity },
+          },
         });
+
+        if (updated.count === 0) {
+          throw new Error(`Insufficient stock or unavailable product for ID: ${item.productId}`);
+        }
       }
 
       // 3. Create Payment record
