@@ -55,12 +55,12 @@ module.exports = {
   				'gold-soft': '#FDF6E9'
   			},
   			surface: {
-  				base: '#FAFAF8',
-  				card: '#FFFFFF',
-  				elevated: '#F4F3F0',
-  				sunken: '#EDECE8',
-  				border: '#E5E3DF',
-  				'border-hover': '#D1CFC9',
+  				base: 'hsl(var(--background))',
+  				card: 'hsl(var(--card))',
+  				elevated: 'hsl(var(--card))',
+  				sunken: 'hsl(var(--muted))',
+  				border: 'hsl(var(--border))',
+  				'border-hover': 'hsl(var(--input))',
   				'base-dark': '#0F1117',
   				'card-dark': '#1A1D27',
   				'elevated-dark': '#22252F',
@@ -108,10 +108,10 @@ module.exports = {
           950: '#0A0B10',
         },
   			txt: {
-  				primary: '#111827',
-  				secondary: '#4B5563',
-  				tertiary: '#9CA3AF',
-  				inverse: '#FFFFFF'
+  				primary: 'hsl(var(--foreground))',
+  				secondary: 'hsl(var(--muted-foreground))',
+  				tertiary: 'hsl(var(--muted-foreground) / 0.7)',
+  				inverse: 'hsl(var(--background))'
   			},
   			crimson: '#FF3131',
   			'electric-cyan': '#00E5FF',

@@ -184,25 +184,25 @@ export function AuditLogsClient({ initialData }: Props) {
                           className={cn(
                             "rounded-xl p-2 shadow-sm",
                             log.action === "CREATE"
-                              ? "bg-success/10 text-success"
+                              ? "bg-success/15 text-success"
                               : log.action === "DELETE"
-                                ? "bg-red-500/10 text-red-500"
+                                ? "bg-red-500/15 text-red-500"
                                 : log.action === "IMPORT"
-                                  ? "bg-brand-orange/10 text-brand-orange"
+                                  ? "bg-brand-orange/15 text-brand-orange"
                                   : log.action === "LOGIN"
-                                    ? "bg-blue-500/10 text-blue-500"
-                                    : "bg-obsidian-500/10 text-obsidian-500",
+                                    ? "bg-blue-500/15 text-blue-500"
+                                    : "bg-muted text-muted-foreground",
                           )}
                         >
                           <Activity className="h-4 w-4" />
                         </div>
-                        <span className="text-sm font-bold text-obsidian-950">{log.action}</span>
+                        <span className="text-sm font-bold text-foreground">{log.action}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-surface-sunken bg-surface-base shadow-inner">
-                          {log.user.avatar ? (
+                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-surface-sunken bg-surface-sunken shadow-inner">
+                          {log.user?.avatar ? (
                             <img
                               src={log.user.avatar}
                               alt=""
@@ -210,16 +210,16 @@ export function AuditLogsClient({ initialData }: Props) {
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center">
-                              <User className="h-5 w-5 text-muted-foreground/40" />
+                              <User className="h-5 w-5 text-muted-foreground/50" />
                             </div>
                           )}
                         </div>
                         <div>
-                          <p className="text-sm font-bold leading-none text-obsidian-950">
-                            {log.user.firstName} {log.user.lastName}
+                          <p className="text-sm font-bold leading-none text-foreground">
+                            {log.user?.firstName} {log.user?.lastName}
                           </p>
                           <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-brand-orange">
-                            {log.user.role}
+                            {log.user?.role}
                           </p>
                         </div>
                       </div>
@@ -228,7 +228,7 @@ export function AuditLogsClient({ initialData }: Props) {
                       <div className="flex flex-col gap-1">
                         <Badge
                           variant="outline"
-                          className="w-fit rounded-lg border-surface-sunken bg-surface-base px-3 py-1 text-[10px] font-bold uppercase text-obsidian-700"
+                          className="w-fit rounded-lg border-surface-sunken bg-surface-sunken/60 px-3 py-1 text-[10px] font-bold uppercase text-foreground"
                         >
                           {log.entityType}
                         </Badge>
@@ -241,7 +241,7 @@ export function AuditLogsClient({ initialData }: Props) {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-obsidian-900">
+                        <span className="text-sm font-bold text-foreground">
                           {formatDate(log.createdAt)}
                         </span>
                         <span className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -255,7 +255,7 @@ export function AuditLogsClient({ initialData }: Props) {
                     <td className="px-6 py-4 text-right">
                       <button
                         aria-label="View log details"
-                        className="rounded-xl border border-surface-sunken bg-surface-base p-2.5 text-muted-foreground shadow-sm transition-all hover:border-brand-orange hover:bg-brand-orange hover:text-white"
+                        className="rounded-xl border border-surface-sunken bg-surface-sunken/50 p-2.5 text-muted-foreground shadow-sm transition-all hover:border-brand-orange hover:bg-brand-orange hover:text-white"
                       >
                         <Layers className="h-4 w-4" />
                       </button>
