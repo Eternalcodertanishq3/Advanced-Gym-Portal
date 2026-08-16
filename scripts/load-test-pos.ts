@@ -49,7 +49,7 @@ export async function runSyntheticPOSLoadTest(
   const startTime = Date.now();
 
   // Simulated atomic decrement operation identical to Prisma updateMany { stock: { gte: qty } }
-  const simulateAtomicCheckout = async (workerId: number): Promise<{ success: boolean; duration: number }> => {
+  const simulateAtomicCheckout = async (_workerId: number): Promise<{ success: boolean; duration: number }> => {
     const workerStart = Date.now();
     // Simulate database network jitter (2ms - 15ms)
     await new Promise((r) => setTimeout(r, Math.random() * 13 + 2));
