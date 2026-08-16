@@ -459,7 +459,7 @@ export async function getTrainersList() {
   try {
     const { branchId, role } = await getBranchContext();
     const where: any = {
-      deletedAt: null,
+      isActive: true,
       user: {
         deletedAt: null,
         status: "ACTIVE",
