@@ -1,16 +1,16 @@
 import pino from "pino";
 
+/**
+ * 🦅 GymFlow SaaS — Server Logging Engine
+ * Configured synchronously to prevent Node.js worker thread crashes in Next.js HMR & Serverless runtimes.
+ */
 export const logger = pino({
   level: process.env.LOG_LEVEL || "info",
-  transport:
-    process.env.NODE_ENV === "development"
-      ? {
-          target: "pino-pretty",
-          options: {
-            colorize: true,
-            translateTime: "UTC:yyyy-mm-dd HH:MM:ss.l",
-            ignore: "pid,hostname",
-          },
-        }
-      : undefined,
+  base: {
+    env: process.env.NODE_ENV,
+  },
+  timestamp: pino.stdTimeFunctions.isoTime,
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
 });

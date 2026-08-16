@@ -1,6 +1,3 @@
-import { headers } from "next/headers";
-import { resolveTenantId } from "@/lib/prisma";
-
 // ═══════════════════════════════════════════════════════════════
 // 🦅 EAGLE GYM — Dynamic Tenant Details Helper
 // ═══════════════════════════════════════════════════════════════
@@ -15,28 +12,17 @@ export interface TenantDetails {
 }
 
 /**
- * Resolves the active Tenant's metadata from HTTP headers dynamically (asynchronous).
- * Provides safe fallback constants during build operations or offline CLI tasks.
+ * Resolves the active Tenant's metadata dynamically from incoming request headers.
+ * Safe fallback during build operations or offline CLI tasks.
  */
 export async function getTenantDetails(): Promise<TenantDetails> {
-  const tenantId = await resolveTenantId();
-  if (!tenantId) {
-    return {
-      id: null,
-      subdomain: null,
-      name: "GymFlow SaaS",
-      logo: "/logo.png",
-      currency: "INR",
-      locale: "en-IN",
-    };
-  }
-
   try {
     const { headers } = require("next/headers");
     const headersList = await headers();
+    const tenantId = headersList.get("x-tenant-id") || null;
     return {
       id: tenantId,
-      subdomain: headersList.get("x-tenant-subdomain"),
+      subdomain: headersList.get("x-tenant-subdomain") || null,
       name: headersList.get("x-tenant-name") || "GymFlow SaaS",
       logo: headersList.get("x-tenant-logo") || "/logo.png",
       currency: headersList.get("x-tenant-currency") || "INR",
@@ -44,7 +30,7 @@ export async function getTenantDetails(): Promise<TenantDetails> {
     };
   } catch {
     return {
-      id: tenantId,
+      id: null,
       subdomain: null,
       name: "GymFlow SaaS",
       logo: "/logo.png",
@@ -56,6 +42,7 @@ export async function getTenantDetails(): Promise<TenantDetails> {
 
 /**
  * Synchronous fallback resolver for client bundles and formatting libraries.
+ * Guaranteed zero-dependency, safe to import across Client Components.
  */
 export function getTenantDetailsSync(): TenantDetails {
   return {
