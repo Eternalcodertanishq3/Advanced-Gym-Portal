@@ -443,24 +443,25 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
         )}
       >
         {/* Logo Area */}
-        <div className="group flex items-center gap-3 border-b border-white/10 px-4 py-5">
+        <div className="group flex h-[73px] shrink-0 items-center gap-3 border-b border-white/10 px-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-orange shadow-lg shadow-brand-orange/20 transition-transform duration-500 group-hover:-rotate-3 group-hover:scale-105">
             <span className="font-display text-xl font-bold tracking-tight text-white">
               {tenantName.charAt(0).toUpperCase()}
             </span>
           </div>
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {!collapsed && (
               <motion.div
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
-                className="overflow-hidden"
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="overflow-hidden whitespace-nowrap"
               >
-                <h1 className="font-display text-lg font-bold leading-none tracking-tight text-white">
+                <h1 className="truncate whitespace-nowrap font-display text-lg font-bold leading-tight tracking-tight text-white">
                   {tenantName}
                 </h1>
-                <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+                <p className="mt-0.5 truncate whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
                   {getRoleLabel(role)}
                 </p>
               </motion.div>
@@ -472,13 +473,14 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
         <nav className="scrollbar-thin flex-1 space-y-6 overflow-y-auto px-3 py-4">
           {sections.map((section, _sIdx) => (
             <div key={section.title}>
-              <AnimatePresence>
+              <AnimatePresence initial={false}>
                 {!collapsed && (
                   <motion.h3
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-white/30"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="mb-2 overflow-hidden whitespace-nowrap px-3 text-[10px] font-bold uppercase tracking-widest text-white/30"
                   >
                     {section.title}
                   </motion.h3>
@@ -507,12 +509,13 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
                           isActive ? "text-white" : "text-white/50 group-hover:text-white",
                         )}
                       />
-                      <AnimatePresence>
+                      <AnimatePresence initial={false}>
                         {!collapsed && (
                           <motion.span
                             initial={{ opacity: 0, width: 0 }}
                             animate={{ opacity: 1, width: "auto" }}
                             exit={{ opacity: 0, width: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
                             className={cn(
                               "overflow-hidden whitespace-nowrap text-sm font-medium",
                               isActive ? "font-semibold text-white" : "",
@@ -539,7 +542,7 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
         <div className="border-t border-white/10 p-3">
           <div
             className={cn(
-              "flex items-center gap-3 rounded-xl p-2",
+              "flex h-[52px] items-center gap-3 rounded-xl p-2",
               "border border-white/5 bg-black/20",
             )}
           >
@@ -552,18 +555,21 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
               {user?.firstName?.[0]}
               {user?.lastName?.[0]}
             </div>
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {!collapsed && (
                 <motion.div
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
-                  className="min-w-0 flex-1 overflow-hidden"
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
                 >
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate whitespace-nowrap text-sm font-medium text-white">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="truncate text-[10px] text-white/50">{user?.email}</p>
+                  <p className="truncate whitespace-nowrap text-[10px] text-white/50">
+                    {user?.email}
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -583,12 +589,13 @@ export function Sidebar({ user, allowedFeatures = [], tenantName = "GymFlow SaaS
             )}
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {!collapsed && (
                 <motion.span
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
                   className="overflow-hidden whitespace-nowrap text-sm font-medium"
                 >
                   Logout
