@@ -1,8 +1,8 @@
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
-
 import { prisma } from "@/lib/prisma";
 import { SECURITY } from "@/lib/constants";
+import { serializeData } from "@/lib/utils";
 
 export async function getStaff(page = 1, limit = 10, search = "") {
   const session = await auth();
@@ -42,7 +42,10 @@ export async function getStaff(page = 1, limit = 10, search = "") {
 
     return {
       success: true,
-      data: { staff: workers, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
+      data: serializeData({
+        staff: workers,
+        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+      }),
     };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -69,7 +72,7 @@ export async function getStaffAttendance(limit = 20) {
       take: limit,
     });
 
-    return { success: true, data: attendance };
+    return { success: true, data: serializeData(attendance) };
   } catch (error: unknown) {
     return { success: false, error: "Failed to load staff attendance" };
   }
@@ -86,7 +89,7 @@ export async function getStaffById(id: string) {
       include: { user: true },
     });
     if (!worker) return { success: false, error: "Staff member not found" };
-    return { success: true, data: worker };
+    return { success: true, data: serializeData(worker) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -132,7 +135,7 @@ export async function createStaff(data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/staff");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error creating staff:", error);
     if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
@@ -175,7 +178,7 @@ export async function updateStaff(id: string, data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/staff");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error updating staff:", error);
     return {

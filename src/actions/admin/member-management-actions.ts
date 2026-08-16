@@ -6,6 +6,7 @@ import { getBranchContext } from "@/lib/action-utils";
 import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
 import { SECURITY } from "@/lib/constants";
+import { serializeData } from "@/lib/utils";
 
 export async function getMembers(page = 1, limit = 10, search = "", filterBranchId?: string) {
   try {
@@ -73,7 +74,7 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
 
     return {
       success: true,
-      data: members,
+      data: serializeData(members),
       meta: {
         total,
         page,
@@ -131,7 +132,7 @@ export async function getMemberById(id: string) {
       return { success: false, error: "Member not found" };
     }
 
-    return { success: true, data: member };
+    return { success: true, data: serializeData(member) };
   } catch (error: unknown) {
     console.error("Error fetching member:", error);
     return {
@@ -212,7 +213,7 @@ export async function createMember(formData: any) {
 
     revalidatePath("/admin/members");
     revalidatePath("/super-admin/audit-logs");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error creating member:", error);
     return {
@@ -258,7 +259,7 @@ export async function updateMember(id: string, formData: any) {
 
     revalidatePath("/admin/members");
     revalidatePath(`/admin/members/${id}`);
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error updating member:", error);
     return {

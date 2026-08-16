@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { razorpay } from "@/lib/razorpay";
 import crypto from "crypto";
+import { serializeData } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // 🦅 GymFlow SaaS — Member Billing and Payment Actions
@@ -55,18 +56,18 @@ export async function getBillingInfo() {
     const invoices = member.payments.map((p) => ({
       id: p.id,
       amount: Number(p.total),
-      date: p.createdAt,
+      date: p.createdAt instanceof Date ? p.createdAt.toISOString() : String(p.createdAt),
       status: p.status.toLowerCase(),
       receiptNo: p.receiptNo,
     }));
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         subscription: member.subscription,
         paymentMethods,
         invoices,
-      },
+      }),
     };
   } catch (error) {
     console.error("Error fetching billing info:", error);
@@ -231,7 +232,7 @@ export async function verifyPaymentSignature(data: {
 
     revalidatePath("/member/billing");
     revalidatePath("/member/subscription");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Signature verification failed:", error);
     return {

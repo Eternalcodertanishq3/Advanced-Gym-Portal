@@ -1,8 +1,8 @@
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
-
 import { prisma } from "@/lib/prisma";
 import { SECURITY } from "@/lib/constants";
+import { serializeData } from "@/lib/utils";
 
 export async function getTrainerDashboardStats(trainerId: string) {
   const session = await auth();
@@ -64,14 +64,14 @@ export async function getTrainerDashboardStats(trainerId: string) {
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         myMembers,
         upcomingSessions: upcomingSessionsCount,
         completedSessions,
         activeClasses,
         rating,
         schedule,
-      },
+      }),
     };
   } catch (error: unknown) {
     console.error("Error fetching trainer stats:", error);
@@ -94,7 +94,7 @@ export async function getTrainers() {
       },
       orderBy: { createdAt: "desc" },
     });
-    return { success: true, data: trainers };
+    return { success: true, data: serializeData(trainers) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -127,7 +127,7 @@ export async function getTrainerMembers(trainerId: string) {
       orderBy: { joinDate: "desc" },
     });
 
-    return { success: true, data: members };
+    return { success: true, data: serializeData(members) };
   } catch (error: unknown) {
     console.error("Error fetching trainer members:", error);
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -209,7 +209,7 @@ export async function getMemberProfileForTrainer(memberId: string) {
 
     if (!member) return { success: false, error: "Member not found" };
 
-    return { success: true, data: member };
+    return { success: true, data: serializeData(member) };
   } catch (error: unknown) {
     console.error("Error fetching member profile:", error);
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -223,8 +223,8 @@ export async function schedulePTSession(data: {
   memberId: string;
   trainerId: string;
   date: Date;
-  startTime: string; // HH:MM
-  endTime: string; // HH:MM
+  startTime: string;
+  endTime: string;
   notes?: string;
 }) {
   const session = await auth();
@@ -246,7 +246,7 @@ export async function schedulePTSession(data: {
 
     require("next/cache").revalidatePath("/trainer/sessions");
     require("next/cache").revalidatePath("/trainer");
-    return { success: true, data: session };
+    return { success: true, data: serializeData(session) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -269,7 +269,7 @@ export async function getTrainerById(id: string) {
     });
 
     if (!trainer) return { success: false, error: "Trainer not found" };
-    return { success: true, data: trainer };
+    return { success: true, data: serializeData(trainer) };
   } catch (error: unknown) {
     return {
       success: false,
@@ -297,7 +297,7 @@ export async function updateSessionStatus(sessionId: string, status: string, fee
 
     require("next/cache").revalidatePath("/trainer/sessions");
     require("next/cache").revalidatePath("/trainer");
-    return { success: true, data: session };
+    return { success: true, data: serializeData(session) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -350,7 +350,7 @@ export async function createTrainer(data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/trainers");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error creating trainer:", error);
     if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
@@ -398,7 +398,7 @@ export async function updateTrainer(id: string, data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/trainers");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error updating trainer:", error);
     return {

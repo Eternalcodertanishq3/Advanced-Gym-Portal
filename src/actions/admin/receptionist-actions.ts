@@ -1,8 +1,8 @@
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
-
 import { prisma } from "@/lib/prisma";
 import { SECURITY } from "@/lib/constants";
+import { serializeData } from "@/lib/utils";
 
 export async function getReceptionistDashboardStats() {
   const session = await auth();
@@ -57,14 +57,14 @@ export async function getReceptionistDashboardStats() {
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         todayCheckIns,
         pendingPayments,
         todayClasses,
         todayCollection,
         recentCheckIns,
         newWalkIns,
-      },
+      }),
     };
   } catch (error: unknown) {
     console.error("Error fetching receptionist stats:", error);
@@ -98,11 +98,11 @@ export async function generateVisitorPass(data: {
         purpose: data.purpose,
         validUntil: data.validUntil,
         passCode: `GUEST-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        createdBy: "RECEPTIONIST", // Should ideally be session user ID
+        createdBy: "RECEPTIONIST",
       },
     });
 
-    return { success: true, data: pass };
+    return { success: true, data: serializeData(pass) };
   } catch (error: unknown) {
     return { success: false, error: "Failed to generate pass" };
   }
@@ -142,7 +142,7 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
 
     return {
       success: true,
-      data: receptionists,
+      data: serializeData(receptionists),
       meta: {
         total,
         page,
@@ -171,7 +171,7 @@ export async function getReceptionistById(id: string) {
       include: { user: true },
     });
     if (!rec) return { success: false, error: "Receptionist not found" };
-    return { success: true, data: rec };
+    return { success: true, data: serializeData(rec) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -216,7 +216,7 @@ export async function createReceptionist(data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/receptionists");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error creating receptionist:", error);
     if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
@@ -258,7 +258,7 @@ export async function updateReceptionist(id: string, data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/receptionists");
-    return { success: true, data: result };
+    return { success: true, data: serializeData(result) };
   } catch (error: unknown) {
     console.error("Error updating receptionist:", error);
     return {

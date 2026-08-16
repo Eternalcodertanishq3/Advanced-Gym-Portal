@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
-
 import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/utils";
 
 export async function getInventoryItems(page = 1, limit = 10, search = "") {
   const session = await auth();
@@ -27,7 +27,10 @@ export async function getInventoryItems(page = 1, limit = 10, search = "") {
 
     return {
       success: true,
-      data: { items, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
+      data: serializeData({
+        items,
+        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+      }),
     };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -45,7 +48,7 @@ export async function updateInventoryQuantity(id: string, newQuantity: number) {
       data: { stock: newQuantity },
     });
     require("next/cache").revalidatePath("/admin/inventory");
-    return { success: true, data: item };
+    return { success: true, data: serializeData(item) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -118,7 +121,7 @@ export async function processSale(data: {
       // 3. Create Payment record
       await tx.payment.create({
         data: {
-          memberId: data.customerId || "WALK-IN", // Placeholder or handling for non-members
+          memberId: data.customerId || "WALK-IN",
           amount: data.subtotal,
           tax: data.tax,
           discount: data.discount,
@@ -137,7 +140,7 @@ export async function processSale(data: {
 
     require("next/cache").revalidatePath("/admin/inventory");
     require("next/cache").revalidatePath("/admin/payments");
-    return { success: true, data: sale };
+    return { success: true, data: serializeData(sale) };
   } catch (error: unknown) {
     console.error("Sale processing failed:", error);
     return {
@@ -157,7 +160,7 @@ export async function getProductById(id: string) {
       where: { id },
     });
     if (!product) return { success: false, error: "Product not found" };
-    return { success: true, data: product };
+    return { success: true, data: serializeData(product) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -182,7 +185,7 @@ export async function createProduct(data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/inventory");
-    return { success: true, data: product };
+    return { success: true, data: serializeData(product) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -208,7 +211,7 @@ export async function updateProduct(id: string, data: any) {
     });
 
     require("next/cache").revalidatePath("/admin/inventory");
-    return { success: true, data: product };
+    return { success: true, data: serializeData(product) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }

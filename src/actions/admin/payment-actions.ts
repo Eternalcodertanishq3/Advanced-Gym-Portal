@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getBranchContext } from "@/lib/action-utils";
 import { auth } from "@/auth";
+import { serializeData } from "@/lib/utils";
 
 export async function getPayments(page = 1, limit = 10, status?: string) {
   try {
@@ -43,10 +44,10 @@ export async function getPayments(page = 1, limit = 10, status?: string) {
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         payments,
         pagination: { total, pages: Math.ceil(total / limit), page, limit },
-      },
+      }),
     };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -87,7 +88,7 @@ export async function createPayment(data: {
     });
 
     revalidatePath("/admin/payments");
-    return { success: true, data: payment };
+    return { success: true, data: serializeData(payment) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }

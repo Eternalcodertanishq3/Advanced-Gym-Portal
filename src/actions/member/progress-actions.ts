@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { writeFile } from "fs/promises";
 import { join } from "path";
+import { serializeData } from "@/lib/utils";
 
 /**
  * Adds a new progress photo.
@@ -58,7 +59,7 @@ export async function addProgressPhoto(formData: FormData) {
     });
 
     revalidatePath("/member/progress");
-    return { success: true, data: progressPhoto };
+    return { success: true, data: serializeData(progressPhoto) };
   } catch (error) {
     console.error("Error uploading progress photo:", error);
     return { success: false, error: "Failed to upload photo" };
@@ -100,11 +101,11 @@ export async function getMemberProgress() {
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         measurements,
         photos,
         goals,
-      },
+      }),
     };
   } catch (error) {
     console.error("Error fetching progress:", error);
@@ -138,7 +139,7 @@ export async function addMeasurement(data: any) {
     });
 
     revalidatePath("/member/progress");
-    return { success: true, data: progress };
+    return { success: true, data: serializeData(progress) };
   } catch (error) {
     console.error("Error adding measurement:", error);
     return { success: false, error: "Failed to save measurement" };

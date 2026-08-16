@@ -1,9 +1,9 @@
 "use server";
 
 import { ensurePermission } from "@/lib/permissions";
-
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { serializeData } from "@/lib/utils";
 
 export async function getDashboardStats() {
   await ensurePermission("manage:system");
@@ -141,7 +141,7 @@ export async function getDashboardStats() {
 
     return {
       success: true,
-      stats: {
+      stats: serializeData({
         totalRevenue,
         activeMembersCount,
         activeStaffCount,
@@ -151,8 +151,8 @@ export async function getDashboardStats() {
         revenueSparkline,
         membersSparkline,
         branchComparison,
-      },
-      recentLogs,
+      }),
+      recentLogs: serializeData(recentLogs),
     };
   } catch (error: unknown) {
     console.error("Failed to fetch dashboard stats:", error);

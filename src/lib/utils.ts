@@ -332,3 +332,44 @@ export function getGreeting(): string {
   if (hour < 21) return "Good Evening";
   return "Good Night";
 }
+
+/**
+ * Recursively converts Prisma Decimal, Date, and nested complex objects into plain JSON-serializable primitives.
+ * Guarantees zero serialization errors across Next.js Server-to-Client Component boundaries.
+ */
+export function serializeData<T>(data: T): T {
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  if (typeof data === "object") {
+    // Handle Prisma Decimal or objects with Decimal methods
+    if (
+      (data as any).isDecimal?.() ||
+      (typeof (data as any).toNumber === "function" &&
+        ("d" in (data as any) || "s" in (data as any))) ||
+      (data as any).constructor?.name === "Decimal"
+    ) {
+      return Number((data as any).toString()) as any;
+    }
+
+    // Handle Date instances -> ISO strings
+    if (data instanceof Date) {
+      return data.toISOString() as any;
+    }
+
+    // Handle Arrays
+    if (Array.isArray(data)) {
+      return data.map((item) => serializeData(item)) as any;
+    }
+
+    // Handle Plain Objects
+    const serialized: any = {};
+    for (const [key, value] of Object.entries(data)) {
+      serialized[key] = serializeData(value);
+    }
+    return serialized;
+  }
+
+  return data;
+}

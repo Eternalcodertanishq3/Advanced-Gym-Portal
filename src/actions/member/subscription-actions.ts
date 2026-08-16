@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { serializeData } from "@/lib/utils";
 
 /**
  * Subscribe a member to a plan
@@ -102,7 +103,7 @@ export async function subscribeToPlan({
         action: "UPGRADE",
         entityType: "SUBSCRIPTION",
         entityId: member.id,
-        newValue: { plan: plan.name, amount: plan.price },
+        newValue: { plan: plan.name, amount: Number(plan.price) },
       },
     });
 
@@ -136,10 +137,10 @@ export async function getMemberSubscriptionDetails() {
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         subscription: member.subscription,
         payments: member.payments,
-      },
+      }),
     };
   } catch (error: unknown) {
     console.error("Error fetching subscription details:", error);

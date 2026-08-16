@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
+import { serializeData } from "@/lib/utils";
 
 export async function getMemberProfile() {
   try {
@@ -49,7 +50,7 @@ export async function getMemberProfile() {
       return { success: false, error: "Member profile not found" };
     }
 
-    return { success: true, data: member };
+    return { success: true, data: serializeData(member) };
   } catch (error) {
     console.error("Error fetching member profile:", error);
     return { success: false, error: "Failed to fetch profile" };

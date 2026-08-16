@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { ensureSuperAdmin, recordAudit } from "@/lib/action-utils";
+import { serializeData } from "@/lib/utils";
 
 /**
  * Fetch all subscription plans
@@ -12,13 +13,7 @@ export async function getPlans() {
     const plans = await prisma.plan.findMany({
       orderBy: { sortOrder: "asc" },
     });
-    const serializedPlans = plans.map((p) => ({
-      ...p,
-      price: Number(p.price),
-      createdAt: p.createdAt ? p.createdAt.toISOString() : null,
-      updatedAt: p.updatedAt ? p.updatedAt.toISOString() : null,
-    }));
-    return { success: true, plans: serializedPlans };
+    return { success: true, plans: serializeData(plans) };
   } catch (error: unknown) {
     console.error("Failed to fetch plans:", error);
     return { success: false, error: "Failed to load subscription plans", plans: [] };
@@ -59,7 +54,7 @@ export async function createPlan(data: any) {
     });
 
     revalidatePath("/super-admin/subscription-plans");
-    return { success: true, plan };
+    return { success: true, plan: serializeData(plan) };
   } catch (error: unknown) {
     console.error("Failed to create plan:", error);
     return { success: false, error: "Failed to create plan" };
@@ -104,7 +99,7 @@ export async function updatePlan(id: string, data: any) {
     });
 
     revalidatePath("/super-admin/subscription-plans");
-    return { success: true, plan };
+    return { success: true, plan: serializeData(plan) };
   } catch (error: unknown) {
     console.error("Failed to update plan:", error);
     return { success: false, error: "Failed to update plan" };

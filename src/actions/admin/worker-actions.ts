@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { serializeData } from "@/lib/utils";
 
 /**
  * Fetches dashboard statistics for the authenticated worker.
@@ -41,12 +42,12 @@ export async function getWorkerDashboardStats() {
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         pendingTasks: worker._count.tasks,
         activeMaintenance: worker._count.maintenanceLogs,
         faultyEquipment,
         recentTasks,
-      },
+      }),
     };
   } catch (error: unknown) {
     console.error("Error fetching worker stats:", error);
@@ -70,13 +71,10 @@ export async function getWorkerTasks() {
 
     const tasks = await prisma.task.findMany({
       where: { workerId: worker.id },
-      orderBy: [
-        { status: "asc" }, // PENDING first
-        { dueDate: "asc" },
-      ],
+      orderBy: [{ status: "asc" }, { dueDate: "asc" }],
     });
 
-    return { success: true, data: tasks };
+    return { success: true, data: serializeData(tasks) };
   } catch (error) {
     return { success: false, error: "Failed to load tasks" };
   }
@@ -103,7 +101,7 @@ export async function updateTaskStatus(taskId: string, status: string, photoProo
 
     revalidatePath("/worker/tasks");
     revalidatePath("/worker");
-    return { success: true, data: task };
+    return { success: true, data: serializeData(task) };
   } catch (error) {
     return { success: false, error: "Failed to update task" };
   }
@@ -140,7 +138,7 @@ export async function reportMaintenanceIssue(equipmentId: string, issue: string)
     });
 
     revalidatePath("/worker/equipment");
-    return { success: true, data: log };
+    return { success: true, data: serializeData(log) };
   } catch (error) {
     return { success: false, error: "Failed to report issue" };
   }
@@ -161,7 +159,7 @@ export async function getMaintenanceLogs() {
       orderBy: { createdAt: "desc" },
     });
 
-    return { success: true, data: logs };
+    return { success: true, data: serializeData(logs) };
   } catch (error) {
     return { success: false, error: "Failed to load maintenance logs" };
   }
