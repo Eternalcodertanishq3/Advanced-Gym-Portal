@@ -1,4 +1,4 @@
-import { getMemberById } from "@/actions/admin/member-management-actions";
+import { getMemberById, getTrainersList } from "@/actions/admin/member-management-actions";
 import { notFound } from "next/navigation";
 import { formatCurrency, formatDate, getInitials, getAvatarColor, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -16,10 +16,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AssignTrainerModal } from "@/app/(dashboard)/admin/members/components/assign-trainer-modal";
 
-export default async function MemberDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
-  const res = await getMemberById(id);
+export default async function MemberDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }> | { id: string };
+}) {
+  const resolvedParams = await Promise.resolve(params);
+  const { id } = resolvedParams;
+
+  const [res, trainersRes] = await Promise.all([getMemberById(id), getTrainersList()]);
 
   if (!res.success || !res.data) {
     notFound();
@@ -30,6 +37,7 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
   const name = `${user.firstName} ${user.lastName}`;
   const initials = getInitials(name);
   const avatarColor = getAvatarColor(name);
+  const trainers = trainersRes.success && trainersRes.data ? trainersRes.data : [];
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
@@ -37,7 +45,7 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
       <div className="flex items-center">
         <Link
           href="/admin/members"
-          className="flex items-center text-sm font-medium text-obsidian-500 transition-colors hover:text-obsidian-900"
+          className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Members
@@ -56,8 +64,8 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
             {initials}
           </div>
           <div className="text-center md:text-left">
-            <h1 className="font-display text-3xl font-bold text-obsidian-950">{name}</h1>
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-obsidian-600 md:justify-start">
+            <h1 className="font-display text-3xl font-bold text-foreground">{name}</h1>
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground md:justify-start">
               <span className="flex items-center gap-1.5">
                 <Mail className="h-4 w-4" /> {user.email}
               </span>
@@ -73,13 +81,13 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
             <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:justify-start">
               <Badge
                 variant="outline"
-                className="border-surface-sunken bg-surface-base px-3 py-1 font-medium text-obsidian-700"
+                className="border-surface-sunken bg-surface-sunken/60 px-3 py-1 font-medium text-foreground"
               >
                 {member.status}
               </Badge>
               <Badge
                 variant="secondary"
-                className="bg-brand-navy/10 px-3 py-1 font-medium text-brand-navy"
+                className="bg-brand-navy/10 px-3 py-1 font-medium text-brand-navy dark:bg-brand-navy/30 dark:text-brand-navy-light"
               >
                 Plan: {member.subscription?.plan?.name || "No Plan"}
               </Badge>
@@ -118,16 +126,16 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
               {member.subscription ? (
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-obsidian-950">
+                    <p className="text-sm font-semibold text-foreground">
                       {member.subscription.plan.name}
                     </p>
-                    <p className="mt-1 text-xs text-obsidian-500">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {member.subscription.plan.description}
                     </p>
                   </div>
                   <div className="flex items-center justify-between border-t border-surface-sunken pt-4 text-sm">
-                    <span className="text-obsidian-500">Expires On</span>
-                    <span className="font-medium text-obsidian-900">
+                    <span className="text-muted-foreground">Expires On</span>
+                    <span className="font-semibold text-foreground">
                       {formatDate(member.subscription.endDate)}
                     </span>
                   </div>
@@ -147,7 +155,7 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                           Renew Plan
                         </Button>
                         {!canRenew && (
-                          <p className="text-center text-[10px] text-obsidian-400">
+                          <p className="text-center text-[10px] text-muted-foreground">
                             Renewal option opens 30 days before expiration.
                           </p>
                         )}
@@ -157,7 +165,9 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                 </div>
               ) : (
                 <div className="py-4 text-center">
-                  <p className="mb-4 text-sm text-obsidian-500">No active subscription found.</p>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    No active subscription found.
+                  </p>
                   <Button variant="outline" className="w-full">
                     Assign Plan
                   </Button>
@@ -167,7 +177,7 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
           </Card>
 
           <Card className="border-surface-sunken bg-surface-card shadow-sm">
-            <CardHeader className="pb-3">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Dumbbell className="h-5 w-5 text-brand-orange" />
                 Assigned Trainer
@@ -175,27 +185,51 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
             </CardHeader>
             <CardContent>
               {member.trainer ? (
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-sunken text-sm font-bold text-obsidian-500">
-                    {getInitials(
-                      member.trainer.user.firstName + " " + member.trainer.user.lastName,
-                    )}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-orange/10 text-sm font-bold text-brand-orange">
+                      {getInitials(
+                        member.trainer.user.firstName + " " + member.trainer.user.lastName,
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        {member.trainer.user.firstName} {member.trainer.user.lastName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {Array.isArray(member.trainer.specialization)
+                          ? member.trainer.specialization.join(", ")
+                          : member.trainer.specialization || "Personal Trainer"}
+                      </p>
+                      {member.trainer.user.email && (
+                        <p className="text-xs text-muted-foreground/70">
+                          {member.trainer.user.email}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-obsidian-950">
-                      {member.trainer.user.firstName} {member.trainer.user.lastName}
-                    </p>
-                    <p className="text-xs text-obsidian-500">{member.trainer.specialization}</p>
-                  </div>
+                  <AssignTrainerModal
+                    memberId={member.id}
+                    memberName={name}
+                    currentTrainerId={member.trainerId}
+                    trainers={trainers}
+                    triggerVariant="outline"
+                    triggerLabel="Change Trainer"
+                    className="w-full rounded-xl border-surface-sunken bg-surface-sunken/30 hover:bg-surface-sunken/60"
+                  />
                 </div>
               ) : (
                 <div className="py-4 text-center">
-                  <p className="mb-4 text-sm text-obsidian-500">No trainer assigned.</p>
-                  <Link href={`/admin/members/${member.id}/edit`} className="w-full">
-                    <Button variant="outline" className="w-full">
-                      Assign Trainer
-                    </Button>
-                  </Link>
+                  <p className="mb-4 text-sm text-muted-foreground">No trainer assigned.</p>
+                  <AssignTrainerModal
+                    memberId={member.id}
+                    memberName={name}
+                    currentTrainerId={null}
+                    trainers={trainers}
+                    triggerVariant="outline"
+                    triggerLabel="Assign Trainer"
+                    className="w-full rounded-xl border-surface-sunken bg-surface-card"
+                  />
                 </div>
               )}
             </CardContent>
@@ -220,21 +254,21 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                   {member.attendance.map((record: any) => (
                     <div
                       key={record.id}
-                      className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-base p-3"
+                      className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-sunken/40 p-3"
                     >
                       <div className="flex items-center gap-3">
-                        <Clock className="h-4 w-4 text-obsidian-400" />
-                        <span className="text-sm font-medium text-obsidian-900">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium text-foreground">
                           {formatDate(record.date)}
                         </span>
                       </div>
                       <Badge
                         variant="outline"
                         className={cn(
-                          "text-xs",
+                          "text-xs font-semibold",
                           record.status === "PRESENT"
-                            ? "border-green-200 bg-green-50 text-green-700"
-                            : "border-red-200 bg-red-50 text-red-700",
+                            ? "border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400"
+                            : "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400",
                         )}
                       >
                         {record.status}
@@ -243,7 +277,7 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                   ))}
                 </div>
               ) : (
-                <p className="py-4 text-center text-sm text-obsidian-500">
+                <p className="py-4 text-center text-sm text-muted-foreground">
                   No attendance records found.
                 </p>
               )}
@@ -278,30 +312,32 @@ export default async function MemberDetailPage({ params }: { params: { id: strin
                   {member.payments.map((payment: any) => (
                     <div
                       key={payment.id}
-                      className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-base p-3"
+                      className="flex items-center justify-between rounded-xl border border-surface-sunken bg-surface-sunken/40 p-3"
                     >
                       <div>
-                        <p className="text-sm font-medium text-obsidian-950">
+                        <p className="text-sm font-semibold text-foreground">
                           {formatCurrency(payment.amount)}
                         </p>
-                        <p className="mt-0.5 text-xs text-obsidian-500">
+                        <p className="mt-0.5 text-xs text-muted-foreground">
                           {payment.description || "Membership Fee"}
                         </p>
                       </div>
                       <div className="text-right">
                         <Badge
                           variant="outline"
-                          className="mb-1 border-surface-sunken bg-surface-card text-obsidian-600"
+                          className="mb-1 border-surface-sunken bg-surface-card text-xs font-semibold text-foreground"
                         >
                           {payment.method}
                         </Badge>
-                        <p className="text-xs text-obsidian-400">{formatDate(payment.createdAt)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(payment.createdAt)}
+                        </p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="py-4 text-center text-sm text-obsidian-500">
+                <p className="py-4 text-center text-sm text-muted-foreground">
                   No payment history found.
                 </p>
               )}

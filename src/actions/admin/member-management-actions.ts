@@ -392,3 +392,102 @@ export async function bulkArchiveMembers(ids: string[]) {
     };
   }
 }
+
+export async function assignTrainerToMember(memberId: string, trainerId: string | null) {
+  const session = await auth();
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.role !== "SUPER_ADMIN" &&
+      session.user.role !== "RECEPTIONIST")
+  ) {
+    return { success: false, error: "Unauthorized" };
+  }
+  try {
+    const effectiveTrainerId = trainerId && trainerId !== "none" ? trainerId : null;
+
+    const updatedMember = await prisma.member.update({
+      where: { id: memberId },
+      data: {
+        trainerId: effectiveTrainerId,
+      },
+      include: {
+        user: true,
+        trainer: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (session.user.id) {
+      await prisma.auditLog.create({
+        data: {
+          userId: session.user.id,
+          action: "UPDATE",
+          entityType: "MEMBER",
+          entityId: memberId,
+          newValue: {
+            trainerId: effectiveTrainerId,
+            trainerName: updatedMember.trainer
+              ? `${updatedMember.trainer.user.firstName} ${updatedMember.trainer.user.lastName}`
+              : null,
+          },
+        },
+      });
+    }
+
+    revalidatePath(`/admin/members/${memberId}`);
+    revalidatePath("/admin/members");
+
+    return { success: true, data: serializeData(updatedMember) };
+  } catch (error: unknown) {
+    console.error("Error assigning trainer:", error);
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to assign trainer",
+    };
+  }
+}
+
+export async function getTrainersList() {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+  try {
+    const { branchId, role } = await getBranchContext();
+    const where: any = {
+      deletedAt: null,
+      user: {
+        deletedAt: null,
+        status: "ACTIVE",
+      },
+    };
+    if (role !== "SUPER_ADMIN" && branchId) {
+      where.user.branchId = branchId;
+    }
+
+    const trainers = await prisma.trainer.findMany({
+      where,
+      include: {
+        user: true,
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return { success: true, data: serializeData(trainers) };
+  } catch (error: unknown) {
+    console.error("Error fetching trainers list:", error);
+    return {
+      success: false,
+      error: (error instanceof Error ? error.message : String(error)) || "Failed to fetch trainers",
+    };
+  }
+}
