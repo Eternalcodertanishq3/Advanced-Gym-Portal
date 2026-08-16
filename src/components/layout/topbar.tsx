@@ -136,11 +136,13 @@ export function Topbar({ user }: TopbarProps) {
               <Menu className="h-5 w-5" />
             </button>
             <div className="hidden md:block">
-              <p className="text-sm font-medium text-txt-secondary">
+              <p suppressHydrationWarning className="text-sm font-medium text-txt-secondary">
                 {greeting},{" "}
                 <span className="font-bold text-brand-orange">{user.firstName || "Admin"}</span>
               </p>
-              <p className="text-xs text-txt-tertiary">{currentDate}</p>
+              <p suppressHydrationWarning className="text-xs text-txt-tertiary">
+                {currentDate}
+              </p>
             </div>
           </div>
 
@@ -214,13 +216,14 @@ export function Topbar({ user }: TopbarProps) {
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Theme Toggle */}
+            {/* Theme Toggle — CSS-based dual icon prevents SSR hydration mismatch */}
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle Theme"
               className="rounded-full p-2 text-txt-secondary transition-colors hover:bg-surface-elevated hover:text-brand-orange"
             >
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              <Sun className="hidden h-5 w-5 text-brand-orange dark:block" />
+              <Moon className="h-5 w-5 dark:hidden" />
             </button>
 
             {/* Notifications */}
