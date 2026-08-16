@@ -1,7 +1,9 @@
+"use server";
+
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
-
 import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/utils";
 
 export async function getAttendanceHeatmapData(year: number, month: number) {
   const session = await auth();

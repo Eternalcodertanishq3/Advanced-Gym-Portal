@@ -1,7 +1,9 @@
+"use server";
+
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
-
 import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/utils";
 
 export async function getDietPlans(page = 1, limit = 10, search = "") {
   const session = await auth();
@@ -34,10 +36,10 @@ export async function getDietPlans(page = 1, limit = 10, search = "") {
 
     return {
       success: true,
-      data: {
+      data: serializeData({
         plans,
         pagination: { total, pages: Math.ceil(total / limit), page, limit },
-      },
+      }),
     };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -55,7 +57,7 @@ export async function getDietTemplates() {
       include: { meals: true },
       orderBy: { createdAt: "desc" },
     });
-    return { success: true, data: templates };
+    return { success: true, data: serializeData(templates) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -85,7 +87,7 @@ export async function createDietPlan(data: {
     });
 
     require("next/cache").revalidatePath("/trainer/diet");
-    return { success: true, data: plan };
+    return { success: true, data: serializeData(plan) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }

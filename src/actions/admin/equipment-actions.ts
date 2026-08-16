@@ -1,7 +1,9 @@
+"use server";
+
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
-
 import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/utils";
 
 export async function getEquipment(page = 1, limit = 10, search = "") {
   const session = await auth();
@@ -27,7 +29,10 @@ export async function getEquipment(page = 1, limit = 10, search = "") {
 
     return {
       success: true,
-      data: { equipment, pagination: { total, pages: Math.ceil(total / limit), page, limit } },
+      data: serializeData({
+        equipment,
+        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+      }),
     };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -48,7 +53,7 @@ export async function markEquipmentUnderMaintenance(id: string, notes?: string) 
       },
     });
     require("next/cache").revalidatePath("/admin/equipment");
-    return { success: true, data: item };
+    return { success: true, data: serializeData(item) };
   } catch (error: unknown) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }

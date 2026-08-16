@@ -1,3 +1,5 @@
+"use server";
+
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
