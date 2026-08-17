@@ -1,102 +1,127 @@
-// ═══════════════════════════════════════════════════════════════
-// 🦅 GymFlow SaaS — High-Performance Per-Tenant Rate Limiter
-// O(1) Time & Space sliding window algorithm with auto-TTL pruning
-// ═══════════════════════════════════════════════════════════════
+/**
+ * High-Performance Dual-Tier Sliding-Window Token-Bucket Rate Limiter
+ * - Distributed Tier: Native Upstash/Redis HTTP API when REDIS env is configured
+ * - Local Tier: O(1) Time & Space sliding window with auto-pruning TTL cache
+ */
 
 interface RateLimitRecord {
-  count: number;
-  resetAt: number;
+  tokens: number;
+  lastRefill: number;
 }
 
-// In-memory cache stored on globalThis to survive Next.js HMR reloads
-const cache: Map<string, RateLimitRecord> =
-  (globalThis as any).rateLimitCache || new Map<string, RateLimitRecord>();
+const memoryStore = new Map<string, RateLimitRecord>();
+const MAX_CACHE_SIZE = 5000;
 
-if (process.env.NODE_ENV !== "production") {
-  (globalThis as any).rateLimitCache = cache;
-}
-
-export interface RateLimitOptions {
-  /** Maximum number of allowed requests in the window */
-  limit?: number;
-  /** Window duration in milliseconds (default: 60,000ms = 1 min) */
-  windowMs?: number;
-}
-
-export interface RateLimitResult {
-  success: boolean;
-  limit: number;
-  remaining: number;
-  reset: number;
+function pruneExpiredEntries(now: number, windowMs: number) {
+  if (memoryStore.size > MAX_CACHE_SIZE) {
+    for (const [k, v] of memoryStore.entries()) {
+      if (now - v.lastRefill > windowMs * 2) {
+        memoryStore.delete(k);
+      }
+    }
+  }
 }
 
 /**
- * Checks and increments rate limit for a specific key (e.g. `tenant:${tenantId}` or `ip:${ip}`).
+ * Checks and consumes rate limit quota for a given key.
  * Time Complexity: O(1)
- * Space Complexity: O(1) bounded with periodic TTL purging
+ * Space Complexity: O(1)
  */
-export function checkRateLimit(key: string, options: RateLimitOptions = {}): RateLimitResult {
-  const limit = options.limit ?? 60;
-  const windowMs = options.windowMs ?? 60_000;
+export function checkRateLimit(
+  key: string,
+  options?: { limit?: number; windowMs?: number },
+): { success: boolean; limit: number; remaining: number; reset: number } {
+  const limit = options?.limit ?? 10;
+  const windowMs = options?.windowMs ?? 60_000;
   const now = Date.now();
 
-  // Periodic passive cleanup to prevent memory bloat (Space Complexity bounded)
-  if (cache.size > 5000) {
-    for (const [k, val] of cache.entries()) {
-      if (val.resetAt <= now) cache.delete(k);
-    }
-  }
+  pruneExpiredEntries(now, windowMs);
 
-  const record = cache.get(key);
+  let record = memoryStore.get(key);
 
-  if (!record || record.resetAt <= now) {
-    // Initialize or reset window
-    const newRecord: RateLimitRecord = { count: 1, resetAt: now + windowMs };
-    cache.set(key, newRecord);
+  if (!record || now - record.lastRefill > windowMs) {
+    record = { tokens: limit - 1, lastRefill: now };
+    memoryStore.set(key, record);
     return {
       success: true,
       limit,
       remaining: limit - 1,
-      reset: newRecord.resetAt,
+      reset: Math.ceil((now + windowMs) / 1000),
     };
   }
 
-  if (record.count >= limit) {
+  if (record.tokens > 0) {
+    record.tokens -= 1;
     return {
-      success: false,
+      success: true,
       limit,
-      remaining: 0,
-      reset: record.resetAt,
+      remaining: record.tokens,
+      reset: Math.ceil((record.lastRefill + windowMs) / 1000),
     };
   }
 
-  record.count += 1;
   return {
-    success: true,
+    success: false,
     limit,
-    remaining: limit - record.count,
-    reset: record.resetAt,
+    remaining: 0,
+    reset: Math.ceil((record.lastRefill + windowMs) / 1000),
   };
 }
 
 /**
- * Convenience rateLimit helper with positional arguments (compatible with legacy callers)
+ * Dual signature async rate limiter for API routes and server actions
  */
 export async function rateLimit(
-  key: string,
-  limit = 60,
+  keyOrReq: any,
+  limit = 10,
   windowSeconds = 60,
-): Promise<RateLimitResult> {
-  return checkRateLimit(key, { limit, windowMs: windowSeconds * 1000 });
-}
+): Promise<{ success: boolean; remaining: number; limit: number }> {
+  let key: string;
 
-/**
- * Helper to build standard RateLimit response headers
- */
-export function getRateLimitHeaders(result: RateLimitResult): Record<string, string> {
+  if (typeof keyOrReq === "string") {
+    key = keyOrReq;
+  } else if (keyOrReq?.headers) {
+    const forwarded = keyOrReq.headers.get("x-forwarded-for");
+    key = forwarded ? forwarded.split(",")[0].trim() : "anonymous_ip";
+  } else {
+    key = "global_rate_limit";
+  }
+
+  // 1. Check for Distributed Redis via Upstash REST API if configured
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (redisUrl && redisToken) {
+    try {
+      const response = await fetch(`${redisUrl}/pipeline`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${redisToken}` },
+        body: JSON.stringify([
+          ["INCR", `rate_limit:${key}`],
+          ["EXPIRE", `rate_limit:${key}`, windowSeconds],
+        ]),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const count = data[0]?.result || 1;
+        const remaining = Math.max(0, limit - count);
+        return {
+          success: count <= limit,
+          remaining,
+          limit,
+        };
+      }
+    } catch {
+      // Fallback seamlessly to local in-memory tier if Redis network fails
+    }
+  }
+
+  // 2. High-speed local in-memory sliding window fallback
+  const res = checkRateLimit(key, { limit, windowMs: windowSeconds * 1000 });
   return {
-    "X-RateLimit-Limit": result.limit.toString(),
-    "X-RateLimit-Remaining": Math.max(0, result.remaining).toString(),
-    "X-RateLimit-Reset": Math.ceil(result.reset / 1000).toString(),
+    success: res.success,
+    remaining: res.remaining,
+    limit: res.limit,
   };
 }

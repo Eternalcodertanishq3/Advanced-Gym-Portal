@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
 import { SECURITY } from "@/lib/constants";
 import { serializeData } from "@/lib/utils";
+import { withTenantRLS } from "@/lib/rls";
 
 export async function getMembers(page = 1, limit = 10, search = "", filterBranchId?: string) {
   try {
@@ -160,8 +161,11 @@ export async function createMember(formData: any) {
       SECURITY.BCRYPT_ROUNDS,
     );
 
-    // Atomic Transaction: Concurrency-safe existence check and dual record creation
-    const result = await prisma.$transaction(async (tx) => {
+    // Atomic Transaction: Database-enforced RLS & Concurrency-safe creation
+    const session = await auth();
+    const tenantId = (session?.user as any)?.tenantId;
+
+    const result = await withTenantRLS(tenantId, async (tx) => {
       const existingUser = await tx.user.findFirst({
         where: {
           OR: [{ email: formData.email }, { phone: formData.phone }],
