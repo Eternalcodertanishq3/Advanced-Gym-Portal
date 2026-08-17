@@ -155,48 +155,39 @@ export async function bookClass(scheduleId: string) {
 
     if (!member) return { success: false, error: "Member profile not found" };
 
-    // Check if already booked
-    const existing = await prisma.classBooking.findFirst({
-      where: {
-        scheduleId,
-        memberId: member.id,
-        status: "CONFIRMED",
-      },
-    });
+    // Atomic Transaction: Concurrency-safe capacity check and seat allocation
+    const booking = await prisma.$transaction(async (tx) => {
+      const existing = await tx.classBooking.findFirst({
+        where: { scheduleId, memberId: member.id, status: "CONFIRMED" },
+      });
+      if (existing) throw new Error("You have already booked this class session.");
 
-    if (existing) return { success: false, error: "You have already booked this class session." };
-
-    // Check capacity
-    const schedule = await prisma.classSchedule.findUnique({
-      where: { id: scheduleId },
-      include: {
-        class: true,
-        _count: {
-          select: { bookings: { where: { status: "CONFIRMED" } } },
+      const schedule = await tx.classSchedule.findUnique({
+        where: { id: scheduleId },
+        include: {
+          class: true,
+          _count: { select: { bookings: { where: { status: "CONFIRMED" } } } },
         },
-      },
-    });
+      });
 
-    if (!schedule) return { success: false, error: "Class schedule not found" };
-    if (schedule._count.bookings >= schedule.class.maxCapacity) {
-      return { success: false, error: "This class is fully booked." };
-    }
+      if (!schedule) throw new Error("Class schedule not found");
+      if (schedule._count.bookings >= schedule.class.maxCapacity) {
+        throw new Error("This class is fully booked.");
+      }
 
-    const booking = await prisma.classBooking.create({
-      data: {
-        scheduleId,
-        memberId: member.id,
-        status: "CONFIRMED",
-      },
+      return tx.classBooking.create({
+        data: {
+          scheduleId,
+          memberId: member.id,
+          status: "CONFIRMED",
+        },
+      });
     });
 
     revalidatePath("/member/classes");
     return { success: true, data: booking };
   } catch (error: unknown) {
-    console.error("Error booking class:", error);
-    return {
-      success: false,
-      error: (error instanceof Error ? error.message : String(error)) || "Failed to book class",
-    };
+    const message = error instanceof Error ? error.message : "Failed to book class";
+    return { success: false, error: message };
   }
 }
