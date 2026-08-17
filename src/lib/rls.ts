@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 
 /**
  * Executes a database operation within a dedicated PostgreSQL session configured with tenant RLS.
+ * Uses parameterized set_config to prevent SQL injection and enforce database-level isolation.
  * Time Complexity: O(1)
  * Space Complexity: O(1)
  *
@@ -20,10 +21,10 @@ export async function withTenantRLS<T>(
   const effectiveTenantId = tenantId || "SUPER_ADMIN_BYPASS";
 
   return prisma.$transaction(async (tx) => {
-    // Set local session variable (scoped exclusively to this transaction)
-    await tx.$executeRawUnsafe(
-      `SET LOCAL app.current_tenant_id = '${effectiveTenantId.replace(/'/g, "''")}';`,
-    );
+    // 100% Parameterized session variable injection (local scope: true)
+    await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${effectiveTenantId}, true)`;
     return callback(tx);
   });
 }
+
+export default withTenantRLS;

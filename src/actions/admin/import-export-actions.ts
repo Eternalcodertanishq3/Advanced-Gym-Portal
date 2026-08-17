@@ -46,8 +46,8 @@ export async function bulkImportMembers(rows: ImportMemberRow[]) {
       SECURITY.DEFAULT_TEMP_PASSWORD(),
       SECURITY.BCRYPT_ROUNDS,
     );
-
-    const result = await prisma.$transaction(async (tx) => {
+    const { withTenantRLS } = await import("@/lib/rls");
+    const result = await withTenantRLS(tenantId, async (tx) => {
       let importedCount = 0;
       let skippedCount = 0;
       const errors: string[] = [];

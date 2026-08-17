@@ -73,6 +73,8 @@ export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
   }
 }
 
+import { withTenantRLS } from "@/lib/rls";
+
 export async function checkInMember(memberId: string) {
   const session = await auth();
   if (
@@ -87,9 +89,10 @@ export async function checkInMember(memberId: string) {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const cooldownWindow = new Date(now.getTime() - 60_000); // 60s debounce
+    const tenantId = (session.user as any).tenantId;
 
-    // Atomic Transaction: Check-in idempotency & single-session enforcement
-    const attendance = await prisma.$transaction(async (tx) => {
+    // Atomic Transaction: Database RLS & Check-in idempotency
+    const attendance = await withTenantRLS(tenantId, async (tx) => {
       // 1. Double-scan cooldown protection (Idempotency)
       const recentScan = await tx.attendance.findFirst({
         where: {
@@ -142,7 +145,9 @@ export async function checkOutMember(attendanceId: string) {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const attendance = await prisma.$transaction(async (tx) => {
+    const tenantId = (session.user as any).tenantId;
+
+    const attendance = await withTenantRLS(tenantId, async (tx) => {
       const record = await tx.attendance.findUnique({ where: { id: attendanceId } });
       if (!record) throw new Error("Attendance record not found");
       if (record.checkOut) return record; // Idempotent return

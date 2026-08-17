@@ -319,8 +319,10 @@ export async function createTrainer(data: any) {
       SECURITY.DEFAULT_TEMP_PASSWORD(),
       SECURITY.BCRYPT_ROUNDS,
     );
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await withTenantRLS(tenantId, async (tx) => {
       // 1. Create the base User
       const user = await tx.user.create({
         data: {
@@ -375,7 +377,10 @@ export async function updateTrainer(id: string, data: any) {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
+
+    const result = await withTenantRLS(tenantId, async (tx) => {
       const trainer = await tx.trainer.update({
         where: { id },
         data: {

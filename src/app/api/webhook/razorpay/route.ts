@@ -65,6 +65,7 @@ export async function POST(req: Request) {
     // Handle payment capture events
     if (eventType === "payment.captured" || eventType === "order.paid") {
       const paymentEntity = payload.payload.payment.entity;
+      const razorpayPaymentId = paymentEntity.id;
       const notes = paymentEntity.notes || {};
 
       const { memberId, planId } = notes;
@@ -77,8 +78,9 @@ export async function POST(req: Request) {
         if (plan) {
           const now = new Date();
           const endDate = new Date(now.getTime() + plan.duration * 24 * 60 * 60 * 1000);
+          const { withTenantRLS } = await import("@/lib/rls");
 
-          await prisma.$transaction(async (tx) => {
+          await withTenantRLS(plan.tenantId || "SUPER_ADMIN_BYPASS", async (tx) => {
             // 2. Insert event ID inside the transaction (database enforcement check for concurrent requests)
             await tx.webhookEvent.create({
               data: {
@@ -115,48 +117,50 @@ export async function POST(req: Request) {
               },
             });
 
-            // 2. Check for duplicate logs (idempotency check)
-            const duplicateCheck = await tx.payment.findFirst({
-              where: { transactionId: paymentEntity.id },
+            // 2. Create payment record
+            await tx.payment.create({
+              data: {
+                memberId,
+                subscriptionId: sub.id,
+                amount: plan.price,
+                tax: 0,
+                discount: 0,
+                total: plan.price,
+                method: "ONLINE",
+                status: "COMPLETED",
+                transactionId: razorpayPaymentId,
+                receiptNo: `REC-${Date.now().toString().slice(-6)}`,
+              },
             });
 
-            if (!duplicateCheck) {
-              await tx.payment.create({
+            // 3. Mark member as ACTIVE
+            await tx.member.update({
+              where: { id: memberId },
+              data: { status: "ACTIVE" },
+            });
+
+            // 4. Create Notification
+            if (user) {
+              await tx.notification.create({
                 data: {
-                  memberId,
-                  amount: plan.price,
-                  total: plan.price,
-                  method: "ONLINE",
-                  type: "SUBSCRIPTION",
-                  status: "COMPLETED",
-                  receiptNo: `REC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
-                  transactionId: paymentEntity.id,
-                  subscriptionId: sub.id,
-                  branchId,
+                  userId: user.id,
+                  title: "Payment Successful",
+                  body: `Your payment of ₹${Number(plan.price)} for ${plan.name} was successful.`,
+                  type: "PAYMENT_RECEIVED",
                 },
               });
-
-              // 3. Mark member active
-              await tx.member.update({
-                where: { id: memberId },
-                data: { status: "ACTIVE" },
-              });
-
-              // 4. Award XP for subscribing (Gamification Integration!)
-              if (user) {
-                await tx.xPTransaction.create({
-                  data: {
-                    userId: user.id,
-                    amount: 150,
-                    reason: `Subscribed to ${plan.name} plan`,
-                  },
-                });
-                await tx.user.update({
-                  where: { id: user.id },
-                  data: { xp: { increment: 150 } },
-                });
-              }
             }
+
+            // 5. System Audit Log
+            await tx.auditLog.create({
+              data: {
+                userId: user ? user.id : "SYSTEM",
+                action: "CREATE",
+                entityType: "PAYMENT",
+                entityId: sub.id,
+                newValue: { amount: plan.price, transactionId: razorpayPaymentId },
+              },
+            });
           });
         }
       }
@@ -171,7 +175,8 @@ export async function POST(req: Request) {
         });
 
         if (plan) {
-          await prisma.$transaction(async (tx) => {
+          const { withTenantRLS } = await import("@/lib/rls");
+          await withTenantRLS(plan.tenantId || "SUPER_ADMIN_BYPASS", async (tx) => {
             // Write event to idempotency check table
             await tx.webhookEvent.create({
               data: {

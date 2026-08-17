@@ -75,7 +75,10 @@ export async function processSale(data: {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const sale = await prisma.$transaction(async (tx) => {
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
+
+    const sale = await withTenantRLS(tenantId, async (tx) => {
       // 1. Create the Sale
       const newSale = await tx.sale.create({
         data: {

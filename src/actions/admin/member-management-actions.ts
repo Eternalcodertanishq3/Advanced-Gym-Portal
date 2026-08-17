@@ -242,7 +242,8 @@ export async function updateMember(id: string, formData: any) {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const tenantId = (session.user as any).tenantId;
+    const result = await withTenantRLS(tenantId, async (tx) => {
       const member = await tx.member.update({
         where: { id },
         data: {
@@ -297,7 +298,8 @@ export async function archiveMember(id: string) {
       return { success: false, error: "Member not found" };
     }
 
-    await prisma.$transaction(async (tx) => {
+    const tenantId = (session.user as any).tenantId;
+    await withTenantRLS(tenantId, async (tx) => {
       await tx.member.update({
         where: { id },
         data: {
@@ -358,8 +360,9 @@ export async function bulkArchiveMembers(ids: string[]) {
     });
 
     const userIds = members.map((m) => m.userId);
+    const tenantId = (session.user as any).tenantId;
 
-    await prisma.$transaction(async (tx) => {
+    await withTenantRLS(tenantId, async (tx) => {
       await tx.member.updateMany({
         where: { id: { in: ids } },
         data: {

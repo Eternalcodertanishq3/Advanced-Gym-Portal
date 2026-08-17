@@ -87,7 +87,10 @@ export async function anonymizeMemberData(memberId: string) {
   }
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
+
+    const result = await withTenantRLS(tenantId, async (tx) => {
       const member = await tx.member.findUnique({
         where: { id: memberId },
         include: { user: true },

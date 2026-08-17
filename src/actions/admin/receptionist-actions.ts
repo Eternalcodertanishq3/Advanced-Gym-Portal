@@ -192,9 +192,11 @@ export async function createReceptionist(data: any) {
       SECURITY.DEFAULT_TEMP_PASSWORD(),
       SECURITY.BCRYPT_ROUNDS,
     );
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
 
-    // Atomic Transaction: Concurrency-safe duplicate check and staff creation
-    const result = await prisma.$transaction(async (tx) => {
+    // Atomic Transaction: Database RLS & Concurrency-safe staff creation
+    const result = await withTenantRLS(tenantId, async (tx) => {
       const existing = await tx.user.findFirst({
         where: {
           OR: [{ email: data.email }, { phone: data.phone }],
@@ -247,7 +249,10 @@ export async function updateReceptionist(id: string, data: any) {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
+
+    const result = await withTenantRLS(tenantId, async (tx) => {
       const rec = await tx.receptionist.update({
         where: { id },
         data: {

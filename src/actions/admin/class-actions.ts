@@ -155,8 +155,11 @@ export async function bookClass(scheduleId: string) {
 
     if (!member) return { success: false, error: "Member profile not found" };
 
-    // Atomic Transaction: Concurrency-safe capacity check and seat allocation
-    const booking = await prisma.$transaction(async (tx) => {
+    // Atomic Transaction: Database RLS & Concurrency-safe capacity check
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
+
+    const booking = await withTenantRLS(tenantId, async (tx) => {
       const existing = await tx.classBooking.findFirst({
         where: { scheduleId, memberId: member.id, status: "CONFIRMED" },
       });

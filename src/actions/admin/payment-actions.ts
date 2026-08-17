@@ -73,8 +73,11 @@ export async function createPayment(data: {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    // Atomic Transaction: Idempotency deduplication & payment recording
-    const payment = await prisma.$transaction(async (tx) => {
+    // Atomic Transaction: Database RLS & Idempotency deduplication
+    const tenantId = (session.user as any).tenantId;
+    const { withTenantRLS } = await import("@/lib/rls");
+
+    const payment = await withTenantRLS(tenantId, async (tx) => {
       if (data.receiptNo) {
         const existing = await tx.payment.findFirst({
           where: { receiptNo: data.receiptNo },

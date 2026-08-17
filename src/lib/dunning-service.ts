@@ -28,7 +28,8 @@ export const DunningService = {
       failureReason,
     });
 
-    return prisma.$transaction(async (tx) => {
+    const { withTenantRLS } = await import("@/lib/rls");
+    return withTenantRLS(tenantId, async (tx) => {
       // 1. Fetch subscription details
       const sub = await tx.subscription.findUnique({
         where: { id: subscriptionId },
@@ -71,8 +72,9 @@ export const DunningService = {
     subscriptionId: string;
     transactionId: string;
     amount: number;
+    tenantId?: string;
   }) {
-    const { subscriptionId, transactionId, amount } = payload;
+    const { subscriptionId, transactionId, amount, tenantId } = payload;
 
     logger.info("Subscription payment recovered, restoring active status", {
       subscriptionId,
@@ -80,7 +82,8 @@ export const DunningService = {
       amount,
     });
 
-    return prisma.$transaction(async (tx) => {
+    const { withTenantRLS } = await import("@/lib/rls");
+    return withTenantRLS(tenantId, async (tx) => {
       const sub = await tx.subscription.findUnique({
         where: { id: subscriptionId },
         include: { member: true, plan: true },
@@ -128,8 +131,9 @@ export const DunningService = {
    */
   async processOverdueSuspensions(gracePeriodDays = 7) {
     const cutoffDate = new Date(Date.now() - gracePeriodDays * 24 * 60 * 60 * 1000);
+    const { withTenantRLS } = await import("@/lib/rls");
 
-    return prisma.$transaction(async (tx) => {
+    return withTenantRLS("SUPER_ADMIN_BYPASS", async (tx) => {
       const expiredSubs = await tx.subscription.findMany({
         where: {
           status: "GRACE",
