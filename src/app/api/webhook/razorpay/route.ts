@@ -204,6 +204,17 @@ export async function POST(req: Request) {
 
             // 2. Alert the user of their failed payment & provide a recovery path (Dunning Flow)
             if (user?.email) {
+              const { DunningService } = await import("@/lib/dunning-service");
+              const memberSub = await tx.subscription.findUnique({ where: { memberId } });
+              if (memberSub) {
+                await DunningService.handlePaymentFailure({
+                  subscriptionId: memberSub.id,
+                  memberId,
+                  amount: Number(plan.price),
+                  failureReason: paymentEntity.error_description || "Payment failed via gateway",
+                });
+              }
+
               await NotificationService.sendEmail({
                 to: user.email,
                 subject: "Payment Failed — GymFlow SaaS Subscription Alert",

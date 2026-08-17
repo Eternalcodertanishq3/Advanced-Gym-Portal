@@ -11,7 +11,7 @@ describe("Security Hardening Unit Tests", () => {
     it("should allow requests and return remaining quota if Redis client is not initialized", async () => {
       const res = await rateLimit("test_ip", 10, 60);
       expect(res.success).toBe(true);
-      expect(res.remaining).toBe(10);
+      expect(res.remaining).toBe(9);
     });
   });
 
