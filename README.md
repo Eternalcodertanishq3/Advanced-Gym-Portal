@@ -140,16 +140,16 @@ Protects front-desk scanners from rapid double-tapping and enforces active sessi
 
 ```mermaid
 flowchart TD
-    Scan([Member Scans QR Code / Enters ID]) --> Cooldown{Scanned within last 60s?}
+    Scan["Member Scans QR Code or Enters ID"] --> Cooldown{"Scanned within last 60 seconds?"}
     
-    Cooldown -- Yes (Duplicate Tap) --> SafeReturn[Return Existing Check-In Log (Idempotent 200)]
+    Cooldown -- "Yes (Duplicate Tap)" --> SafeReturn["Return Existing Check-In Log (Idempotent 200)"]
     
-    Cooldown -- No --> ActiveCheck{Already Checked In Today without Checkout?}
+    Cooldown -- "No" --> ActiveCheck{"Already Checked In Today without Checkout?"}
     
-    ActiveCheck -- Yes --> Reject[Reject Check-In: Active Session in Progress]
-    ActiveCheck -- No --> CreateRecord[Atomic Tx: Insert Attendance Record & Unlock Turnstile]
+    ActiveCheck -- "Yes" --> Reject["Reject Check-In: Active Session in Progress"]
+    ActiveCheck -- "No" --> CreateRecord["Atomic Tx: Insert Attendance Record & Unlock Turnstile"]
     
-    CreateRecord --> Broadcast[Update Live Receptionist Activity Stream]
+    CreateRecord --> Broadcast["Update Live Receptionist Activity Stream"]
 ```
 
 ---
