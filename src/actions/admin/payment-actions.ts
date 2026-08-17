@@ -8,7 +8,8 @@ import { serializeData } from "@/lib/utils";
 
 export async function getPayments(page = 1, limit = 10, status?: string) {
   try {
-    const skip = (page - 1) * limit;
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const skip = (Math.max(1, page) - 1) * safeLimit;
 
     const { branchId } = await getBranchContext();
 
@@ -37,7 +38,7 @@ export async function getPayments(page = 1, limit = 10, status?: string) {
         },
         orderBy: { createdAt: "desc" },
         skip,
-        take: limit,
+        take: safeLimit,
       }),
       prisma.payment.count({ where: whereClause }),
     ]);
@@ -46,7 +47,7 @@ export async function getPayments(page = 1, limit = 10, status?: string) {
       success: true,
       data: serializeData({
         payments,
-        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+        pagination: { total, pages: Math.ceil(total / safeLimit), page, limit: safeLimit },
       }),
     };
   } catch (error: unknown) {
@@ -72,19 +73,29 @@ export async function createPayment(data: {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const payment = await prisma.payment.create({
-      data: {
-        memberId: data.memberId,
-        subscriptionId: data.subscriptionId,
-        amount: data.amount,
-        tax: 0,
-        discount: 0,
-        total: data.amount,
-        method: data.method,
-        status: "COMPLETED",
-        receiptNo: data.receiptNo,
-        transactionId: data.transactionId,
-      },
+    // Atomic Transaction: Idempotency deduplication & payment recording
+    const payment = await prisma.$transaction(async (tx) => {
+      if (data.receiptNo) {
+        const existing = await tx.payment.findFirst({
+          where: { receiptNo: data.receiptNo },
+        });
+        if (existing) return existing; // Idempotent return
+      }
+
+      return tx.payment.create({
+        data: {
+          memberId: data.memberId,
+          subscriptionId: data.subscriptionId,
+          amount: data.amount,
+          tax: 0,
+          discount: 0,
+          total: data.amount,
+          method: data.method,
+          status: "COMPLETED",
+          receiptNo: data.receiptNo,
+          transactionId: data.transactionId,
+        },
+      });
     });
 
     revalidatePath("/admin/payments");

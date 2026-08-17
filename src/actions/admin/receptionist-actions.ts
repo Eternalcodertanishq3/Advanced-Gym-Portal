@@ -116,7 +116,6 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const skip = (page - 1) * limit;
     const where: any = {};
 
     if (search) {
@@ -129,11 +128,14 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
       };
     }
 
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const skip = (Math.max(1, page) - 1) * safeLimit;
+
     const [receptionists, total] = await Promise.all([
       prisma.receptionist.findMany({
         where,
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           user: true,
         },
@@ -148,8 +150,8 @@ export async function getReceptionists(page = 1, limit = 10, search = "") {
       meta: {
         total,
         page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        limit: safeLimit,
+        totalPages: Math.ceil(total / safeLimit),
       },
     };
   } catch (error: unknown) {
@@ -191,7 +193,15 @@ export async function createReceptionist(data: any) {
       SECURITY.BCRYPT_ROUNDS,
     );
 
+    // Atomic Transaction: Concurrency-safe duplicate check and staff creation
     const result = await prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findFirst({
+        where: {
+          OR: [{ email: data.email }, { phone: data.phone }],
+        },
+      });
+      if (existing) throw new Error("A user with this email or phone already exists.");
+
       const user = await tx.user.create({
         data: {
           firstName: data.firstName,

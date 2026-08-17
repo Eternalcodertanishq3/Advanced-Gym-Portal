@@ -12,7 +12,8 @@ export async function getStaff(page = 1, limit = 10, search = "") {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const skip = (page - 1) * limit;
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const skip = (Math.max(1, page) - 1) * safeLimit;
 
     let whereClause: any = {};
     if (search) {
@@ -37,7 +38,7 @@ export async function getStaff(page = 1, limit = 10, search = "") {
         },
         orderBy: { joiningDate: "desc" },
         skip,
-        take: limit,
+        take: safeLimit,
       }),
       prisma.worker.count({ where: whereClause }),
     ]);
@@ -46,7 +47,7 @@ export async function getStaff(page = 1, limit = 10, search = "") {
       success: true,
       data: serializeData({
         staff: workers,
-        pagination: { total, pages: Math.ceil(total / limit), page, limit },
+        pagination: { total, pages: Math.ceil(total / safeLimit), page, limit: safeLimit },
       }),
     };
   } catch (error: unknown) {
@@ -63,6 +64,7 @@ export async function getStaffAttendance(limit = 20) {
     return { success: false, error: "Unauthorized" };
   }
   try {
+    const safeLimit = Math.min(Math.max(1, limit), 100);
     const attendance = await prisma.attendance.findMany({
       where: {
         user: { role: { not: "MEMBER" } },
@@ -71,7 +73,7 @@ export async function getStaffAttendance(limit = 20) {
         user: { select: { firstName: true, lastName: true, role: true, avatar: true } },
       },
       orderBy: { date: "desc" },
-      take: limit,
+      take: safeLimit,
     });
 
     return { success: true, data: serializeData(attendance) };
@@ -109,7 +111,15 @@ export async function createStaff(data: any) {
       SECURITY.BCRYPT_ROUNDS,
     );
 
+    // Atomic Transaction: Concurrency-safe duplicate check and staff creation
     const result = await prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findFirst({
+        where: {
+          OR: [{ email: data.email }, { phone: data.phone }],
+        },
+      });
+      if (existing) throw new Error("A user with this email or phone already exists.");
+
       const user = await tx.user.create({
         data: {
           firstName: data.firstName,

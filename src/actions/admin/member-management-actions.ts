@@ -10,7 +10,8 @@ import { serializeData } from "@/lib/utils";
 
 export async function getMembers(page = 1, limit = 10, search = "", filterBranchId?: string) {
   try {
-    const skip = (page - 1) * limit;
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const skip = (Math.max(1, page) - 1) * safeLimit;
 
     const { branchId: contextBranchId, role } = await getBranchContext();
 
@@ -54,7 +55,7 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
       prisma.member.findMany({
         where,
         skip,
-        take: limit,
+        take: safeLimit,
         include: {
           user: {
             include: {
@@ -78,8 +79,8 @@ export async function getMembers(page = 1, limit = 10, search = "", filterBranch
       meta: {
         total,
         page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        limit: safeLimit,
+        totalPages: Math.ceil(total / safeLimit),
       },
     };
   } catch (error: unknown) {
@@ -106,7 +107,11 @@ export async function getMemberById(id: string) {
     const member = await prisma.member.findUnique({
       where: { id },
       include: {
-        user: true,
+        user: {
+          include: {
+            branch: true,
+          },
+        },
         subscription: {
           include: {
             plan: true,
@@ -149,25 +154,24 @@ export async function createMember(formData: any) {
     const { branchId: contextBranchId } = await getBranchContext();
     const branchId = formData.branchId || contextBranchId;
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: formData.email }, { phone: formData.phone }],
-      },
-    });
-
-    if (existingUser) {
-      return { success: false, error: "A user with this email or phone already exists." };
-    }
-
     // Hash default password
     const hashedPassword = await bcrypt.hash(
       SECURITY.DEFAULT_TEMP_PASSWORD(),
       SECURITY.BCRYPT_ROUNDS,
     );
 
-    // Create User and Member in a transaction
+    // Atomic Transaction: Concurrency-safe existence check and dual record creation
     const result = await prisma.$transaction(async (tx) => {
+      const existingUser = await tx.user.findFirst({
+        where: {
+          OR: [{ email: formData.email }, { phone: formData.phone }],
+        },
+      });
+
+      if (existingUser) {
+        throw new Error("A user with this email or phone already exists.");
+      }
+
       const user = await tx.user.create({
         data: {
           email: formData.email,

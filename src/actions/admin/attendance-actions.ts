@@ -7,7 +7,8 @@ import { auth } from "@/auth";
 
 export async function getAttendanceLogs(page = 1, limit = 10, search = "") {
   try {
-    const skip = (page - 1) * limit;
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const skip = (Math.max(1, page) - 1) * safeLimit;
 
     const { branchId } = await getBranchContext();
 
@@ -83,28 +84,44 @@ export async function checkInMember(memberId: string) {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const activeSession = await prisma.attendance.findFirst({
-      where: {
-        memberId,
-        date: { gte: today },
-      },
-    });
-
-    if (activeSession) {
-      return { success: false, error: "Member is already checked in today." };
-    }
-
     const now = new Date();
-    const attendance = await prisma.attendance.create({
-      data: {
-        member: { connect: { id: memberId } },
-        date: now,
-        checkIn: now,
-        status: "PRESENT",
-      },
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const cooldownWindow = new Date(now.getTime() - 60_000); // 60s debounce
+
+    // Atomic Transaction: Check-in idempotency & single-session enforcement
+    const attendance = await prisma.$transaction(async (tx) => {
+      // 1. Double-scan cooldown protection (Idempotency)
+      const recentScan = await tx.attendance.findFirst({
+        where: {
+          memberId,
+          checkIn: { gte: cooldownWindow },
+        },
+      });
+      if (recentScan) {
+        return recentScan; // Safely return existing check-in without duplicating
+      }
+
+      // 2. Active daily session check
+      const activeSession = await tx.attendance.findFirst({
+        where: {
+          memberId,
+          date: { gte: today },
+          checkOut: null,
+        },
+      });
+
+      if (activeSession) {
+        throw new Error("Member is already checked in today.");
+      }
+
+      return tx.attendance.create({
+        data: {
+          member: { connect: { id: memberId } },
+          date: today,
+          checkIn: now,
+          status: "PRESENT",
+        },
+      });
     });
 
     revalidatePath("/admin/attendance");
@@ -125,11 +142,15 @@ export async function checkOutMember(attendanceId: string) {
     return { success: false, error: "Unauthorized" };
   }
   try {
-    const attendance = await prisma.attendance.update({
-      where: { id: attendanceId },
-      data: {
-        checkOut: new Date(),
-      },
+    const attendance = await prisma.$transaction(async (tx) => {
+      const record = await tx.attendance.findUnique({ where: { id: attendanceId } });
+      if (!record) throw new Error("Attendance record not found");
+      if (record.checkOut) return record; // Idempotent return
+
+      return tx.attendance.update({
+        where: { id: attendanceId },
+        data: { checkOut: new Date() },
+      });
     });
 
     revalidatePath("/admin/attendance");
