@@ -29,7 +29,7 @@
 1. [Platform Overview](#1-platform-overview)
 2. [Multi-Tenant Architecture & Data Isolation](#2-multi-tenant-architecture--data-isolation)
 3. [6 Role Dashboards & Feature Surface](#3-6-role-dashboards--feature-surface)
-4. [Hardened Platform Modules](#4-hardened-platform-modules)
+4. [Hardened Platform Modules & Workflows](#4-hardened-platform-modules--workflows)
 5. [Technology Stack](#5-technology-stack)
 6. [Core Code Implementation Highlights](#6-core-code-implementation-highlights)
 7. [Environment Setup & Installation](#7-environment-setup--installation)
@@ -58,34 +58,30 @@ GymFlow is a full-featured B2B multi-tenant Software-as-a-Service (SaaS) web app
 
 GymFlow employs a multi-tiered isolation strategy designed for shared database efficiency with strict security boundaries:
 
-```
-+-------------------------------------------------------------------+
-|                     Client Layer (Next.js 15)                     |
-|  /login   /admin   /receptionist   /trainer   /member   /worker   |
-+-------------------------------------------------------------------+
-                                  |
-                                  v
-+-------------------------------------------------------------------+
-|               Next.js Edge Middleware (Edge Runtime)              |
-|   • Hostname & Tenant Resolution                                  |
-|   • In-Memory HMR-Safe Tenant Cache (globalThis.tenantCache)      |
-|   • Suspended Workspace Lockout Redirection                       |
-+-------------------------------------------------------------------+
-                                  |
-                                  v
-+-------------------------------------------------------------------+
-|                  Server Actions & Security Layer                  |
-|   • Role-Based Access Control (RBAC Permission Matrix)            |
-|   • Parameterized Session Context Injection via withTenantRLS     |
-|   • Concurrency-Safe Atomic $transaction Blocks                   |
-+-------------------------------------------------------------------+
-                                  |
-                                  v
-+-------------------------------------------------------------------+
-|                   PostgreSQL Database (Prisma ORM)                |
-|   • SET LOCAL app.current_tenant_id session variable              |
-|   • Row-Level Security (RLS) Filtering Policies                   |
-+-------------------------------------------------------------------+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User / Client
+    participant MW as Edge Middleware
+    participant Action as Server Action / Route
+    participant RLS as withTenantRLS Helper
+    participant DB as PostgreSQL Database
+
+    User->>MW: Incoming HTTP Request (Host / Cookie)
+    MW->>MW: Resolve & Cache Tenant ID (HMR-Safe globalThis)
+    alt Workspace Suspended
+        MW-->>User: 307 Redirect to /locked
+    else Workspace Active
+        MW->>Action: Forward Request with Tenant Context
+    end
+
+    Action->>RLS: Execute Mutation (tenantId, callback)
+    RLS->>DB: BEGIN Transaction
+    RLS->>DB: SELECT set_config('app.current_tenant_id', tenantId, true)
+    RLS->>DB: Run Queries (Scoped strictly by Postgres RLS)
+    DB-->>RLS: Commit & Return Scoped Results
+    RLS-->>Action: Typed Mutation Payload
+    Action-->>User: Revalidated UI View
 ```
 
 ### 2.1 Database Session RLS (`withTenantRLS`)
@@ -115,16 +111,48 @@ All sub-routes under the role trees are active Next.js Server Components with `a
 
 ---
 
-## 4. HARDENED PLATFORM MODULES
+## 4. HARDENED PLATFORM MODULES & WORKFLOWS
 
-### 4.1 Subscription Dunning Engine ([`src/lib/dunning-service.ts`](file:///c:/Personal%20Projects/eagle-gym-portal/src/lib/dunning-service.ts))
-* Automates membership lifecycle states when recurring charges fail: transitions from `ACTIVE` $\rightarrow$ `GRACE` (7 days) $\rightarrow$ `CANCELLED`.
-* Dispatches email notifications with direct checkout recovery links.
-* Restores active subscription and member statuses immediately upon payment recovery webhook.
+### 4.1 Subscription Dunning Lifecycle ([`src/lib/dunning-service.ts`](file:///c:/Personal%20Projects/eagle-gym-portal/src/lib/dunning-service.ts))
+Automates membership lifecycle transitions and recovery when recurring payments fail:
 
-### 4.2 Turnstile Check-In Idempotency ([`src/actions/admin/attendance-actions.ts`](file:///c:/Personal%20Projects/eagle-gym-portal/src/actions/admin/attendance-actions.ts))
-* 60-second atomic cooldown window on QR card scans to prevent double-tap gate openings.
-* Enforces single-active-session constraints per member per day.
+```mermaid
+stateDiagram-v2
+    [*] --> ACTIVE: Subscription Purchased
+
+    ACTIVE --> GRACE: Razorpay Webhook (payment.failed)
+    
+    state GRACE {
+        [*] --> SendRecoveryEmail: Dispatch In-App Alert & Recovery Link
+        SendRecoveryEmail --> AwaitPayment: 7-Day Grace Window
+    }
+
+    GRACE --> ACTIVE: Razorpay Webhook (payment.captured / recovery)
+    GRACE --> CANCELLED: Cron Expiry (grace period > 7 days)
+
+    CANCELLED --> ACTIVE: Member Re-Subscribes
+```
+
+---
+
+### 4.2 Turnstile Check-In & Idempotency ([`src/actions/admin/attendance-actions.ts`](file:///c:/Personal%20Projects/eagle-gym-portal/src/actions/admin/attendance-actions.ts))
+Protects front-desk scanners from rapid double-tapping and enforces active session integrity:
+
+```mermaid
+flowchart TD
+    Scan([Member Scans QR Code / Enters ID]) --> Cooldown{Scanned within last 60s?}
+    
+    Cooldown -- Yes (Duplicate Tap) --> SafeReturn[Return Existing Check-In Log (Idempotent 200)]
+    
+    Cooldown -- No --> ActiveCheck{Already Checked In Today without Checkout?}
+    
+    ActiveCheck -- Yes --> Reject[Reject Check-In: Active Session in Progress]
+    ActiveCheck -- No --> CreateRecord[Atomic Tx: Insert Attendance Record & Unlock Turnstile]
+    
+    CreateRecord --> Broadcast[Update Live Receptionist Activity Stream]
+```
+
+---
 
 ### 4.3 Retail POS Concurrency Locks ([`src/actions/admin/inventory-actions.ts`](file:///c:/Personal%20Projects/eagle-gym-portal/src/actions/admin/inventory-actions.ts))
 * Atomic product stock checks and decrements within `$transaction` blocks to prevent negative inventory under concurrent counter checkouts.
